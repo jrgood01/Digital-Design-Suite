@@ -42,7 +42,10 @@ export const MenuBar = ({ props } : {props: MenuBarProps}) => {
         (event.target as HTMLElement).style.color = constants.MenuBar.FontColor;
     }
 
- 
+    function forceUpdate(){
+        const [value, setValue] = useState(0); // integer state
+        return () => setValue(value => value + 1); // update the state to force render
+    }
     return (
         <div style={MenuBarStyle}>
             {props.elements.map((subMenu, i) => (
@@ -52,7 +55,9 @@ export const MenuBar = ({ props } : {props: MenuBarProps}) => {
                 style={MenuBarDivTopStyle} 
                 onMouseOver={menuElementMouseEnterHandler}
                 onMouseOut={menuElementMouseLeaveHandler}
-                onClick={(e) => {setActiveDropDown(i.toString())}}>
+                onClick={(e) => {
+                        setActiveDropDown(i.toString());
+                    }}>
 
                     <h1>
                         {subMenu.title}

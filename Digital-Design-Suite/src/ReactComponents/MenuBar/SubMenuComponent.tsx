@@ -26,9 +26,13 @@ export const SubMenu = ({props} : {props : SubMenuProps}) => {
         useEffect(() => {
 
             function handleClickOutside(event : MouseEvent) {
-                if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
+                let clickIsInParentBar = ref.current.parentElement.contains(event.target as HTMLElement);
+                if (!ref.current.contains(event.target as HTMLElement) && !clickIsInParentBar) {
                     ref.current.style.visibility= "hidden";
+                } else {
+                    ref.current.style.visibility= "visible";
                 }
+
             }
     
             document.addEventListener("mousedown", handleClickOutside);
