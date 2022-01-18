@@ -1,3 +1,10 @@
+//Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
+//
+//  You may not re-dsitrubte this software with modification or use this software 
+//  for commercial purposes without written permission from the owner
+//
+//Copyright Jacob R. Haygood 2022
+
 import React, { useState, useEffect, useRef, LegacyRef} from 'react';
 import CSS from 'csstype';
 import 'typeface-montserrat-alternates';
@@ -36,7 +43,6 @@ export const MenuBar = ({ props } : {props: MenuBarProps}) => {
     const menuElementMouseEnterHandler  = (event: React.MouseEvent<HTMLElement>) => {
         (event.target as HTMLElement).style.color = constants.MenuBar.FontColor;
     }
-    
     
     const menuElementMouseLeaveHandler  = (event: React.MouseEvent<HTMLElement>) => {
         (event.target as HTMLElement).style.color = constants.MenuBar.FontColor;
