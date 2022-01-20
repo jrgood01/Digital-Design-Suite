@@ -10,13 +10,16 @@ import * as ReactDOM from 'react-dom';
 import './default.css';
 import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
-import {MenuBarProps} from "./ReactComponents/MenuBar/MenuBarComponent";
-import {MenuBarElement} from "./ReactComponents/MenuBar/MenuBarElement";
+import { ToolBoxWindow } from './ReactComponents/WindowComponents/ToolBoxWindow';
 
 
 function render() {
+
+  const containerRef = React.createRef<HTMLDivElement>();
+
   const subMenuArr: SubMenuProps[] = [
     { title: "File", values: [
+        {title: "New", action:() => {}},
         {title: "Save", action:() => {}},
         {title: "Open", action:() => {}}
       ]
@@ -34,9 +37,21 @@ function render() {
       ]
     }
   ];
+
+  let topDivRef = React.createRef<HTMLDivElement>();
+
   ReactDOM.render(
-    <div style={{width:"100vw", height: "100vh", background:"#141216"}}>
+    <div style={{width:"100vw", height: "100vh"}} ref={topDivRef}>
+
       <MenuBar props={{elements:subMenuArr}}/>
+        <div ref = {containerRef} style={{
+              width : "100%",
+              height : "100%",
+              background:"#1c1a24"
+        }}>
+
+        </div>
+      
     </div>
   , document.body
   );

@@ -89,6 +89,7 @@
     "get-google-fonts": "^1.2.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-draggable": "^4.4.4",
     "typeface-lato": "^1.1.13",
     "typeface-montserrat-alternates": "^1.1.13",
     "typeface-raleway": "^1.1.13",
