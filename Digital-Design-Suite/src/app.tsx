@@ -10,8 +10,6 @@ import * as ReactDOM from 'react-dom';
 import './default.css';
 import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
-import { ToolBoxWindow } from './ReactComponents/WindowComponents/ToolBoxWindow';
-
 
 function render() {
 
