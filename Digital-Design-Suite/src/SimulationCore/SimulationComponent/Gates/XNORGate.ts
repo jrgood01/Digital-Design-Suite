@@ -5,7 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-class ORGate extends SimulationComponent {
+class XNORGate extends SimulationComponent {
     inputs : number;
     bitWidth : number;
 
