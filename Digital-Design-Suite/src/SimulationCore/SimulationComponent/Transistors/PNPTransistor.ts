@@ -1,3 +1,10 @@
+//Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
+//
+//  You may not re-dsitrubte this software with modification or use this software 
+//  for commercial purposes without written permission from the owner
+//
+//Copyright Jacob R. Haygood 2022
+
 class PNPTransistor extends SimulationComponent {
     constructor() {
         super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));
