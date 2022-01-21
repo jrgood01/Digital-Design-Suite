@@ -5,6 +5,8 @@
 //
 //Copyright Jacob R. Haygood 2022
 
+import {SimulationComponent} from "../SimulationComponent"
+
 class PNPTransistor extends SimulationComponent {
     constructor() {
         super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));

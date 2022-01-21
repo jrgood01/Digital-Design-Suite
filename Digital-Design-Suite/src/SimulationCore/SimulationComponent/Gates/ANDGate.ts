@@ -5,6 +5,8 @@
 //
 //Copyright Jacob R. Haygood 2022
 
+import {SimulationComponent} from "../SimulationComponent"
+
 class ANDGate extends SimulationComponent {
     inputs : number;
     bitWidth : number;
