@@ -6,6 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "../SimulationComponent"
+import { wireState } from "../../WireStates";
 
 class XNORGate extends SimulationComponent {
     inputs : number;
@@ -21,13 +22,17 @@ class XNORGate extends SimulationComponent {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
             let numOn = 0;
             for (let line = 0; line < this.inputs; line ++) {
-                if (this.input.getLineBit(line, bit) == true) {
+                if (this.input.getLineBit(line, bit) == wireState.High) {
                     numOn ++;
                 }
             }
             if (numOn == this.inputs || numOn == 0) {
-                this.output.setLineBit(0, bit, false);
+                this.output.setLineBit(0, bit, wireState.Low);
             }
         }
+    }
+
+    draw() {
+        
     }
 }

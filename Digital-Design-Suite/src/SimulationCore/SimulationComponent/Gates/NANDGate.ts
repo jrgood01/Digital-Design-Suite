@@ -6,6 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "../SimulationComponent"
+import { wireState } from "../../WireStates";
 
 class NANDGate extends SimulationComponent {
     inputs : number;
@@ -19,13 +20,17 @@ class NANDGate extends SimulationComponent {
 
     simulate() {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
-            let outputBit = false;
+            let outputBit = wireState.Low;
             for (let line = 0; line < this.inputs; line ++) {
-                if (this.input.getLineBit(line, bit) == false) {
-                    outputBit = true;
+                if (this.input.getLineBit(line, bit) == wireState.Low) {
+                    outputBit = wireState.High;
                 }
             }
             this.output.setLineBit(0, bit, outputBit);
         }
+    }
+
+    draw() {
+        
     }
 }

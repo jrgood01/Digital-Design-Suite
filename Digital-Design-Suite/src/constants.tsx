@@ -6,7 +6,11 @@
 //Copyright Jacob R. Haygood 2022
 
 export const General = {
-    BgColor_1: 0x141216
+    BgColor_1: 0x141216,
+    componentColorFloat : 0xCC6666,
+    componentColorStandard : 0x22baff,
+    componentColorHigh : 0x11ff11,
+    componentColorLow : 0xbaffba
 }
 
 export const MenuBar = {

@@ -7,6 +7,7 @@
 
 import {ComponentConnection} from "./ComponentConnection"
 import {SimulationComponentIO} from "./SimulationComponentIO"
+import { wireState } from "../WireStates";
 
 export abstract class SimulationComponent {
     componentId : string;
@@ -25,6 +26,7 @@ export abstract class SimulationComponent {
     }
 
     abstract simulate(): void;
+    abstract draw() : void;
 
     simulateAndPass() {
         this.simulate();
@@ -71,7 +73,7 @@ export abstract class SimulationComponent {
         return this.output.getLineBit(lineNumber, bitNumber);
     }
 
-    setInputLine(lineNumber : number, value : Array<boolean>) {
+    setInputLine(lineNumber : number, value : Array<wireState>) {
         this.input.setLineValue(lineNumber, value);
     }
 

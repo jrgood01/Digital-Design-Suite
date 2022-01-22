@@ -5,10 +5,10 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationGraphicsComponent} from "./SimulationGraphics/Component/SimulationGraphicComponent"
+import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
 import {SimulationState} from "./SimulationState";
+import { NPNTransistor } from "./SimulationComponent/Transistors/NPNTransistor";
 import * as PIXI from "pixi.js"
-import { NPNTransistorGraphicsComponent } from "./SimulationGraphics/Component/Transistors/NPNTransistorGraphicsComponent";
 import * as constants from "../constants";
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
@@ -37,13 +37,13 @@ export class DigitalDesignSimulation extends PIXI.Application{
         
         window.addEventListener('resize', this.resizePixiSimulation);  
 
-        let v = new NPNTransistorGraphicsComponent(this.stage);
+        let v = new NPNTransistor(this.stage);
         this.simulationState.addComponent(v)
         this.renderer.backgroundColor = constants.General.BgColor_1
 
     }
 
-    addComponent(component : SimulationGraphicsComponent) {
+    addComponent(component : SimulationComponent) {
         this.simulationState.addComponent(component);
     }
 

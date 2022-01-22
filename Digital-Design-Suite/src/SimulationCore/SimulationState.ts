@@ -6,27 +6,27 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
-import {SimulationGraphicsComponent} from "./SimulationGraphics/Component/SimulationGraphicComponent"
+
 export class SimulationState {
-    components : Array<SimulationGraphicsComponent>;
+    components : Array<SimulationComponent>;
     private tickFrequency : number;
     private numComponents : number;
 
     constructor() {
-        this.components = new Array<SimulationGraphicsComponent>();
+        this.components = new Array<SimulationComponent>();
         this.numComponents = 0;
     }
 
-    addComponent(graphicsComponent : SimulationGraphicsComponent) {
-        graphicsComponent.component.componentId = this.numComponents.toString();
-        this.components.push(graphicsComponent);
+    addComponent(component : SimulationComponent) {
+        component.componentId = this.numComponents.toString();
+        this.components.push(component);
     }
 
     removeComponent(componentId : string) {
         let i = 0;
-        this.components.forEach((graphicsComponent : SimulationGraphicsComponent) => {
-            if (graphicsComponent.component.componentId == componentId) {
-                graphicsComponent.component.deleted = true;
+        this.components.forEach((component : SimulationComponent) => {
+            if (component.componentId == componentId) {
+                component.deleted = true;
                 delete this.components[i];
             }
         })

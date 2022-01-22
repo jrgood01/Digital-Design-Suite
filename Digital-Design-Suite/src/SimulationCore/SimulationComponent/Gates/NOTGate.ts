@@ -6,6 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "../SimulationComponent"
+import { wireState } from "../../WireStates";
 
 class NOTGate extends SimulationComponent {
     inputs : number;
@@ -19,8 +20,17 @@ class NOTGate extends SimulationComponent {
 
     simulate() {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
-            let outputBit = !this.input.getLineBit(0, bit);
+            let outputBit = wireState.Error;
+            if (this.input.getLineBit(0, bit) == wireState.High) {
+                outputBit = wireState.Low;
+            } else {
+                outputBit = wireState.High;
+            }
             this.output.setLineBit(0, bit, outputBit);
         }
+    }
+
+    draw() {
+        
     }
 }

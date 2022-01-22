@@ -5,6 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
+import { wireState } from "../../WireStates";
 import {SimulationComponent} from "../SimulationComponent"
 
 class NORGate extends SimulationComponent {
@@ -19,13 +20,17 @@ class NORGate extends SimulationComponent {
 
     simulate() {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
-            let outputBit = true;
+            let outputBit = wireState.Low;
             for (let line = 0; line < this.inputs; line ++) {
-                if (this.input.getLineBit(line, bit) == true) {
-                    outputBit = false;
+                if (this.input.getLineBit(line, bit) == wireState.High) {
+                    outputBit = wireState.Low;
                 }
             }
             this.output.setLineBit(0, bit, outputBit);
         }
+    }
+
+    draw() {
+        
     }
 }

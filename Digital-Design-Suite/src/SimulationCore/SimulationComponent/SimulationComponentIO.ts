@@ -5,15 +5,17 @@
 //
 //Copyright Jacob R. Haygood 2022
 
+import { wireState } from "../WireStates";
+
 export class SimulationComponentIO {
-    private _lineValues : Array<Array<boolean>>
+    private _lineValues : Array<Array<wireState>>
 
     constructor(inputLinesNum : number, bitWidths : Array<number>) {
-        this._lineValues = new Array<Array<boolean>>()
+        this._lineValues = new Array<Array<wireState>>()
         for (let i = 0; i < inputLinesNum; i ++) {
-            this._lineValues.push(new Array<boolean>());
+            this._lineValues.push(new Array<wireState>());
             for (let l = 0; l < inputLinesNum; l ++) {
-                this._lineValues[i].push(false);
+                this._lineValues[i].push(wireState.Float);
             }
         }
     }
@@ -26,18 +28,18 @@ export class SimulationComponentIO {
         return this._lineValues[lineNumber][bitNumber];
     }
 
-    setLineBit(lineNumber : number, bitNumber : number, value : boolean) {
+    setLineBit(lineNumber : number, bitNumber : number, value : wireState) {
         this._lineValues[lineNumber][bitNumber] = value;
     }
 
-    setLineValue(lineNumber : number, value : Array<boolean>) {
+    setLineValue(lineNumber : number, value : Array<wireState>) {
         this._lineValues[lineNumber] = value;
     }
 
     addLine(bitWidth : number) {
-        const addLine : Array<boolean> = new Array<boolean>();
-        //Set line to false initially
-        for (let i = 0; i < bitWidth ; i ++) { addLine[i] = false;} 
+        const addLine : Array<wireState> = new Array<wireState>();
+        //Set line to float initially
+        for (let i = 0; i < bitWidth ; i ++) { addLine[i] = wireState.Float;} 
         this._lineValues.push(addLine);
     }
 
@@ -51,7 +53,7 @@ export class SimulationComponentIO {
 
         if (diff > 0) {
             for (let i = 0; i < diff; i ++) {
-                this._lineValues[lineNumber].push(false);
+                this._lineValues[lineNumber].push(wireState.Float);
             }
         } else {
             for (let i = 0; i < -diff; i ++) {
