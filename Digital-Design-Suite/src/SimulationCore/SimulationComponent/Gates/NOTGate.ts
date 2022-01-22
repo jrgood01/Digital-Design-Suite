@@ -7,15 +7,17 @@
 
 import {SimulationComponent} from "../SimulationComponent"
 import { wireState } from "../../WireStates";
+import * as constants from "../../../constants"
+import * as PIXI from 'pixi.js'
 
-class NOTGate extends SimulationComponent {
-    inputs : number;
+export class NOTGate extends SimulationComponent {
     bitWidth : number;
 
-    constructor(bitWidth : number, numInputs : number) {
-        super(1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1));
-        this.inputs = numInputs;
+    constructor(bitWidth : number, stage : PIXI.Container) {
+        super(1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1), stage);
         this.bitWidth = bitWidth;
+        this.x = 500;
+        this.y = 500;
     }
 
     simulate() {
@@ -30,7 +32,47 @@ class NOTGate extends SimulationComponent {
         }
     }
 
-    draw() {
-        
+    getInputVal() {
+        return this.getInputLineBit(0, 0);
     }
+
+    getOutputVal() {
+        return this.getOutputLineBit(0, 0);
+    }
+
+    draw() {
+        const colors = {
+            componentBody : constants.General.componentColorStandard,
+            inputWire : this.getInputVal(),
+            outputWire : this.getOutputVal()
+        }
+
+        let scaler = .5;
+        let componentLineWidth = scaler * 10;
+        let componentLength = scaler * 200;
+        let componentHeight = scaler * 200; 
+
+        let cornerX = this.x - (componentLength / 2);
+        let cornerY = this.y - (componentHeight / 2)
+
+        this.componentTemplate.clear();
+        this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
+            .moveTo(cornerX, cornerY)
+            .lineTo(cornerX, cornerY + componentHeight);
+        this.componentTemplate.lineStyle(componentLineWidth, colors.inputWire)
+            .moveTo(cornerX, cornerY + (componentHeight / 2))
+            .lineTo(cornerX - 70 * scaler, cornerY + (componentHeight / 2));
+        this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
+                .moveTo(cornerX, cornerY + 3.9 * scaler)
+                .lineTo(cornerX + componentLength, cornerY + (componentHeight / 2));
+        this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
+                .moveTo(cornerX, cornerY + componentHeight - 3.9 * scaler)
+                .lineTo(cornerX + componentLength, cornerY + (componentHeight / 2));   
+        this.componentTemplate.lineStyle(componentLineWidth, colors.outputWire)
+                .moveTo(cornerX + componentLength, cornerY + (componentHeight / 2))
+                .lineTo(cornerX + componentLength + 70 * scaler, cornerY + (componentHeight / 2));
+
+    }
+
+    
 }

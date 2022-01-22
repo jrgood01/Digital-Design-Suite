@@ -7,7 +7,7 @@
 
 export const General = {
     BgColor_1: 0x141216,
-    componentColorFloat : 0xCC6666,
+    componentColorError : 0xCC6666,
     componentColorStandard : 0x22baff,
     componentColorHigh : 0x11ff11,
     componentColorLow : 0xbaffba

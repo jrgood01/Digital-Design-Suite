@@ -7,9 +7,10 @@
 
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
 import {SimulationState} from "./SimulationState";
-import { NPNTransistor } from "./SimulationComponent/Transistors/NPNTransistor";
+import { NOTGate } from "./SimulationComponent/Gates/NOTGate";
 import * as PIXI from "pixi.js"
 import * as constants from "../constants";
+import { Transistor } from "./SimulationComponent/Transistors/Transistor";
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
     private container : HTMLDivElement;
@@ -37,7 +38,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         
         window.addEventListener('resize', this.resizePixiSimulation);  
 
-        let v = new NPNTransistor(this.stage);
+        let v = new NOTGate(1, this.stage)
         this.simulationState.addComponent(v)
         this.renderer.backgroundColor = constants.General.BgColor_1
 

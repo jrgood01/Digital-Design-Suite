@@ -14,7 +14,7 @@ export class SimulationComponentIO {
         this._lineValues = new Array<Array<wireState>>()
         for (let i = 0; i < inputLinesNum; i ++) {
             this._lineValues.push(new Array<wireState>());
-            for (let l = 0; l < inputLinesNum; l ++) {
+            for (let l = 0; l < bitWidths[i]; l ++) {
                 this._lineValues[i].push(wireState.Float);
             }
         }

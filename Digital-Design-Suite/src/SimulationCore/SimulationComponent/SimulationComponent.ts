@@ -8,6 +8,7 @@
 import {ComponentConnection} from "./ComponentConnection"
 import {SimulationComponentIO} from "./SimulationComponentIO"
 import { wireState } from "../WireStates";
+import * as PIXI from 'pixi.js'
 
 export abstract class SimulationComponent {
     componentId : string;
@@ -18,12 +19,20 @@ export abstract class SimulationComponent {
     componentOutputMap : Map<Number, ComponentConnection>;
     deleted : boolean;
 
-    constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>) {
+    x : number;
+    y : number;
+
+    componentTemplate : PIXI.Graphics;
+
+    constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
         this.componentOutputMap = new Map<Number, ComponentConnection>();
         this.deleted = false;
+        this.componentTemplate = new PIXI.Graphics();
+        stage.addChild(this.componentTemplate);
     }
+
 
     abstract simulate(): void;
     abstract draw() : void;

@@ -9,16 +9,20 @@ import * as PIXI from 'pixi.js'
 import * as constants from "../../../constants"
 import {SimulationComponent} from "../SimulationComponent"
 
-export class NPNTransistor extends SimulationComponent {
-    componentTemplate : PIXI.Graphics;
-    x : number;
-    y : number;
+export enum TransistorType {
+    NPN,
+    PNP
+}
 
-    constructor(stage : PIXI.Container) {
-        super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));
-        this.componentTemplate = new PIXI.Graphics();
-        stage.addChild(this.componentTemplate);
+export class Transistor extends SimulationComponent {
+    type : TransistorType;
+
+    constructor(stage : PIXI.Container, x : number, y : number) {
+        super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1), stage);
+        this.x = x;
+        this.y = y;
     }
+
     simulate() {
         let collector = this.input.getLineBit(0, 0);
         let base = this.input.getLineBit(1, 0);
@@ -35,25 +39,27 @@ export class NPNTransistor extends SimulationComponent {
     }
 
     getEmitter() {
-        return this.output.getLineBit(1, 0);
+        return this.output.getLineBit(0, 0);
     }
 
     draw() {
+        this.componentTemplate.clear();
         let standard = constants.General.componentColorStandard;
         let colors = {
-            baseConnector : standard,
-            collectorConnector : constants.General.componentColorLow,
+            baseConnector : constants.General.componentColorError,
+            collectorConnector : constants.General.componentColorLow, //this.getCollector(),
             emitterConnector : constants.General.componentColorHigh,
 
             base : standard,
-            collector : constants.General.componentColorLow,
-            emitter : constants.General.componentColorHigh,
+            collector : this.getCollector(),
+            emitter : this.getEmitter(),
 
             circle : standard
         }
 
-        let centerX = 600;
-        let centerY = 400;
+
+        let centerX = this.x;
+        let centerY = this.y;
         let scaler = .5;
 
         let circleRadius = scaler * 100;
