@@ -9,13 +9,15 @@ import {SimulationComponent} from "../SimulationComponent"
 import { wireState } from "../../WireStates";
 import * as constants from "../../../constants"
 import * as PIXI from 'pixi.js'
-
+import {SimulationState} from "../../SimulationState"
 export class NOTGate extends SimulationComponent {
     bitWidth : number;
+    simulationState : SimulationState;
 
-    constructor(bitWidth : number, stage : PIXI.Container) {
+    constructor(bitWidth : number, stage : PIXI.Container, simulationState : SimulationState) {
         super(1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1), stage);
         this.bitWidth = bitWidth;
+        this.simulationState = simulationState;
         this.x = 500;
         this.y = 500;
     }
@@ -44,11 +46,12 @@ export class NOTGate extends SimulationComponent {
         const colors = {
             componentBody : constants.General.componentColorStandard,
             inputWire : this.getInputVal(),
-            outputWire : this.getOutputVal()
+            outputWire : constants.General.componentColorError
         }
 
-        let scaler = .5;
+        let scaler = 1;
         let componentLineWidth = scaler * 10;
+        let wireLineWidth = scaler * 7;
         let componentLength = scaler * 200;
         let componentHeight = scaler * 200; 
 
@@ -59,7 +62,7 @@ export class NOTGate extends SimulationComponent {
         this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
             .moveTo(cornerX, cornerY)
             .lineTo(cornerX, cornerY + componentHeight);
-        this.componentTemplate.lineStyle(componentLineWidth, colors.inputWire)
+        this.componentTemplate.lineStyle(wireLineWidth, colors.inputWire)
             .moveTo(cornerX, cornerY + (componentHeight / 2))
             .lineTo(cornerX - 70 * scaler, cornerY + (componentHeight / 2));
         this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
@@ -68,7 +71,7 @@ export class NOTGate extends SimulationComponent {
         this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
                 .moveTo(cornerX, cornerY + componentHeight - 3.9 * scaler)
                 .lineTo(cornerX + componentLength, cornerY + (componentHeight / 2));   
-        this.componentTemplate.lineStyle(componentLineWidth, colors.outputWire)
+        this.componentTemplate.lineStyle(wireLineWidth, colors.outputWire)
                 .moveTo(cornerX + componentLength, cornerY + (componentHeight / 2))
                 .lineTo(cornerX + componentLength + 70 * scaler, cornerY + (componentHeight / 2));
 

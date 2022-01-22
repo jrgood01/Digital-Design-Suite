@@ -6,14 +6,29 @@
 //Copyright Jacob R. Haygood 2022
 
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
+
+export enum MouseMode {
+    PAN,
+    ZOOM,
+    SELECT
+}
+
 export class SimulationState {
     components : Array<SimulationComponent>;
+    SelectedComponents : Array<SimulationComponent>;
     private tickFrequency : number;
     private numComponents : number;
+    private scale : number;
+    private mode : MouseMode;
+    simulationFocused : boolean;
+    isDragging : boolean;
+    isPanning : boolean;
 
     constructor() {
         this.components = new Array<SimulationComponent>();
         this.numComponents = 0;
+        this.scale = 1;
+        this.mode = MouseMode.SELECT;
     }
 
     addComponent(component : SimulationComponent) {
@@ -37,5 +52,21 @@ export class SimulationState {
 
     getTickFrequency() {
         return this.tickFrequency;
+    }
+
+    getScale () {
+        return this.scale;
+    }
+
+    setScale(newScale : number) {
+        this.scale = newScale;
+    }
+
+    setMode(mode : MouseMode) {
+        this.mode = mode;
+    }
+
+    getMode() {
+        return this.mode;
     }
 }

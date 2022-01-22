@@ -39,18 +39,11 @@ function render() {
 
 
   ReactDOM.render(
-    <div style={{width:"100vw", height: "100vh"}}>
 
       <MenuBar props={{elements:subMenuArr}}/>
-        <div ref = {containerRef} style={{
-              width : "100%",
-              height : "100%",
-              background:"#1c1a24"
-        }}>
 
-        </div>
       
-    </div>
+
   , document.body
   );
 

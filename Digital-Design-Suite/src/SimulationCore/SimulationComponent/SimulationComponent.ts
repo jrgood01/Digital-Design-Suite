@@ -22,6 +22,8 @@ export abstract class SimulationComponent {
     x : number;
     y : number;
 
+    selected : boolean;
+
     componentTemplate : PIXI.Graphics;
 
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
@@ -30,6 +32,7 @@ export abstract class SimulationComponent {
         this.componentOutputMap = new Map<Number, ComponentConnection>();
         this.deleted = false;
         this.componentTemplate = new PIXI.Graphics();
+        this.selected = false;
         stage.addChild(this.componentTemplate);
     }
 

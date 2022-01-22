@@ -10,7 +10,8 @@ export const General = {
     componentColorError : 0xCC6666,
     componentColorStandard : 0x22baff,
     componentColorHigh : 0x11ff11,
-    componentColorLow : 0xbaffba
+    componentColorLow : 0xbaffba,
+    selectedColor : 0x99EEFF
 }
 
 export const MenuBar = {

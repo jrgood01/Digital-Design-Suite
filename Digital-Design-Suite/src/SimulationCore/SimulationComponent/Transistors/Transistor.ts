@@ -7,6 +7,7 @@
 
 import * as PIXI from 'pixi.js'
 import * as constants from "../../../constants"
+import { SimulationState } from '../../SimulationState';
 import {SimulationComponent} from "../SimulationComponent"
 
 export enum TransistorType {
@@ -16,11 +17,16 @@ export enum TransistorType {
 
 export class Transistor extends SimulationComponent {
     type : TransistorType;
+    simulationState : SimulationState;
 
-    constructor(stage : PIXI.Container, x : number, y : number) {
+    constructor(stage : PIXI.Container, x : number, y : number, simulationState : SimulationState) {
         super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1), stage);
+        
+        this.simulationState = simulationState;
         this.x = x;
         this.y = y;
+        this.componentTemplate.interactive = true;
+        this.componentTemplate.cursor = "pointer"
     }
 
     simulate() {
@@ -46,21 +52,21 @@ export class Transistor extends SimulationComponent {
         this.componentTemplate.clear();
         let standard = constants.General.componentColorStandard;
         let colors = {
-            baseConnector : constants.General.componentColorError,
-            collectorConnector : constants.General.componentColorLow, //this.getCollector(),
-            emitterConnector : constants.General.componentColorHigh,
+            baseConnector : this.selected ? constants.General.selectedColor : constants.General.componentColorError,
+            collectorConnector : this.selected ? constants.General.selectedColor : constants.General.componentColorLow, //this.getCollector(),
+            emitterConnector : this.selected ? constants.General.selectedColor : constants.General.componentColorError,
 
-            base : standard,
-            collector : this.getCollector(),
-            emitter : this.getEmitter(),
+            base : this.selected ? constants.General.selectedColor : standard,
+            collector : this.selected ? constants.General.selectedColor : this.getCollector(),
+            emitter : this.selected ? constants.General.selectedColor : this.getEmitter(),
 
-            circle : standard
+            circle : this.selected ? constants.General.selectedColor : this.getCollector(), standard
         }
 
 
         let centerX = this.x;
         let centerY = this.y;
-        let scaler = .5;
+        let scaler = 1;
 
         let circleRadius = scaler * 100;
         let circuleWidth = scaler * 10;
@@ -126,5 +132,9 @@ export class Transistor extends SimulationComponent {
         this.componentTemplate.lineStyle(connectorLineWidth, colors.base)
             .moveTo(centerX - connectorLineToCenterLength, centerY - (connectorLineLength / 2))
             .lineTo(centerX - connectorLineToCenterLength, centerY + (connectorLineLength / 2));
+        this.componentTemplate.hitArea = new PIXI.Rectangle(
+            this.componentTemplate.getBounds().x, this.componentTemplate.getBounds().y,
+            this.componentTemplate.getBounds().width,
+            this.componentTemplate.getBounds().height)
     }
 }
