@@ -7,13 +7,14 @@
 
 import { wireState } from "../../WireStates";
 import {SimulationComponent} from "../SimulationComponent"
+import * as PIXI from 'pixi.js'
 
-class ANDGate extends SimulationComponent {
+export class ANDGate extends SimulationComponent {
     inputs : number;
     bitWidth : number;
 
-    constructor(bitWidth : number, numInputs : number) {
-        super(numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
+    constructor(bitWidth : number, numInputs : number, stage : PIXI.Container) {
+        super(numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1), stage);
         this.inputs = numInputs;
         this.bitWidth = bitWidth;
     }
@@ -31,6 +32,23 @@ class ANDGate extends SimulationComponent {
     }
 
     draw() {
+        let scaler = 1;
+        let componentLineWidth = scaler * 10;
+        let height = 200;
+        let lengthOne = 100;
+        let lengthTwo = 80;
+
+        this.componentTemplate.clear();
+        this.componentTemplate.lineStyle(componentLineWidth, 0xff0000)
+            .moveTo(160, 160)
+            .lineTo(160 + lengthOne, 160);
         
+        this.componentTemplate.lineStyle(componentLineWidth, 0xff0000)
+            .moveTo(160, 160 + height)
+            .lineTo(160 + lengthOne, 160 + height);
+
+        this.componentTemplate.beginFill(componentLineWidth, 0xff0000)    
+            .arcTo(160 + lengthOne, 160 + height, 160 + lengthOne + lengthTwo, 160 + (height / 2), 100)
+
     }
 }
