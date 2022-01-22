@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 export const General = {
-    BgColor_1:"#141216"
+    BgColor_1: 0x141216
 }
 
 export const MenuBar = {

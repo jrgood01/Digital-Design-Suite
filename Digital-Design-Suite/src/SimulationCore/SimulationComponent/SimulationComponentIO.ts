@@ -5,14 +5,15 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-class SimulationComponentIO {
+export class SimulationComponentIO {
     private _lineValues : Array<Array<boolean>>
 
     constructor(inputLinesNum : number, bitWidths : Array<number>) {
+        this._lineValues = new Array<Array<boolean>>()
         for (let i = 0; i < inputLinesNum; i ++) {
             this._lineValues.push(new Array<boolean>());
             for (let l = 0; l < inputLinesNum; l ++) {
-                this._lineValues[l].push(false);
+                this._lineValues[i].push(false);
             }
         }
     }

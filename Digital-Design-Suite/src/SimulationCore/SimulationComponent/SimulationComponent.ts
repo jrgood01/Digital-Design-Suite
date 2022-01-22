@@ -6,13 +6,14 @@
 //Copyright Jacob R. Haygood 2022
 
 import {ComponentConnection} from "./ComponentConnection"
+import {SimulationComponentIO} from "./SimulationComponentIO"
 
 export abstract class SimulationComponent {
-    x : number;
-    y : number;
     componentId : string;
+
     input : SimulationComponentIO;
     output : SimulationComponentIO;
+
     componentOutputMap : Map<Number, ComponentConnection>;
     deleted : boolean;
 

@@ -7,7 +7,7 @@
 
 import {SimulationComponent} from "../SimulationComponent"
 
-class NPNTransistor extends SimulationComponent {
+export class NPNTransistor extends SimulationComponent {
     constructor() {
         super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));
     }

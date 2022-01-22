@@ -6,24 +6,30 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
-
+import {SimulationGraphicsComponent} from "./SimulationGraphics/Component/SimulationGraphicComponent"
 export class SimulationState {
-    private components : Array<SimulationComponent>;
+    components : Array<SimulationGraphicsComponent>;
     private tickFrequency : number;
     private numComponents : number;
 
     constructor() {
-        this.components = new Array<SimulationComponent>();
+        this.components = new Array<SimulationGraphicsComponent>();
         this.numComponents = 0;
     }
 
-    addComponent(component : SimulationComponent) {
-        component.componentId = this.numComponents.toString();
-        this.components.push(component);
+    addComponent(graphicsComponent : SimulationGraphicsComponent) {
+        graphicsComponent.component.componentId = this.numComponents.toString();
+        this.components.push(graphicsComponent);
     }
 
     removeComponent(componentId : string) {
-        delete this.components[Number.parseInt(componentId)];
+        let i = 0;
+        this.components.forEach((graphicsComponent : SimulationGraphicsComponent) => {
+            if (graphicsComponent.component.componentId == componentId) {
+                graphicsComponent.component.deleted = true;
+                delete this.components[i];
+            }
+        })
     }
 
     setTickFrequency(frequency : number) {

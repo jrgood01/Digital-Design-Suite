@@ -10,7 +10,7 @@ import * as ReactDOM from 'react-dom';
 import './default.css';
 import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
-
+import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
 function render() {
 
   const containerRef = React.createRef<HTMLDivElement>();
@@ -36,10 +36,10 @@ function render() {
     }
   ];
 
-  let topDivRef = React.createRef<HTMLDivElement>();
+
 
   ReactDOM.render(
-    <div style={{width:"100vw", height: "100vh"}} ref={topDivRef}>
+    <div style={{width:"100vw", height: "100vh"}}>
 
       <MenuBar props={{elements:subMenuArr}}/>
         <div ref = {containerRef} style={{
@@ -53,6 +53,8 @@ function render() {
     </div>
   , document.body
   );
+
+  let simulation = new DigitalDesignSimulation(containerRef.current);
 }
 
 render();
