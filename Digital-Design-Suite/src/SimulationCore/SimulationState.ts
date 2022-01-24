@@ -15,20 +15,23 @@ export enum MouseMode {
 
 export class SimulationState {
     components : Array<SimulationComponent>;
-    SelectedComponents : Array<SimulationComponent>;
+    SelectedComponent : SimulationComponent;
     private tickFrequency : number;
     private numComponents : number;
     private scale : number;
     private mode : MouseMode;
+    stateChanged : boolean;
     simulationFocused : boolean;
     isDragging : boolean;
     isPanning : boolean;
+    isDraggingComponent : boolean;
 
     constructor() {
         this.components = new Array<SimulationComponent>();
         this.numComponents = 0;
         this.scale = 1;
         this.mode = MouseMode.SELECT;
+        this.stateChanged = true;
     }
 
     addComponent(component : SimulationComponent) {
