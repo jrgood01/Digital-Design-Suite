@@ -16,7 +16,7 @@ import { SimulationComponentIO } from "./SimulationComponent/SimulationComponent
 
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
-
+    simulationUpdateFrequency : number;
     ticker : PIXI.Ticker;
     interactionManager : InteractionManager;
     grid : PIXI.Graphics;
@@ -31,6 +31,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.onScroll = this.onScroll.bind(this);
         this.addComponent = this.addComponent.bind(this);
         this.simulationLoop = this.simulationLoop.bind(this);
+        this.runSimulation = this.runSimulation.bind(this);
 
         //Simulation state holds data about the simulation
         this.simulationState = new SimulationState();
@@ -62,8 +63,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
         let v = new NOTGate(1, this.stage, this.simulationState)
         let v2 = new Transistor(this.stage, 820, 500, this.simulationState);
-        this.simulationState.addComponent(v)
         this.simulationState.addComponent(v2)
+        this.simulationState.addComponent(v)
         this.renderer.backgroundColor = constants.General.BgColor_1
         
         //Add listeners for global events
@@ -71,6 +72,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
         document.addEventListener("mousedown", this.onMouseDown);
         document.addEventListener("mouseup", this.onMouseUp);
         document.addEventListener("mousemove", this.onMouseMove);  
+
+        this.simulationUpdateFrequency = 100;
+        setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
     }
 
     addComponent(component : SimulationComponent) {
@@ -114,6 +118,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
         this.simulationState.components.forEach((component : SimulationComponent) => {
             if (component.componentTemplate == hit) {
+                console.log("hit");
                 component.selected = true;
                 this.simulationState.isDraggingComponent = true;
                 this.simulationState.stateChanged = true;
@@ -153,6 +158,15 @@ export class DigitalDesignSimulation extends PIXI.Application{
         }
     }
 
+    runSimulation() {
+        this.simulationState.components.forEach((c : SimulationComponent) => {
+            c.passOutputs();
+        })
+
+        this.simulationState.components.forEach((c : SimulationComponent) => {
+            c.simulate();
+        })
+    }
     isInside(x : number, y : number, rect : DOMRect) {
         return (x >= rect.x && x <= rect.x + rect.width
             && y >= rect.y && rect.y <= rect.y + rect.height) 

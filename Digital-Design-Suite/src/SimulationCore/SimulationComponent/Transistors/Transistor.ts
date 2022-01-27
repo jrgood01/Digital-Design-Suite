@@ -8,6 +8,7 @@
 import * as PIXI from 'pixi.js'
 import * as constants from "../../../constants"
 import { SimulationState } from '../../SimulationState';
+import { wireState } from '../../WireStates';
 import {SimulationComponent} from "../SimulationComponent"
 
 export enum TransistorType {
@@ -17,23 +18,29 @@ export enum TransistorType {
 
 export class Transistor extends SimulationComponent {
     type : TransistorType;
-    simulationState : SimulationState;
 
     constructor(stage : PIXI.Container, x : number, y : number, simulationState : SimulationState) {
         super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1), stage);
-        
+        this.input.setLineBit(0, 0, wireState.Float);
+        this.input.setLineBit(0, 1, wireState.Float);
         this.simulationState = simulationState;
         this.x = x;
         this.y = y;
-        this.componentTemplate.interactive = true;
-        this.componentTemplate.cursor = "pointer"
     }
 
     simulate() {
         let collector = this.input.getLineBit(0, 0);
         let base = this.input.getLineBit(1, 0);
-        let emitter = collector && base;
-        this.output.setLineBit(0, 0, emitter);
+        let emitterHigh = collector == wireState.High && base == wireState.High;
+        if (emitterHigh) {
+            this.output.setLineBit(0, 0, wireState.High);
+        } else if (base == wireState.Error || collector == wireState.Error ||
+                    base == wireState.Float || collector == wireState.Float) {
+            this.output.setLineBit(0, 0, wireState.Error);
+        } else {
+            this.output.setLineBit(0, 0, wireState.Low);
+        }
+
     }
 
     getCollector() {
@@ -52,15 +59,15 @@ export class Transistor extends SimulationComponent {
         this.componentTemplate.clear();
         let standard = constants.General.componentColorStandard;
         let colors = {
-            baseConnector : this.selected ? constants.General.selectedColor : constants.General.componentColorError,
-            collectorConnector : this.selected ? constants.General.selectedColor : constants.General.componentColorLow, //this.getCollector(),
-            emitterConnector : this.selected ? constants.General.selectedColor : constants.General.componentColorError,
+            baseConnector : this.selected ? constants.General.selectedColor : this.getBase(),
+            collectorConnector : this.selected ? constants.General.selectedColor : this.getCollector(), //this.getCollector(),
+            emitterConnector : this.selected ? constants.General.selectedColor :this.getEmitter(),
 
             base : this.selected ? constants.General.selectedColor : standard,
             collector : this.selected ? constants.General.selectedColor : this.getCollector(),
             emitter : this.selected ? constants.General.selectedColor : this.getEmitter(),
 
-            circle : this.selected ? constants.General.selectedColor : this.getCollector(), standard
+            circle : this.selected ? constants.General.selectedColor : this.getCollector()
         }
 
 
@@ -125,6 +132,7 @@ export class Transistor extends SimulationComponent {
         let emitterConnectorWireStartY = emitterWireFinalY;
         let emitterConnectorWireFinalX = emitterWireFinalX;
         let emitterConnectorWireFinalY = emitterWireFinalY + connectorWireLengths;
+
         this.componentTemplate.lineStyle(emitterConnectorWireWidth, colors.emitterConnector)
             .moveTo(emitterConnectorWireStartX, emitterConnectorWireStartY)
             .lineTo(emitterConnectorWireFinalX, emitterConnectorWireFinalY);
@@ -132,9 +140,7 @@ export class Transistor extends SimulationComponent {
         this.componentTemplate.lineStyle(connectorLineWidth, colors.base)
             .moveTo(centerX - connectorLineToCenterLength, centerY - (connectorLineLength / 2))
             .lineTo(centerX - connectorLineToCenterLength, centerY + (connectorLineLength / 2));
-        this.componentTemplate.hitArea = new PIXI.Rectangle(
-            this.componentTemplate.getBounds().x, this.componentTemplate.getBounds().y,
-            this.componentTemplate.getBounds().width,
-            this.componentTemplate.getBounds().height)
+
+        this.updateHitArea();
     }
 }

@@ -7,11 +7,18 @@
 
 import {ComponentConnection} from "./ComponentConnection"
 import {SimulationComponentIO} from "./SimulationComponentIO"
+import { SimulationState } from '../SimulationState';
 import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
+import { Renderable } from "../Renderable";
 
-export abstract class SimulationComponent {
+/**
+ * Represents a simulated digital component
+ * Extend this class to create usable components
+ */
+export abstract class SimulationComponent implements Renderable{
     componentId : string;
+    simulationState : SimulationState;
 
     input : SimulationComponentIO;
     output : SimulationComponentIO;
@@ -32,6 +39,8 @@ export abstract class SimulationComponent {
         this.componentOutputMap = new Map<Number, ComponentConnection>();
         this.deleted = false;
         this.componentTemplate = new PIXI.Graphics();
+        this.componentTemplate.interactive = true;
+        this.componentTemplate.cursor = "pointer"
         this.selected = false;
         stage.addChild(this.componentTemplate);
     }
@@ -94,6 +103,13 @@ export abstract class SimulationComponent {
             {inputComponent : component, inputComponentLineNumber : inputLineNumber});
     }
 
+
+    updateHitArea() {
+        this.componentTemplate.hitArea = new PIXI.Rectangle(
+            this.componentTemplate.getBounds().x, this.componentTemplate.getBounds().y,
+            this.componentTemplate.getBounds().width,
+            this.componentTemplate.getBounds().height)
+    }
     passOutputs() {
         this.componentOutputMap.forEach((connection : ComponentConnection, key : number) => {
             if (connection.inputComponent.deleted) {

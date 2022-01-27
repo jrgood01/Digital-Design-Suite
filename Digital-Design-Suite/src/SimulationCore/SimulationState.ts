@@ -5,6 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
+import { Renderable } from "./Renderable";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 
 export enum MouseMode {
@@ -14,6 +15,7 @@ export enum MouseMode {
 }
 
 export class SimulationState {
+    renderable : Array<Renderable>;
     components : Array<SimulationComponent>;
     SelectedComponent : SimulationComponent;
     private tickFrequency : number;
@@ -37,6 +39,7 @@ export class SimulationState {
     addComponent(component : SimulationComponent) {
         component.componentId = this.numComponents.toString();
         this.components.push(component);
+        this.numComponents ++;
     }
 
     removeComponent(componentId : string) {

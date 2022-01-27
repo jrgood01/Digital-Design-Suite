@@ -16,6 +16,7 @@ export class NOTGate extends SimulationComponent {
 
     constructor(bitWidth : number, stage : PIXI.Container, simulationState : SimulationState) {
         super(1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1), stage);
+        this.input.setLineBit(0, 0, wireState.Float);
         this.bitWidth = bitWidth;
         this.simulationState = simulationState;
         this.x = 500;
@@ -27,11 +28,16 @@ export class NOTGate extends SimulationComponent {
             let outputBit = wireState.Error;
             if (this.input.getLineBit(0, bit) == wireState.High) {
                 outputBit = wireState.Low;
+            } else if (this.input.getLineBit(0, bit) == wireState.Float ||
+                       this.input.getLineBit(0, bit) == wireState.Error) {
+                outputBit = wireState.Error;
             } else {
                 outputBit = wireState.High;
             }
+            
             this.output.setLineBit(0, bit, outputBit);
         }
+        
     }
 
     getInputVal() {
@@ -39,14 +45,15 @@ export class NOTGate extends SimulationComponent {
     }
 
     getOutputVal() {
+        console.log(this.getOutputLineBit(0, 0))
         return this.getOutputLineBit(0, 0);
     }
 
     draw() {
         const colors = {
-            componentBody : constants.General.componentColorStandard,
-            inputWire : this.getInputVal(),
-            outputWire : constants.General.componentColorError
+            componentBody : this.selected ? constants.General.selectedColor : constants.General.componentColorStandard,
+            inputWire : this.selected ? constants.General.selectedColor : this.getInputVal(),
+            outputWire : this.selected ? constants.General.selectedColor : this.getOutputVal()
         }
 
         let scaler = 1;
@@ -75,6 +82,7 @@ export class NOTGate extends SimulationComponent {
                 .moveTo(cornerX + componentLength, cornerY + (componentHeight / 2))
                 .lineTo(cornerX + componentLength + 70 * scaler, cornerY + (componentHeight / 2));
 
+        this.updateHitArea();
     }
 
     
