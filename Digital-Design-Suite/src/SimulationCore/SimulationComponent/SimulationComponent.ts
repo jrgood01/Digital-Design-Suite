@@ -121,8 +121,11 @@ export abstract class SimulationComponent implements Renderable{
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.x += x;
                 wiringArea.graphic.y += y;
+                wiringArea.x += x;
+                wiringArea.y += y;
             });
         });      
+        console.log(this);
     }
 
     updateHitArea() {
