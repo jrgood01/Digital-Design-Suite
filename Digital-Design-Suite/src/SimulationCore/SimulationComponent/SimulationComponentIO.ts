@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import { wireState } from "../WireStates";
-
+import { SimulationComponent } from "./SimulationComponent";
 //SimulationComponentIO represnts the inputs or outputs to / from
 // a component. It contains one feild : lineValues. This 
 // is an array of arrays of wire state. Each subarray represents a wire.
@@ -16,6 +16,7 @@ import { wireState } from "../WireStates";
  * SimulationComponentIO represnts the inputs or outputs to / from
  * a component.
  */
+
 export class SimulationComponentIO {
     private lineValues : Array<Array<wireState>>
 
@@ -38,6 +39,15 @@ export class SimulationComponentIO {
                 this.lineValues[i].push(wireState.Float);
             }
         }
+    }
+
+    /**
+     * 
+     * @param lineNumber line number
+     * @returns the bit width of the line
+     */
+    getLineBitWidth(lineNumber : number) {
+        return this.getLineBits(lineNumber).length;
     }
 
     /**
@@ -70,6 +80,15 @@ export class SimulationComponentIO {
             throw(`The specified bitNumber ${bitNumber} is larger than the bitwidth of the wire`)
         }
         return this.lineValues[lineNumber][bitNumber];
+    }
+
+    /**
+     * 
+     * @param lineNumber line number
+     * @returns all the bits states of the line
+     */
+    getLineBits(lineNumber : number) : Array<wireState> {
+        return this.lineValues[lineNumber];
     }
 
     /**
@@ -119,7 +138,7 @@ export class SimulationComponentIO {
         if (lineNumber >= this.lineValues.length || lineNumber < 0) {
             throw("No line exists at index "+lineNumber.toString())
         }
-        
+
         delete this.lineValues[lineNumber];
     }
 

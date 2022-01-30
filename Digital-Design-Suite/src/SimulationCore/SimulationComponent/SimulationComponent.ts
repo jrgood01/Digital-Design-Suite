@@ -5,13 +5,12 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {ComponentConnection} from "./ComponentConnection"
 import {SimulationComponentIO} from "./SimulationComponentIO"
 import { SimulationState } from '../SimulationState';
 import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
 import { Renderable } from "../Renderable";
-
+import {WiringArea} from "./WiringArea"
 /**
  * Represents a simulated digital component
  * Extend this class to create usable components
@@ -23,7 +22,6 @@ export abstract class SimulationComponent implements Renderable{
     input : SimulationComponentIO;
     output : SimulationComponentIO;
 
-    componentOutputMap : Map<Number, ComponentConnection>;
     deleted : boolean;
 
     x : number;
@@ -33,22 +31,38 @@ export abstract class SimulationComponent implements Renderable{
 
     componentTemplate : PIXI.Graphics;
 
+    wiringAreas : Map<boolean, Map<Number, WiringArea>>;
+
+    geometry : Record <string, number>;
+
+    activeWiringArea : WiringArea;
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
-        this.componentOutputMap = new Map<Number, ComponentConnection>();
+
         this.deleted = false;
         this.componentTemplate = new PIXI.Graphics();
         this.componentTemplate.interactive = true;
         this.componentTemplate.cursor = "pointer"
         this.selected = false;
+
+        this.wiringAreas = new Map<boolean, Map<Number, WiringArea>>();
+        this.wiringAreas.set(false, new Map<Number, WiringArea>());
+        this.wiringAreas.set(true, new Map<Number, WiringArea>());
+
         stage.addChild(this.componentTemplate);
+        this.geometry = this.calculateGeometry(1);
+        this.activeWiringArea = null;
     }
 
 
     abstract simulate(): void;
     abstract draw() : void;
-
+    calculateGeometry(scaler : number) {return {"a" : 1} as Record<string, number>}
+    
+    /**
+     * Simulates the values of the component and passes to outputs
+     */
     simulateAndPass() {
         this.simulate();
         this.passOutputs();
@@ -98,26 +112,74 @@ export abstract class SimulationComponent implements Renderable{
         this.input.setLineValue(lineNumber, value);
     }
 
-    wireComponentOutput(component : SimulationComponent, outputLine : number, inputLineNumber : number) {
-        this.componentOutputMap.set(outputLine, 
-            {inputComponent : component, inputComponentLineNumber : inputLineNumber});
+    translate (x : number, y : number) {
+        this.x += x;
+        this.y += y;
+        this.geometry = this.calculateGeometry(1);
+ 
+        this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
+            value.forEach((wiringArea : WiringArea) => {
+                wiringArea.graphic.x += x;
+                wiringArea.graphic.y += y;
+            });
+        });      
     }
-
 
     updateHitArea() {
         this.componentTemplate.hitArea = new PIXI.Rectangle(
             this.componentTemplate.getBounds().x, this.componentTemplate.getBounds().y,
             this.componentTemplate.getBounds().width,
-            this.componentTemplate.getBounds().height)
+            this.componentTemplate.getBounds().height + 50)
     }
-    passOutputs() {
-        this.componentOutputMap.forEach((connection : ComponentConnection, key : number) => {
-            if (connection.inputComponent.deleted) {
-                this.componentOutputMap.delete(key);
+
+    addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean) {
+        let wiringAreaGraphic = new PIXI.Graphics();
+
+        wiringAreaGraphic.interactive = true;
+        wiringAreaGraphic.alpha = 0;
+        wiringAreaGraphic.beginFill(0xFF0000);
+        wiringAreaGraphic.drawRect(x, y, 7, 7);
+        wiringAreaGraphic.isMask = false;
+        //wiringAreaGraphic.zIndex = 100;
+        this.simulationState.stage.addChild(wiringAreaGraphic);
+        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 50, y - 50 , 100, 100);
+        
+        const addWiringArea = {
+            x : x,
+            y : y,
+
+            component : this,
+
+            input : isInput,
+            lineNumber : lineNumber,
+
+            graphic : wiringAreaGraphic
+        }
+
+        wiringAreaGraphic.cursor = "grab"
+
+        wiringAreaGraphic.on("mouseover", () => 
+        {
+            if (!this.selected) {
+                wiringAreaGraphic.alpha = 1;
+                this.activeWiringArea=addWiringArea
             }
-            let lineVal = this.getOutputLine(key);
-            let inputLine = connection.inputComponentLineNumber;
-            connection.inputComponent.setInputLine(inputLine, lineVal);
         });
+
+        wiringAreaGraphic.on("mouseout", () => 
+        {
+            if (!this.selected) {
+                wiringAreaGraphic.alpha = 0;
+                this.activeWiringArea = null;
+            }
+        });
+
+        this.wiringAreas.get(isInput).set(lineNumber, addWiringArea);
+
+    }
+
+    
+    passOutputs() {
+
     }
 }

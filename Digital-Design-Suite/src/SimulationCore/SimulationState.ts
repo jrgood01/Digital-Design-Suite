@@ -5,9 +5,11 @@
 //
 //Copyright Jacob R. Haygood 2022
 
+import * as PIXI from "pixi.js"
+import { Wire } from "./DataStructure/Wire";
 import { Renderable } from "./Renderable";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
-
+import { WiringArea } from "./SimulationComponent/WiringArea";
 export enum MouseMode {
     PAN,
     ZOOM,
@@ -15,25 +17,29 @@ export enum MouseMode {
 }
 
 export class SimulationState {
+    stage : PIXI.Container;
     renderable : Array<Renderable>;
     components : Array<SimulationComponent>;
     SelectedComponent : SimulationComponent;
-    private tickFrequency : number;
-    private numComponents : number;
-    private scale : number;
-    private mode : MouseMode;
+    tickFrequency : number;
+    numComponents : number;
+    scale : number;
+    mode : MouseMode;
     stateChanged : boolean;
     simulationFocused : boolean;
     isDragging : boolean;
     isPanning : boolean;
     isDraggingComponent : boolean;
-
-    constructor() {
+    draggingWireHitArea : WiringArea;
+    draggingWire : Wire;
+    
+    constructor(stage : PIXI.Container) {
         this.components = new Array<SimulationComponent>();
         this.numComponents = 0;
         this.scale = 1;
         this.mode = MouseMode.SELECT;
         this.stateChanged = true;
+        this.stage = stage;
     }
 
     addComponent(component : SimulationComponent) {

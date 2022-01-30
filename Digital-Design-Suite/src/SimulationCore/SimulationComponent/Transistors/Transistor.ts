@@ -21,11 +21,16 @@ export class Transistor extends SimulationComponent {
 
     constructor(stage : PIXI.Container, x : number, y : number, simulationState : SimulationState) {
         super(2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1), stage);
-        this.input.setLineBit(0, 0, wireState.Float);
-        this.input.setLineBit(0, 1, wireState.Float);
+ 
         this.simulationState = simulationState;
         this.x = x;
         this.y = y;
+        this.geometry = this.calculateGeometry(1);
+        this.addWiringArea(this.geometry['emitterConnectorWireFinalX'] - 4, this.geometry['emitterConnectorWireFinalY'] - 7, 
+            0, false);
+
+        this.addWiringArea(this.geometry['collectorConnectorWireFinalX'] - 4, this.geometry['collectorConnectorWireFinalY'], 
+            0, true);
     }
 
     simulate() {
@@ -55,6 +60,82 @@ export class Transistor extends SimulationComponent {
         return this.output.getLineBit(0, 0);
     }
 
+    calculateGeometry(scaler : number) {
+        let retMap = {} as Record<string, number>;
+
+        retMap['centerX'] = this.x;
+        retMap['centerY'] = this.y;
+        retMap['circleRadius'] = scaler * 100;
+        retMap['circuleWidth'] = scaler * 10;
+        retMap['connectorLineWidth'] = scaler * 13;
+        retMap['connectorLineLength'] = scaler * 100;
+        retMap['connectorLineToCenterLength'] = scaler * 50
+
+        //=================================================
+        retMap['baseWireWidth'] = scaler * 7;
+        retMap['baseWireLength'] = scaler * 105;
+        retMap['baseWireStartX'] = retMap['centerX'] - retMap['connectorLineToCenterLength'];
+        retMap['baseWireStartY'] = retMap['centerY'];
+        retMap['baseWireFinalX'] = retMap['baseWireStartX'] - retMap['baseWireLength'];
+        retMap['baseWireFinalY'] = retMap['centerY'];
+        retMap['collectorEmitterOffsetTop'] = scaler * 25;
+        retMap['collectorEmitterstartYOffset'] = scaler * 20;
+        retMap['collectorEmitterOffsetFinalX'] = scaler * 20; 
+
+        //=================================================
+        retMap['collectorWireWidth'] = scaler * 7;
+        retMap['collectorWireStartX'] = retMap['centerX'] 
+            - retMap['connectorLineToCenterLength'];
+
+        retMap['collectorWireStartY'] = retMap['centerY'] 
+            - retMap['collectorEmitterstartYOffset'];
+
+        retMap['collectorWireFinalX'] = retMap['centerX'] 
+            + retMap['collectorEmitterOffsetFinalX'];
+
+        retMap['collectorWireFinalY'] = retMap['centerY'] 
+            - retMap['circleRadius'] 
+            + retMap['collectorEmitterOffsetTop'];
+
+
+        //=================================================
+        retMap['emitterWireWidth'] = scaler * 7;
+        retMap['emitterWireStartX'] = retMap['centerX'] 
+            - retMap['connectorLineToCenterLength'];
+
+        retMap['emitterWireStartY'] = retMap['centerY'] 
+            + retMap['collectorEmitterstartYOffset'];
+
+        retMap['emitterWireFinalX']= retMap['centerX'] 
+            + retMap['collectorEmitterOffsetFinalX'];
+
+        retMap['emitterWireFinalY'] = retMap['centerY'] 
+            + retMap['circleRadius'] 
+            - retMap['collectorEmitterOffsetTop'];
+
+        retMap['connectorWireLengths'] = scaler * 80;
+
+        //=================================================
+        retMap['collectorConnectorWireWidth'] = scaler * 7;
+        retMap['collectorConnectorWireStartX'] = retMap['collectorWireFinalX'];
+        retMap['collectorConnectorWireStartY'] = retMap['collectorWireFinalY'];
+        retMap['collectorConnectorWireFinalX'] = retMap['collectorWireFinalX'];
+        retMap['collectorConnectorWireFinalY'] = retMap['collectorWireFinalY'] 
+            - retMap['connectorWireLengths'];
+
+
+        //=================================================
+        retMap['emitterConnectorWireWidth'] = scaler * 7;
+        retMap['emitterConnectorWireStartX'] = retMap['emitterWireFinalX'];
+        retMap['emitterConnectorWireStartY'] = retMap['emitterWireFinalY'];
+        retMap['emitterConnectorWireFinalX'] = retMap['emitterWireFinalX'];
+        retMap['emitterConnectorWireFinalY'] = retMap['emitterWireFinalY'] 
+            + retMap['connectorWireLengths'];
+            
+        return retMap;
+    }
+
+
     draw() {
         this.componentTemplate.clear();
         let standard = constants.General.componentColorStandard;
@@ -71,75 +152,38 @@ export class Transistor extends SimulationComponent {
         }
 
 
-        let centerX = this.x;
-        let centerY = this.y;
-        let scaler = 1;
+        this.componentTemplate.lineStyle(this.geometry['circuleWidth'], colors.circle);
+        this.componentTemplate.drawCircle(this.geometry['centerX'], 
+            this.geometry['centerY'], this.geometry['circleRadius']);
 
-        let circleRadius = scaler * 100;
-        let circuleWidth = scaler * 10;
-        this.componentTemplate.lineStyle(circuleWidth, colors.circle);
-        this.componentTemplate.drawCircle(centerX, centerY, circleRadius);
+        this.componentTemplate.lineStyle(this.geometry['baseWireWidth'], colors.baseConnector)
+            .moveTo(this.geometry['baseWireStartX'], this.geometry['baseWireStartY'])
+            .lineTo(this.geometry['baseWireFinalX'], this.geometry['baseWireFinalY']);
 
-        let connectorLineWidth = scaler * 13;
-        let connectorLineLength = scaler * 100;
-        let connectorLineToCenterLength = scaler * 50
+        this.componentTemplate.lineStyle(this.geometry['collectorWireWidth'], colors.collector)
+            .moveTo(this.geometry['collectorWireStartX'], this.geometry['collectorWireStartY'])
+            .lineTo(this.geometry['collectorWireFinalX'], this.geometry['collectorWireFinalY']);
 
-        let baseWireWidth = scaler * 7;
-        let baseWireLength = scaler * 105;
-        let baseWireStartX = centerX - connectorLineToCenterLength;
-        let baseWireStartY = centerY;
-        let baseWireFinalX = baseWireStartX - baseWireLength;
-        let baseWireFinalY = centerY;
-        this.componentTemplate.lineStyle(baseWireWidth, colors.baseConnector)
-            .moveTo(baseWireStartX, baseWireStartY)
-            .lineTo(baseWireFinalX, baseWireFinalY);
 
-        let collectorEmitterOffsetTop = scaler * 25;
-        let collectorEmitterstartYOffset = scaler * 20;
-        let collectorEmitterOffsetFinalX = scaler * 20; 
+        this.componentTemplate.lineStyle(this.geometry['emitterWireWidth'], colors.emitter)
+            .moveTo(this.geometry['emitterWireStartX'], this.geometry['emitterWireStartY'])
+            .lineTo(this.geometry['emitterWireFinalX'], this.geometry['emitterWireFinalY']);
 
-        let collectorWireWidth = scaler * 7;
-        let collectorWireStartX = centerX - connectorLineToCenterLength;
-        let collectorWireStartY = centerY - collectorEmitterstartYOffset;
-        let collectorWireFinalX = centerX + collectorEmitterOffsetFinalX;
-        let collectorWireFinalY = centerY - circleRadius + collectorEmitterOffsetTop;
-        this.componentTemplate.lineStyle(collectorWireWidth,colors.collector)
-            .moveTo(collectorWireStartX, collectorWireStartY)
-            .lineTo(collectorWireFinalX, collectorWireFinalY);
 
-        let emitterWireWidth = scaler * 7;
-        let emitterWireStartX = centerX - connectorLineToCenterLength;
-        let emitterWireStartY = centerY + collectorEmitterstartYOffset;
-        let emitterWireFinalX = centerX + collectorEmitterOffsetFinalX;
-        let emitterWireFinalY = centerY + circleRadius - collectorEmitterOffsetTop;
-        this.componentTemplate.lineStyle(emitterWireWidth, colors.emitter)
-            .moveTo(emitterWireStartX, emitterWireStartY)
-            .lineTo(emitterWireFinalX, emitterWireFinalY);
+        this.componentTemplate.lineStyle(this.geometry['collectorConnectorWireWidth'], 
+            colors.collectorConnector)
+            .moveTo(this.geometry['collectorConnectorWireStartX'], this.geometry['collectorConnectorWireStartY'])
+            .lineTo(this.geometry['collectorConnectorWireFinalX'], this.geometry['collectorConnectorWireFinalY']);
 
-        let connectorWireLengths = scaler * 80;
+        this.componentTemplate.lineStyle(this.geometry['emitterConnectorWireWidth'], colors.emitterConnector)
+            .moveTo(this.geometry['emitterConnectorWireStartX'], this.geometry['emitterConnectorWireStartY'])
+            .lineTo(this.geometry['emitterConnectorWireFinalX'], this.geometry['emitterConnectorWireFinalY']);
 
-        let collectorConnectorWireWidth = scaler * 7;
-        let collectorConnectorWireStartX = collectorWireFinalX;
-        let collectorConnectorWireStartY = collectorWireFinalY;
-        let collectorConnectorWireFinalX = collectorWireFinalX;
-        let collectorConnectorWireFinalY = collectorWireFinalY - connectorWireLengths;
-        this.componentTemplate.lineStyle(collectorConnectorWireWidth, colors.collectorConnector)
-            .moveTo(collectorConnectorWireStartX, collectorConnectorWireStartY)
-            .lineTo(collectorConnectorWireFinalX, collectorConnectorWireFinalY);
-
-        let emitterConnectorWireWidth = scaler * 7;
-        let emitterConnectorWireStartX = emitterWireFinalX;
-        let emitterConnectorWireStartY = emitterWireFinalY;
-        let emitterConnectorWireFinalX = emitterWireFinalX;
-        let emitterConnectorWireFinalY = emitterWireFinalY + connectorWireLengths;
-
-        this.componentTemplate.lineStyle(emitterConnectorWireWidth, colors.emitterConnector)
-            .moveTo(emitterConnectorWireStartX, emitterConnectorWireStartY)
-            .lineTo(emitterConnectorWireFinalX, emitterConnectorWireFinalY);
-
-        this.componentTemplate.lineStyle(connectorLineWidth, colors.base)
-            .moveTo(centerX - connectorLineToCenterLength, centerY - (connectorLineLength / 2))
-            .lineTo(centerX - connectorLineToCenterLength, centerY + (connectorLineLength / 2));
+        this.componentTemplate.lineStyle(this.geometry['connectorLineWidth'], colors.base)
+            .moveTo(this.geometry['centerX'] - this.geometry['connectorLineToCenterLength'], 
+                this.geometry['centerY'] - (this.geometry['connectorLineLength'] / 2))
+            .lineTo(this.geometry['centerX'] - this.geometry['connectorLineToCenterLength'], 
+                this.geometry['centerY'] + (this.geometry['connectorLineLength'] / 2));
 
         this.updateHitArea();
     }

@@ -5,9 +5,13 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { SimulationComponent } from "./SimulationComponent";
+import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 
+/**
+ * Represents an output line on a specific component
+ */
 export interface ComponentConnection {
-    inputComponent : SimulationComponent;
-    inputComponentLineNumber : number;
+    component : SimulationComponent;
+    componentLineNumber : number;
+    lineUpdated : boolean;
 }

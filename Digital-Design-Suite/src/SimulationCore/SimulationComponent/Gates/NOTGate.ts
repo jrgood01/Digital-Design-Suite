@@ -21,6 +21,48 @@ export class NOTGate extends SimulationComponent {
         this.simulationState = simulationState;
         this.x = 500;
         this.y = 500;
+        this.geometry = this.calculateGeometry(1);
+
+        this.addWiringArea(this.geometry['outputWireEndX'] - 7, this.geometry['outputWireEndY'] - 3.5, 
+        0, false);
+
+        this.addWiringArea(this.geometry['inputWireEndX'], this.geometry['inputWireEndY'] - 3.5, 
+        0, true);
+
+    }
+
+    calculateGeometry(scaler : number) {
+        let retMap = {} as Record<string, number>;
+        retMap['scaler'] = 1;
+        retMap['componentLineWidth'] = scaler * 10;
+        retMap['wireLineWidth'] = scaler * 7;
+        retMap['componentLength'] = scaler * 200;
+        retMap['componentHeight'] = scaler * 200; 
+        
+        retMap['cornerX'] = this.x - (retMap['componentLength'] / 2);
+        retMap['cornerY'] = this.y - (retMap['componentHeight'] / 2)
+
+        retMap['inputWireEndX'] = retMap['cornerX'] - 70 * scaler; 
+        retMap['inputWireEndY'] = retMap['cornerY'] + (retMap['componentHeight'] / 2)
+        retMap['inputWireStartX'] = retMap['cornerX']
+        retMap['inputWireStartY'] = retMap['cornerY'] + (retMap['componentHeight'] / 2)
+
+        retMap['topWireStartX'] = retMap['cornerX'];
+        retMap['topWireStartY'] = retMap['cornerY'] + 3.9 * scaler
+        retMap['topWireEndX'] = retMap['cornerX'] + retMap['componentLength']
+        retMap['topWireEndY'] = retMap['cornerY'] + (retMap['componentHeight'] / 2);
+
+        retMap['bottomWireStartX'] = retMap['cornerX'];
+        retMap['bottomWireStartY'] = retMap['cornerY'] + retMap['componentHeight'] - 3.9 * scaler;
+        retMap['bottomWireEndX'] = retMap['cornerX'] + retMap['componentLength'];
+        retMap['bottomWireEndY'] = retMap['cornerY'] + (retMap['componentHeight'] / 2);
+
+        retMap['outputWireStartX'] = retMap['cornerX'] + retMap['componentLength'];
+        retMap['outputWireStartY'] = retMap['cornerY'] + (retMap['componentHeight'] / 2);
+        retMap['outputWireEndX'] = retMap['cornerX'] + retMap['componentLength'] + 70 * scaler;
+        retMap['outputWireEndY'] = retMap['cornerY'] + (retMap['componentHeight'] / 2)
+
+        return retMap
     }
 
     simulate() {
@@ -45,42 +87,37 @@ export class NOTGate extends SimulationComponent {
     }
 
     getOutputVal() {
-        console.log(this.getOutputLineBit(0, 0))
         return this.getOutputLineBit(0, 0);
     }
 
     draw() {
+        this.componentTemplate.clear();
+
         const colors = {
             componentBody : this.selected ? constants.General.selectedColor : constants.General.componentColorStandard,
             inputWire : this.selected ? constants.General.selectedColor : this.getInputVal(),
             outputWire : this.selected ? constants.General.selectedColor : this.getOutputVal()
         }
 
-        let scaler = 1;
-        let componentLineWidth = scaler * 10;
-        let wireLineWidth = scaler * 7;
-        let componentLength = scaler * 200;
-        let componentHeight = scaler * 200; 
+        this.componentTemplate.lineStyle(this.geometry['componentLineWidth'], colors.componentBody)
+            .moveTo(this.geometry['cornerX'], this.geometry['cornerY'])
+            .lineTo(this.geometry['cornerX'], this.geometry['cornerY'] + this.geometry['componentHeight']);
 
-        let cornerX = this.x - (componentLength / 2);
-        let cornerY = this.y - (componentHeight / 2)
+        this.componentTemplate.lineStyle(this.geometry['wireLineWidth'], colors.outputWire)
+            .moveTo(this.geometry['outputWireStartX'], this.geometry['outputWireStartY'])
+            .lineTo(this.geometry['outputWireEndX'], this.geometry['outputWireEndY']);
 
-        this.componentTemplate.clear();
-        this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
-            .moveTo(cornerX, cornerY)
-            .lineTo(cornerX, cornerY + componentHeight);
-        this.componentTemplate.lineStyle(wireLineWidth, colors.inputWire)
-            .moveTo(cornerX, cornerY + (componentHeight / 2))
-            .lineTo(cornerX - 70 * scaler, cornerY + (componentHeight / 2));
-        this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
-                .moveTo(cornerX, cornerY + 3.9 * scaler)
-                .lineTo(cornerX + componentLength, cornerY + (componentHeight / 2));
-        this.componentTemplate.lineStyle(componentLineWidth, colors.componentBody)
-                .moveTo(cornerX, cornerY + componentHeight - 3.9 * scaler)
-                .lineTo(cornerX + componentLength, cornerY + (componentHeight / 2));   
-        this.componentTemplate.lineStyle(wireLineWidth, colors.outputWire)
-                .moveTo(cornerX + componentLength, cornerY + (componentHeight / 2))
-                .lineTo(cornerX + componentLength + 70 * scaler, cornerY + (componentHeight / 2));
+        this.componentTemplate.lineStyle(this.geometry['wireLineWidth'], colors.inputWire)
+            .moveTo(this.geometry['inputWireStartX'], this.geometry['inputWireStartY'])
+            .lineTo(this.geometry['inputWireEndX'], this.geometry['inputWireEndY']);
+
+        this.componentTemplate.lineStyle(this.geometry['componentLineWidth'], colors.componentBody)
+                .moveTo(this.geometry['topWireStartX'], this.geometry['topWireStartY'])
+                .lineTo(this.geometry['topWireEndX'], this.geometry['topWireEndY']);
+
+        this.componentTemplate.lineStyle(this.geometry['componentLineWidth'], colors.componentBody)
+                .moveTo(this.geometry['bottomWireStartX'], this.geometry['bottomWireStartY'])
+                .lineTo(this.geometry['bottomWireEndX'], this.geometry['bottomWireEndY']);  
 
         this.updateHitArea();
     }
