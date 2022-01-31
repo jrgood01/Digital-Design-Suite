@@ -67,6 +67,7 @@ export class WiringMap implements Renderable{
         //Add the wire to the map
         this.wireMap.get(ioComponent).get(isInput).set(lineNumber, addWire);
         this.simulationState.stage.addChild(addWire.graphic);
+        ioComponent.setGlow(true);
         return addWire;
     }
 
@@ -77,17 +78,18 @@ export class WiringMap implements Renderable{
      * @param lineNumber line to map on component
      * @param wire existing wire to map
      */
-    addWireMapping(component : SimulationComponent, isInput : boolean, lineNumber : number, wire : Wire) {
+    addWireMapping(ioComponent : SimulationComponent, isInput : boolean, lineNumber : number, wire : Wire) {
         //If the component is not yet in the map, we need to add it
-        if(this.wireMap.get(component) == null) {
-            this.wireMap.set(component, new Map<boolean, Map<number, Wire>>());
+        if(this.wireMap.get(ioComponent) == null) {
+            this.wireMap.set(ioComponent, new Map<boolean, Map<number, Wire>>());
 
-            this.wireMap.get(component).set(false, new Map<number, Wire>());
-            this.wireMap.get(component).set(true, new Map<number, Wire>());
+            this.wireMap.get(ioComponent).set(false, new Map<number, Wire>());
+            this.wireMap.get(ioComponent).set(true, new Map<number, Wire>());
         }
 
         //Add wire to the map
-        this.wireMap.get(component).get(isInput).set(lineNumber, wire);
+        ioComponent.setGlow(true);
+        this.wireMap.get(ioComponent).get(isInput).set(lineNumber, wire);
     }
 
     /**

@@ -14,6 +14,7 @@ import { Transistor } from "./SimulationComponent/Transistors/Transistor";
 import { InteractionManager } from "pixi.js";
 import { WiringMap } from "./DataStructure/WiringMap"
 import { WiringArea } from "./SimulationComponent/WiringArea";
+import { ConstantComponent } from "./SimulationComponent/Wiring/Constant";
 
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
@@ -64,8 +65,12 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.stage.interactive = true;
 
         let v = new NOTGate(1, this.stage, this.simulationState)
-        let v2 = new Transistor(this.stage, 1000, 500, this.simulationState);
+        let v2 = new Transistor(this.stage, 1000, 200, this.simulationState);
+        let v3 = new Transistor(this.stage, 1000, 700, this.simulationState);
+        let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
 
+        this.simulationState.addComponent(v4);
+        this.simulationState.addComponent(v3)
         this.simulationState.addComponent(v2)
         this.simulationState.addComponent(v)
 

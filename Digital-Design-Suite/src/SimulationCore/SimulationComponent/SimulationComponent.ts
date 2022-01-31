@@ -11,6 +11,8 @@ import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
 import { Renderable } from "../Renderable";
 import {WiringArea} from "./WiringArea"
+import { GlowFilter } from '@pixi/filter-glow';
+
 /**
  * Represents a simulated digital component
  * Extend this class to create usable components
@@ -36,6 +38,7 @@ export abstract class SimulationComponent implements Renderable{
     geometry : Record <string, number>;
 
     activeWiringArea : WiringArea;
+    glowOn : boolean;
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
@@ -53,6 +56,8 @@ export abstract class SimulationComponent implements Renderable{
         stage.addChild(this.componentTemplate);
         this.geometry = this.calculateGeometry(1);
         this.activeWiringArea = null;
+        this.glowOn = false;
+        //this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
     }
 
 
@@ -68,6 +73,13 @@ export abstract class SimulationComponent implements Renderable{
         this.passOutputs();
     }
     
+    setGlow(on : boolean) {
+        if (on) {
+            this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
+        } else {
+            this.componentTemplate.filters = [];
+        }
+    }
     addInputLine(bitWidth : number) {
         this.input.addLine(bitWidth);
     }
@@ -125,7 +137,6 @@ export abstract class SimulationComponent implements Renderable{
                 wiringArea.y += y;
             });
         });      
-        console.log(this);
     }
 
     updateHitArea() {

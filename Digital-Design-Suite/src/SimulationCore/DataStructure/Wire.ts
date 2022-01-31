@@ -13,6 +13,8 @@ import { Renderable
 import { Point, Rectangle } from "pixi.js";
 import * as Constants from "../../constants"
 import e from "express";
+import { GlowFilter } from '@pixi/filter-glow';
+
 export class Wire implements Renderable{
     graphic : PIXI.Graphics;
 
@@ -159,6 +161,7 @@ export class Wire implements Renderable{
             this.graphic.lineStyle(7, lineColor)
                 .moveTo(this.geometry[i - 1].x - offsetX, this.geometry[i].y)
                 .lineTo(this.geometry[i].x, this.geometry[i].y);
+            this.graphic.filters =  [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
             i ++;
         }
     }

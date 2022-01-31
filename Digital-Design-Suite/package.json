@@ -88,6 +88,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "@pixi/filter-glow": "^4.1.5",
     "electron-squirrel-startup": "^1.0.0",
     "get-google-fonts": "^1.2.2",
     "pixi.js": "^6.2.1",
