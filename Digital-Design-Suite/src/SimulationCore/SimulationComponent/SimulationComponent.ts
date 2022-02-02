@@ -9,15 +9,15 @@ import {SimulationComponentIO} from "./SimulationComponentIO"
 import { SimulationState } from '../SimulationState';
 import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
-import { Renderable } from "../Renderable";
 import {WiringArea} from "./WiringArea"
 import { GlowFilter } from '@pixi/filter-glow';
+import { Moveable } from "../Moveable";
 
 /**
  * Represents a simulated digital component
  * Extend this class to create usable components
  */
-export abstract class SimulationComponent implements Renderable{
+export abstract class SimulationComponent implements Moveable{
     componentId : string;
     simulationState : SimulationState;
 

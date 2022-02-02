@@ -14,16 +14,17 @@ import { Point, Rectangle } from "pixi.js";
 import * as Constants from "../../constants"
 import e from "express";
 import { GlowFilter } from '@pixi/filter-glow';
+import {WireSegment} from "./WireSegment"
+import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 
-export class Wire implements Renderable{
+export class Wire {
     graphic : PIXI.Graphics;
 
     private visited : boolean;
     private lastState : boolean;
 
-    private segments : number;
-    private geometry : Array<PIXI.Point>;
-    private state : Array<wireState>;
+    private segments : Array<WireSegment>
+    private state : Array<wireState>
 
     private inputs : Array<ComponentConnection>;
     private outputs : Array<ComponentConnection>;
@@ -35,11 +36,11 @@ export class Wire implements Renderable{
      * @param startX wire startX
      * @param startY wire endX
      */
-    constructor(startX : number, startY : number) {
+    constructor(startX : number, startY : number, dockComponent : SimulationComponent) {
         this.graphic = new PIXI.Graphics();
         this.graphic.interactive = true;
         
-        this.geometry = new Array<PIXI.Point>();
+        this.segments = new Array<WireSegment>();
 
         this.inputs = new Array<ComponentConnection>();
         this.outputs = new Array<ComponentConnection>();
@@ -49,8 +50,7 @@ export class Wire implements Renderable{
         startY += 3.5; 
         startX += 3.5;
 
-        this.geometry.push(new Point(startX, startY));
-        this.segments = 1;
+        this.segments.push(new WireSegment(false, new PIXI.Point(startX, startY), 0));
 
         this.error = false;
     }
@@ -62,10 +62,7 @@ export class Wire implements Renderable{
      */
     addSegment(x : number, y : number) {
         //If the last segment isn't a dummy segment 
-        if (this.geometry[this.segments - 1].x != -10000000 && this.geometry[this.segments - 1].y != -10000000) {
-            this.geometry.push(new PIXI.Point(x, y));
-            this.segments ++;
-        }
+        
     }
 
     /**
