@@ -7,7 +7,6 @@
 
 import * as PIXI from "pixi.js"
 import { Wire } from "./DataStructure/Wire";
-import { Renderable } from "./Renderable";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 import { WiringArea } from "./SimulationComponent/WiringArea";
 export enum MouseMode {
@@ -18,7 +17,6 @@ export enum MouseMode {
 
 export class SimulationState {
     stage : PIXI.Container;
-    renderable : Array<Renderable>;
     components : Array<SimulationComponent>;
     SelectedComponent : SimulationComponent;
     tickFrequency : number;

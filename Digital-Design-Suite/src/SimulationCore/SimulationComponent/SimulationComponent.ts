@@ -11,13 +11,12 @@ import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
 import {WiringArea} from "./WiringArea"
 import { GlowFilter } from '@pixi/filter-glow';
-import { Moveable } from "../Moveable";
 
 /**
  * Represents a simulated digital component
  * Extend this class to create usable components
  */
-export abstract class SimulationComponent implements Moveable{
+export abstract class SimulationComponent{
     componentId : string;
     simulationState : SimulationState;
 
@@ -39,6 +38,7 @@ export abstract class SimulationComponent implements Moveable{
 
     activeWiringArea : WiringArea;
     glowOn : boolean;
+
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);

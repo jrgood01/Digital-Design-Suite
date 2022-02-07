@@ -6,12 +6,11 @@
 //Copyright Jacob R. Haygood 2022
 
 import { Component } from "react";
-import { Renderable } from "../Renderable";
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { SimulationState } from "../SimulationState";
 import { Wire } from "./Wire";
 
-export class WiringMap implements Renderable{
+export class WiringMap {
     //Contains useful information about the simulation
     private simulationState : SimulationState;
 
@@ -50,7 +49,7 @@ export class WiringMap implements Renderable{
         }
 
         //Create a new wire with the passed start coordinates
-        let addWire = new Wire(startX, startY);
+        let addWire = new Wire(startX, startY, ioComponent, this.simulationState.stage);
         const inputConnection = 
         {
             component: ioComponent, 
@@ -59,9 +58,9 @@ export class WiringMap implements Renderable{
         }
         addWire.addInput(inputConnection);
         addWire.graphic.on("mousedown", (e : MouseEvent) => {
-            addWire.addDummySegment();
+            //addWire.addDummySegment();
             
-            this.simulationState.draggingWire = addWire;
+            //this.simulationState.draggingWire = addWire;
         })
 
         //Add the wire to the map
@@ -99,14 +98,7 @@ export class WiringMap implements Renderable{
      * @param dy change in y
      */
     moveComponentWires(component : SimulationComponent, dx : number, dy : number) {
-        if (this.wireMap.get(component)) {
-            this.wireMap.get(component).get(true).forEach((value : Wire) => {
-                value.translateLastSegment(dx, dy);
-            })
-            this.wireMap.get(component).get(false).forEach((value : Wire) => {
-                value.translateFirstSegment(dx, dy);
-            })
-       }
+
     }
 
     /**

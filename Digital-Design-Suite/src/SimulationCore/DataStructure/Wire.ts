@@ -8,8 +8,6 @@
 import * as PIXI from "pixi.js";
 import { wireState } from "../WireStates";
 import { ComponentConnection } from "./ComponentConnection";
-import { Renderable
- } from "../Renderable";
 import { Point, Rectangle } from "pixi.js";
 import * as Constants from "../../constants"
 import e from "express";
@@ -30,13 +28,20 @@ export class Wire {
     private outputs : Array<ComponentConnection>;
     private error : boolean;
     private bitWidth : number;
+    private isPlacing : boolean;
+    private stage : PIXI.Container;
 
     /**
      * Create new wire
      * @param startX wire startX
      * @param startY wire endX
      */
-    constructor(startX : number, startY : number, dockComponent : SimulationComponent) {
+    constructor(startX : number, startY : number, dockComponent : SimulationComponent, stage : PIXI.Container) {
+        console.log(stage);
+        
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onCreateSegment = this.onCreateSegment.bind(this);
+
         this.graphic = new PIXI.Graphics();
         this.graphic.interactive = true;
         
@@ -46,61 +51,55 @@ export class Wire {
         this.outputs = new Array<ComponentConnection>();
 
         this.state = new Array<wireState>();
+        this.stage = stage;
+
+        this.isPlacing = false;
         
         startY += 3.5; 
         startX += 3.5;
-
-        this.segments.push(new WireSegment(false, new PIXI.Point(startX, startY), 0));
+        let addWire = new WireSegment(false, new PIXI.Point(startX, startY), 0, stage, this.onCreateSegment);
+        addWire.ComponentDockBottom = dockComponent;
+        this.segments.push(addWire);
 
         this.error = false;
+
+        stage.on("pointermove", this.onMouseMove);
     }
 
-    /**
-     * Add a segment
-     * @param x x position of end of segment
-     * @param y y position of end of segment
-     */
-    addSegment(x : number, y : number) {
-        //If the last segment isn't a dummy segment 
-        
-    }
-
-    /**
-     * Adds a non-usable segment. This prevents the addition
-     *  of additonal segments until the dummy segment is removed
-     *  or modified
-     */
-    addDummySegment() {
-        if (this.geometry[this.segments - 1].x != -10000000 && this.geometry[this.segments - 1].y != -10000000) {
-            this.geometry.push(new PIXI.Point(-10000000, -10000000));
-            this.segments ++;
+    beginPlace() {   
+        if (this.segments.length == 1) {
+            this.addSegmentTop(0);
+        } else {
+            this.addSegmentTop(0);
+            this.addSegmentTop(0);
         }
+        this.isPlacing = true;
     }
 
-    /**
-     * Sets position of the last segment
-     * @param x Segment new X position
-     * @param y Segment new Y position
-     */
-    positionLastSegment(x : number, y : number) {
-        this.geometry[this.segments - 1].x = x;
-        this.geometry[this.segments - 1].y = y;
+    endPlace() {
+        let segmentOne = this.segments[this.segments.length - 2];
+        let segmentTwo = this.segments[this.segments.length - 1];
+
+        segmentOne.unlockMouse();
+        segmentTwo.unlockMouse();
+
+        this.isPlacing = false;
     }
 
-    translateFirstSegment(dx : number, dy : number) {
-        this.geometry[0].x += dx;
-        this.geometry[0].y += dy;
+    addSegmentTop(length : number) {
+        let lastSegment = this.segments[this.segments.length - 1];
+        let lastSegmentEndPoint = lastSegment.getEndPoint();
+        let addSegment = new WireSegment(lastSegment.isVertical, lastSegmentEndPoint, 0, 
+            this.stage, this.onCreateSegment);
+        lastSegment.top = addSegment;
+        addSegment.bottom = lastSegment
+        this.segments.push(addSegment);
     }
 
-    translateLastSegment(dx : number, dy : number) {
-        this.geometry[this.segments - 1].x += dx;
-        this.geometry[this.segments - 1].y += dy;
-    }
 
     addInput(input : ComponentConnection) {
         this.bitWidth = input.component.output.getLineBitWidth(input.componentLineNumber);
         this.inputs.push(input);
-        console.log(this);
     }
 
     getComponentColor() {
@@ -119,48 +118,73 @@ export class Wire {
         }
     } 
 
+    onMouseMove(ev : any) : any {
+        let pos = ev.data.global;
+        if (this.isPlacing) {
+            this.anchorToPoint(pos.x, pos.y, true);
+        }
+    }
+
+    anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false, smartAnchor : boolean = false) {
+        let segmentOne = this.segments[this.segments.length - 2]
+        let segmentTwo = this.segments[this.segments.length - 1]
+        let anchor = segmentOne.start;
+
+        let dX = x - anchor.x;
+        let dY = y - anchor.y;
+        let anchorType = Math.abs(dY) > Math.abs(dX);
+
+        let newEnd = new PIXI.Point(segmentOne.getEndPoint().x,segmentOne.getEndPoint().y) ;
+        if (dY > 0 && anchorType) {
+            newEnd.y -= 7;
+        } 
+
+        if (dX > 0 && !anchorType) {
+            newEnd.x -= 7;
+        } 
+
+        if (smartAnchor) {
+            if (dX > 0) {
+                dX += 8;
+            }
+        }
+
+        if (anchorType) {
+            segmentTwo.length = dY;
+            segmentTwo.isVertical = true;
+
+            segmentOne.length = dX;
+            segmentOne.isVertical = false;
+
+            if (lockMouseOnAnchor) {
+                segmentTwo.lockToMouseY();
+                segmentOne.lockToMouseX();
+            }
+
+        } else {
+            segmentTwo.length = dX;
+            segmentTwo.isVertical = false;
+
+            segmentOne.length = dY ;
+            segmentOne.isVertical = true;
+
+            if (lockMouseOnAnchor) {
+                segmentTwo.lockToMouseX();
+                segmentOne.lockToMouseY();
+            }
+        }
+
+        segmentTwo.start = newEnd;
+    }
+
+    onCreateSegment(created : WireSegment) {
+        this.segments.push(created);
+    }
     draw() {
         this.graphic.clear();
-
-
-        let lineColor = this.getComponentColor();
-
-        if (this.segments > 0) {
-            this.graphic.hitArea = new Rectangle(
-                this.geometry[this.segments - 1].x - 10, this.geometry[this.segments - 1].y - 10, 20, 20);
-        }
-
-        let i = 1;
-        while (i < this.geometry.length) {
-            if (this.geometry[i].x == -100000) {
-                i += 1;
-                continue;
-            }
-
-            let offsetX = 0;
-            let offsetY = 0;
-
-            if (this.geometry[i - 1].x > this.geometry[i].x) {
-                offsetX = -3.5
-            } else if (this.geometry[i - 1].x < this.geometry[i].x) {
-                offsetX = 3.5
-            }
-
-            if (this.geometry[i - 1].y > this.geometry[i].y) {
-                offsetY = -3.5
-            } else if (this.geometry[i - 1].y < this.geometry[i].y) {
-                offsetY = 3.5
-            }
-            this.graphic.lineStyle(7, lineColor)
-                .moveTo(this.geometry[i - 1].x, this.geometry[i - 1].y - offsetY)
-                .lineTo(this.geometry[i - 1].x, this.geometry[i].y);
-
-            this.graphic.lineStyle(7, lineColor)
-                .moveTo(this.geometry[i - 1].x - offsetX, this.geometry[i].y)
-                .lineTo(this.geometry[i].x, this.geometry[i].y);
-            this.graphic.filters =  [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
-            i ++;
-        }
+        this.segments.forEach((segment : WireSegment) => {
+            segment.Draw();
+        })
     }
 
 

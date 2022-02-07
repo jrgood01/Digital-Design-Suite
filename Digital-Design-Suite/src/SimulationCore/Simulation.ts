@@ -139,16 +139,10 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 val.forEach((val : WiringArea) => {
                     if (val.graphic == hit) {
                         this.simulationState.draggingWireHitArea = component.activeWiringArea;
-                        this.simulationState.draggingWire = 
-                        this.wiringMap.addWire(
+                        this.simulationState.draggingWire = this.wiringMap.addWire(
                             component, component.activeWiringArea.lineNumber, component.activeWiringArea.x, 
-                            component.activeWiringArea.y, this.simulationState.draggingWireHitArea.input)
-                        console.log(this.wiringMap);
-                        if (this.simulationState.draggingWire) {
-                            this.simulationState.draggingWire.addSegment(mouseEvent.x, mouseEvent.y);
-                        }
-                        console.log(this.simulationState.draggingWire);
-                        return
+                            component.activeWiringArea.y, this.simulationState.draggingWireHitArea.input);
+                        this.simulationState.draggingWire.beginPlace();
                     }
                 })
             })
@@ -180,6 +174,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
             }
 
             if (this.simulationState.draggingWire != null) {
+                this.simulationState.draggingWire.endPlace();
                 let hit = this.interactionManager.hitTest(new PIXI.Point(mouseEvent.x, mouseEvent.y), this.stage)
                 this.simulationState.components.forEach((component : SimulationComponent) => {
                     component.wiringAreas.forEach((subMap : Map<Number, WiringArea>) => {
@@ -190,7 +185,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
                                     componentLineNumber : wiringArea.lineNumber,
                                     lineUpdated : false
                                 }
-                                this.simulationState.draggingWire.positionLastSegment(wiringArea.x, wiringArea.y)
+                                this.simulationState.draggingWire.anchorToPoint(wiringArea.x, wiringArea.y, false, true)
                                 this.wiringMap.addWireMapping(component, wiringArea.input, wiringArea.lineNumber, this.simulationState.draggingWire);
                                 this.simulationState.draggingWire = null;
                                 return                                
@@ -218,7 +213,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         }
 
         if (this.simulationState.draggingWire != null) {
-            this.simulationState.draggingWire.positionLastSegment(mouseEvent.x, mouseEvent.y - 30);
+            //this.simulationState.draggingWire.positionLastSegment(mouseEvent.x, mouseEvent.y - 30);
         }
     }
 
