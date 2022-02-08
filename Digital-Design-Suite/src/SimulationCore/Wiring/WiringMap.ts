@@ -103,6 +103,25 @@ export class WiringMap {
 
     }
 
+    getMappedComponentOutputs(component : SimulationComponent) {
+        if (this.wireMap.get(component) != null) {
+            return this.wireMap.get(component).get(false);
+        } else { 
+            return null;
+        }
+        
+    }
+
+    getMappedComponentInputs(component : SimulationComponent) {
+        if (this.wireMap.get(component) != null) {
+            return this.wireMap.get(component).get(true);
+        } else {
+            return null;
+        }
+        
+    }
+
+    
     /**
      * draw the component
      */
@@ -111,6 +130,7 @@ export class WiringMap {
         this.wireMap.forEach((value : Map<boolean, Map<number, Wire>>) => {
             value.forEach((value : Map<number,Wire>) => {
                 value.forEach((value : Wire) => {
+                    value.simulate();
                     value.draw();
                 })
             })

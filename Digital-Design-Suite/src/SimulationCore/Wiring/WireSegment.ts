@@ -27,9 +27,10 @@ export class WireSegment {
     deleted : boolean;
 
     state : wireState
-    
+    color : number;
+
     private ComponentDockBottom : SimulationComponent;
-    ComponentDockTop : SimulationComponent;
+    private ComponentDockTop : SimulationComponent;
 
     private onCreateNewSegment : (created : WireSegment) => void;
 
@@ -88,7 +89,7 @@ export class WireSegment {
 
         this.componentDockBottomActionIndex = -1;
         this.componentDockTopActionIndex = -1;
-        
+        this.color = wireState.Float;
         stage.addChild(this.graphic);
     }
 
@@ -213,7 +214,7 @@ export class WireSegment {
     Draw() {
         this.graphic.clear();
         
-        this.graphic.lineStyle(6.5, this.selected ?  Constants.General.selectedColor : this.state)
+        this.graphic.lineStyle(6.5, this.selected ?  Constants.General.selectedColor : this.color)
             .moveTo(this.start.x, this.start.y)
             .lineTo(this.isVertical ? this.start.x : this.start.x + this.length,
                 this.isVertical ? this.start.y + this.length : this.start.y);

@@ -76,7 +76,7 @@ export class NOTGate extends SimulationComponent {
             } else {
                 outputBit = wireState.High;
             }
-            
+            console.log(this.input.getLineBit(0, bit), this.output.getLineBit(0, bit))
             this.output.setLineBit(0, bit, outputBit);
         }
         

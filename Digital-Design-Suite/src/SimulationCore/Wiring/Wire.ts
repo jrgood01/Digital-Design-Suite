@@ -67,6 +67,16 @@ export class Wire {
         stage.on("pointermove", this.onMouseMove);
     }
 
+    AllInputsVisited () {
+        this.inputs.forEach((c : ComponentConnection) => {
+            if (!c.component.visited) {
+                return false;
+            }
+        });
+
+        return true;
+    }
+
     beginPlace() {   
         if (this.segments.length == 1) {
             this.addSegmentTop(0);
@@ -194,6 +204,52 @@ export class Wire {
         this.segments[this.segments.length - 1].addComponentDockTop(component);
     }
 
+    setColor(color : number) {
+        this.segments.forEach((segment : WireSegment) => {
+            segment.color = color;
+        });
+    }
+
+    getState() {
+        return this.state;
+    }
+
+    simulate() {
+        let s1 = this.inputs[0];
+        let line = s1.component.getOutputLine(s1.componentLineNumber);
+        let hasError = false;
+        this.state = line;
+        this.inputs.forEach((componentConnection : ComponentConnection) => {
+            let line_cmp = componentConnection.component.getOutputLine(componentConnection.componentLineNumber);
+                line.forEach((state : wireState, index : number) => {
+                    if (state != line_cmp[index]) {
+                        this.state[index] = wireState.Error;
+                        hasError = true;
+                    }
+                });
+        });
+  
+        if (hasError) {
+            this.setColor(wireState.Error);
+            return;
+        }
+
+        if (this.bitWidth > 1) {
+            this.setColor(Constants.General.componentMultiBit)
+            return;
+        }
+
+        if (this.inputs.length == 0) {
+            this.setColor(wireState.Float);
+            return;
+        }
+
+
+        let state = line[0];
+        this.setColor(state);
+        
+
+    }
     draw() {
         this.graphic.clear();
         this.segments.forEach((segment : WireSegment) => {

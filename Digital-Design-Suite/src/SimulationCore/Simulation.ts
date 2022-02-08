@@ -8,16 +8,17 @@
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
 import {MouseMode, SimulationState} from "./SimulationState";
 import { NOTGate } from "./SimulationComponent/Gates/NOTGate";
+import { ConstantComponent } from "./SimulationComponent/Wiring/Constant"
 import * as PIXI from "pixi.js"
 import * as constants from "../constants";
 import { Transistor } from "./SimulationComponent/Transistors/Transistor";
 import { InteractionEvent, InteractionManager } from "pixi.js";
 import { WiringMap } from "./Wiring/WiringMap"
-import { WiringArea } from "./SimulationComponent/WiringArea";
 import { SimulationWarden } from "./SimulationWarden"
 import { HitAreaClickEvent } from "./SimulationEvents/HitAreaClickEvent"
 import { ComponentDragEvent } from "./SimulationEvents/ComponentDragEvent";
 import { WireEndDragAtWiringAreaEvent } from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
+import { Wire } from "./Wiring/Wire";
 
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
@@ -76,16 +77,6 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.stage.interactive = true;
         this.stage.sortableChildren = true;
 
-        let v = new NOTGate(1, this.stage, this.simulationState)
-        let v2 = new Transistor(this.stage, 1000, 200, this.simulationState);
-        let v3 = new Transistor(this.stage, 1000, 700, this.simulationState);
-       // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
-
-       // this.simulationState.addComponent(v4);
-        this.simulationState.addComponent(v3)
-        this.simulationState.addComponent(v2)
-        this.simulationState.addComponent(v)
-
         //Set background color for render
         this.bgColor = constants.General.BgColor_1
         this.bg = new PIXI.Graphics();
@@ -98,7 +89,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
  
         
 
-        this.simulationUpdateFrequency = 100;
+        this.simulationUpdateFrequency = 1000;
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
 
         this.lastMouseX = 0;
@@ -112,6 +103,19 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.simulationWarden.addOnHitAreaClick(this.onHitAreaClick);
         this.simulationWarden.addOnComponentDrag(this.onComponentDrag);
         this.simulationWarden.addOnWireEndDragAtWiringAreaEvent(this.onWireEndDragAtWiringArea);
+
+        let v4 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
+        let v = new NOTGate(1, this.stage, this.simulationState)
+        let v2 = new Transistor(this.stage, 1000, 200, this.simulationState);
+        let v3 = new Transistor(this.stage, 1000, 700, this.simulationState);
+        
+       // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
+
+       // this.simulationState.addComponent(v4);
+        this.simulationState.addComponent(v3)
+        this.simulationState.addComponent(v2)
+        this.simulationState.addComponent(v)
+        this.simulationState.addComponent(v4);
     }
 
     /**
@@ -189,19 +193,49 @@ export class DigitalDesignSimulation extends PIXI.Application{
         return    
     }
 
+    updateSimulationComponents() {
+        this.simulationState.components.forEach((c : SimulationComponent) => {c.visited = false})
+        if (this.simulationWarden.requestPermissionToRunSimulation()) {
+            let notVisited = new Array<SimulationComponent>();
+            do {
+                let i = 0;
+                notVisited = this.simulationState.components.filter(c => c.visited == false);
+  
+                while (i < notVisited.length)  {
+                    let inputWires = this.wiringMap.getMappedComponentInputs(notVisited[i]);
+                    if (inputWires == null || inputWires.size == 0) {
+                        notVisited[i].simulate();
+                        notVisited[i].visited = true;
+                        i ++;
+                        continue;
+                    }
+                    let notUpdatedWires = Object.values(inputWires).filter((w) => !(w as Wire).AllInputsVisited());
+                        
+                    if (notUpdatedWires.length == 0) {
+                        inputWires.forEach((wire : Wire, line : number) => {
+                            wire.simulate();
+                            notVisited[i].setInputLine(line, wire.getState());
+                        });
+
+                        notVisited[i].simulate();
+                        notVisited[i].visited = true;
+                    }
+                    i++;
+
+                } 
+                
+            } while (notVisited.length > 0)
+        }
+    }
     /**
      * Runs on an interval faster than pixi.js can render. This
      *  simulates the state of the components and wires
      */
     runSimulation() {
+        this.updateSimulationComponents();
         this.simulationState.components.forEach((c : SimulationComponent) => {
             c.passOutputs();
         })
-
-        this.simulationState.components.forEach((c : SimulationComponent) => {
-            c.simulate();
-        })
-
     }
 
     isInside(x : number, y : number, rect : DOMRect) {

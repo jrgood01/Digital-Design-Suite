@@ -29,6 +29,7 @@ export class SimulationWarden {
 
     private lastMouseX : number;
     private lastMouseY : number;
+    private simulationPaused : boolean;
 
     constructor(state : SimulationState, renderer : PIXI.AbstractRenderer) {
         console.debug("========Simulation Warden Log========")
@@ -52,6 +53,7 @@ export class SimulationWarden {
 
         this.lastMouseX = 0;
         this.lastMouseY = 0;
+        this.simulationPaused = false;
     }
 
     addOnHitAreaClick(handler : (e : HitAreaClickEvent) => void) {
@@ -84,6 +86,10 @@ export class SimulationWarden {
             console.debug("Request to translat denied: components are locked");
             return false;
         }
+    }
+
+    requestPermissionToRunSimulation() {
+        return !this.simulationPaused;
     }
 
     pauseSimulation() {

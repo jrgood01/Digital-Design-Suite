@@ -41,6 +41,8 @@ export abstract class SimulationComponent{
 
     onMove : Array<(dX : number, dY : number) => void>;
 
+    visited : boolean;
+
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
@@ -60,6 +62,7 @@ export abstract class SimulationComponent{
         this.activeWiringArea = null;
         this.glowOn = false;
         this.onMove = new Array<(dX : number, dY : number) => void>();
+        this.visited = false;
         //this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
     }
 
@@ -155,7 +158,7 @@ export abstract class SimulationComponent{
 
     addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean) {
         let wiringAreaGraphic = new PIXI.Graphics();
-
+        console.log(this.simulationState.stage);
         wiringAreaGraphic.interactive = true;
         wiringAreaGraphic.alpha = 0;
         wiringAreaGraphic.lineStyle(4, 0x0000FF);
