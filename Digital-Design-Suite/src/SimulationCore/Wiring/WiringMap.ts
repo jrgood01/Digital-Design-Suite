@@ -6,12 +6,11 @@
 //Copyright Jacob R. Haygood 2022
 
 import { Component } from "react";
-import { Renderable } from "../Renderable";
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { SimulationState } from "../SimulationState";
 import { Wire } from "./Wire";
 
-export class WiringMap implements Renderable{
+export class WiringMap {
     //Contains useful information about the simulation
     private simulationState : SimulationState;
 
@@ -46,11 +45,11 @@ export class WiringMap implements Renderable{
         //If there is already a wire mapped on this wiring area we return null
         //  indicating that no wire was created
         if (this.wireMap.get(ioComponent).get(isInput).get(lineNumber) != null) {
-            return null;;
+            return null;
         }
 
         //Create a new wire with the passed start coordinates
-        let addWire = new Wire(startX, startY);
+        let addWire = new Wire(startX, startY, ioComponent, this.simulationState.stage);
         const inputConnection = 
         {
             component: ioComponent, 
@@ -59,14 +58,15 @@ export class WiringMap implements Renderable{
         }
         addWire.addInput(inputConnection);
         addWire.graphic.on("mousedown", (e : MouseEvent) => {
-            addWire.addDummySegment();
+            //addWire.addDummySegment();
             
-            this.simulationState.draggingWire = addWire;
+            //this.simulationState.draggingWire = addWire;
         })
 
         //Add the wire to the map
         this.wireMap.get(ioComponent).get(isInput).set(lineNumber, addWire);
         this.simulationState.stage.addChild(addWire.graphic);
+        ioComponent.setGlow(true);
         return addWire;
     }
 
@@ -77,17 +77,18 @@ export class WiringMap implements Renderable{
      * @param lineNumber line to map on component
      * @param wire existing wire to map
      */
-    addWireMapping(component : SimulationComponent, isInput : boolean, lineNumber : number, wire : Wire) {
+    addWireMapping(ioComponent : SimulationComponent, isInput : boolean, lineNumber : number, wire : Wire) {
         //If the component is not yet in the map, we need to add it
-        if(this.wireMap.get(component) == null) {
-            this.wireMap.set(component, new Map<boolean, Map<number, Wire>>());
+        if(this.wireMap.get(ioComponent) == null) {
+            this.wireMap.set(ioComponent, new Map<boolean, Map<number, Wire>>());
 
-            this.wireMap.get(component).set(false, new Map<number, Wire>());
-            this.wireMap.get(component).set(true, new Map<number, Wire>());
+            this.wireMap.get(ioComponent).set(false, new Map<number, Wire>());
+            this.wireMap.get(ioComponent).set(true, new Map<number, Wire>());
         }
 
         //Add wire to the map
-        this.wireMap.get(component).get(isInput).set(lineNumber, wire);
+        ioComponent.setGlow(true);
+        this.wireMap.get(ioComponent).get(isInput).set(lineNumber, wire);
     }
 
     /**
@@ -97,16 +98,28 @@ export class WiringMap implements Renderable{
      * @param dy change in y
      */
     moveComponentWires(component : SimulationComponent, dx : number, dy : number) {
-        if (this.wireMap.get(component)) {
-            this.wireMap.get(component).get(true).forEach((value : Wire) => {
-                value.translateLastSegment(dx, dy);
-            })
-            this.wireMap.get(component).get(false).forEach((value : Wire) => {
-                value.translateFirstSegment(dx, dy);
-            })
-       }
+
     }
 
+    getMappedComponentOutputs(component : SimulationComponent) {
+        if (this.wireMap.get(component) != null) {
+            return this.wireMap.get(component).get(false);
+        } else { 
+            return null;
+        }
+        
+    }
+
+    getMappedComponentInputs(component : SimulationComponent) {
+        if (this.wireMap.get(component) != null) {
+            return this.wireMap.get(component).get(true);
+        } else {
+            return null;
+        }
+        
+    }
+
+    
     /**
      * draw the component
      */
@@ -115,6 +128,7 @@ export class WiringMap implements Renderable{
         this.wireMap.forEach((value : Map<boolean, Map<number, Wire>>) => {
             value.forEach((value : Map<number,Wire>) => {
                 value.forEach((value : Wire) => {
+                    value.simulate();
                     value.draw();
                 })
             })

@@ -6,10 +6,10 @@
 //Copyright Jacob R. Haygood 2022
 
 import * as PIXI from "pixi.js"
-import { Wire } from "./DataStructure/Wire";
-import { Renderable } from "./Renderable";
+import { Wire } from "./Wiring/Wire";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 import { WiringArea } from "./SimulationComponent/WiringArea";
+import { WiringAreaActiveEvent } from "./SimulationEvents/WiringAreaActiveEvent";
 export enum MouseMode {
     PAN,
     ZOOM,
@@ -18,7 +18,6 @@ export enum MouseMode {
 
 export class SimulationState {
     stage : PIXI.Container;
-    renderable : Array<Renderable>;
     components : Array<SimulationComponent>;
     SelectedComponent : SimulationComponent;
     tickFrequency : number;
@@ -31,7 +30,9 @@ export class SimulationState {
     isPanning : boolean;
     isDraggingComponent : boolean;
     draggingWireHitArea : WiringArea;
-    draggingWire : Wire;
+    activeWiringArea : WiringArea;
+    private draggingWire : Wire;
+    private isDraggingWire : boolean;
     
     constructor(stage : PIXI.Container) {
         this.components = new Array<SimulationComponent>();
@@ -40,12 +41,42 @@ export class SimulationState {
         this.mode = MouseMode.SELECT;
         this.stateChanged = true;
         this.stage = stage;
+        this.draggingWire = null;
     }
 
     addComponent(component : SimulationComponent) {
         component.componentId = this.numComponents.toString();
+        
+        component.addOnWiringAreaActive((e : WiringAreaActiveEvent) => {
+            this.activeWiringArea = e.wiringArea;
+        })
+
+        component.addOnWiringAreaLeave(() => {
+            this.activeWiringArea = null;
+        })
+
         this.components.push(component);
         this.numComponents ++;
+    }
+
+    setDraggingWire(wire : Wire) {
+        this.draggingWire = wire;
+        wire.beginPlace();
+        this.isDragging = true;
+    }
+
+    getDraggingWire() {
+        return this.draggingWire;
+    }
+
+    stopDraggingWire() {
+        this.draggingWire.endPlace();
+        this.draggingWire = null;
+        this.isDragging = false;
+    }
+    
+    getIsDraggingWire() {
+        return this.isDragging;
     }
 
     removeComponent(componentId : string) {

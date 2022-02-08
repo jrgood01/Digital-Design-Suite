@@ -11,8 +11,10 @@ import './default.css';
 import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
-function render() {
+import {SimulationWarden} from "./SimulationCore/SimulationWarden"
 
+function render() {
+  
   const containerRef = React.createRef<HTMLDivElement>();
 
   const subMenuArr: SubMenuProps[] = [
@@ -46,6 +48,7 @@ function render() {
 
   , document.body
   );
+
 
   let simulation = new DigitalDesignSimulation(containerRef.current);
 }

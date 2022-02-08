@@ -10,7 +10,7 @@ import * as constants from "../../../constants"
 import { SimulationState } from '../../SimulationState';
 import { wireState } from '../../WireStates';
 import {SimulationComponent} from "../SimulationComponent"
-
+import { GlowFilter } from '@pixi/filter-glow';
 export enum TransistorType {
     NPN,
     PNP
@@ -141,12 +141,12 @@ export class Transistor extends SimulationComponent {
         let standard = constants.General.componentColorStandard;
         let colors = {
             baseConnector : this.selected ? constants.General.selectedColor : this.getBase(),
-            collectorConnector : this.selected ? constants.General.selectedColor : this.getCollector(), //this.getCollector(),
+            collectorConnector : this.selected ? constants.General.selectedColor : standard, //this.getCollector(),
             emitterConnector : this.selected ? constants.General.selectedColor :this.getEmitter(),
 
             base : this.selected ? constants.General.selectedColor : standard,
             collector : this.selected ? constants.General.selectedColor : this.getCollector(),
-            emitter : this.selected ? constants.General.selectedColor : this.getEmitter(),
+            emitter : this.selected ? constants.General.selectedColor : standard,
 
             circle : this.selected ? constants.General.selectedColor : this.getCollector()
         }
@@ -184,7 +184,12 @@ export class Transistor extends SimulationComponent {
                 this.geometry['centerY'] - (this.geometry['connectorLineLength'] / 2))
             .lineTo(this.geometry['centerX'] - this.geometry['connectorLineToCenterLength'], 
                 this.geometry['centerY'] + (this.geometry['connectorLineLength'] / 2));
-
         this.updateHitArea();
+
+        if (this.wiringAreas.get(false).size > 0 || this.wiringAreas.get(true).size > 0) {
+         //   this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
+        } else {
+          //  this.componentTemplate.filters = []
+        }
     }
 }
