@@ -39,6 +39,8 @@ export abstract class SimulationComponent{
     activeWiringArea : WiringArea;
     glowOn : boolean;
 
+    onMove : Array<(dX : number, dY : number) => void>;
+
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
@@ -57,6 +59,7 @@ export abstract class SimulationComponent{
         this.geometry = this.calculateGeometry(1);
         this.activeWiringArea = null;
         this.glowOn = false;
+        this.onMove = new Array<(dX : number, dY : number) => void>();
         //this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
     }
 
@@ -137,6 +140,10 @@ export abstract class SimulationComponent{
                 wiringArea.y += y;
             });
         });      
+
+        this.onMove.forEach((f : (dX : number, dY : number) => void) => {
+            f(x, y);
+        })
     }
 
     updateHitArea() {
@@ -151,8 +158,8 @@ export abstract class SimulationComponent{
 
         wiringAreaGraphic.interactive = true;
         wiringAreaGraphic.alpha = 0;
-        wiringAreaGraphic.beginFill(0xFF0000);
-        wiringAreaGraphic.drawRect(x, y, 7, 7);
+        wiringAreaGraphic.lineStyle(4, 0x0000FF);
+        wiringAreaGraphic.drawCircle(x + 3.5, y + 3.5, 14);
         wiringAreaGraphic.isMask = false;
         //wiringAreaGraphic.zIndex = 100;
         this.simulationState.stage.addChild(wiringAreaGraphic);

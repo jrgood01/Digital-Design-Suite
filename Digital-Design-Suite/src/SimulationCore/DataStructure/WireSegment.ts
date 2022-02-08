@@ -5,14 +5,15 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { ProviderExoticComponent } from "react";
-import { Wire } from "./Wire";
 import * as PIXI from "pixi.js"
 import * as Constants from "../../constants"
 import { wireState } from "../WireStates";
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { Moveable } from "../Moveable";
 import { InteractionEvent } from "pixi.js";
+import { Heading } from "../../Heading";
+import { Util } from "../../Util";
+import { Wire } from "./Wire";
 export class WireSegment {
     top : WireSegment;
     bottom : WireSegment;
@@ -26,8 +27,8 @@ export class WireSegment {
     deleted : boolean;
 
     state : wireState
-
-    ComponentDockBottom : SimulationComponent;
+    
+    private ComponentDockBottom : SimulationComponent;
     ComponentDockTop : SimulationComponent;
 
     private onCreateNewSegment : (created : WireSegment) => void;
@@ -41,15 +42,23 @@ export class WireSegment {
 
     private xBoundsReversed : boolean;
     private yBoundsReversed : boolean;
-    
+
+    private componentDockBottomActionIndex : number;
+    private componentDockTopActionIndex : number;
 
     constructor(isVertical : boolean, startCoordinate : PIXI.Point, length : number, 
             stage : PIXI.Container, onSegmentCreate : (created : WireSegment) => void ) {
 
         this.graphic = new PIXI.Graphics();
         this.graphic.zIndex = 100;
-        this.onClick = this.onClick.bind(this);
-        this.onMouseMove = this.onMouseMove.bind(this);
+
+        this._onClick = this._onClick.bind(this);
+        this._onMouseMove = this._onMouseMove.bind(this);
+        this._onMouseUp = this._onMouseUp.bind(this);
+
+        this._onComponentBottomMove = this._onComponentBottomMove.bind(this);
+        this._onComponentTopMove = this._onComponentTopMove.bind(this);
+        this.addComponentDockBottom = this.addComponentDockBottom.bind(this);
 
 
         this.isVertical = isVertical;
@@ -71,25 +80,82 @@ export class WireSegment {
         this.xBoundsReversed = false;
         this.yBoundsReversed = false;
 
-        this.stage.on("pointermove", this.onMouseMove)
-        this.stage.on("pointerdown", this.onClick);
-        this.graphic.on("mousedown", () => {console.log("RR")})
+        this.stage.on("pointermove", this._onMouseMove)
+        this.stage.on("pointerdown", this._onClick);
+        this.stage.on("pointerup", this._onMouseUp);
 
         this.onCreateNewSegment = onSegmentCreate;
-        if (this.isVertical) {
-            this.start.y += 3.5;
-        } else {
-            this.start.y -= .1;
-        }
 
+        this.componentDockBottomActionIndex = -1;
+        this.componentDockTopActionIndex = -1;
+        
         stage.addChild(this.graphic);
     }
 
-    onClick(ev : InteractionEvent) {
+    addComponentDockBottom(dock : SimulationComponent) {
+        this.ComponentDockBottom = dock;
+        this.ComponentDockBottom.onMove.push(this._onComponentBottomMove);
+        this.componentDockBottomActionIndex = this.ComponentDockBottom.onMove.length - 1;
+        console.log(this.ComponentDockBottom.onMove)
+    }
+
+    addComponentDockTop(dock : SimulationComponent) {
+        this.ComponentDockTop = dock;
+        this.ComponentDockTop.onMove.push(this._onComponentTopMove);
+
+    }
+
+    undockComponentBottom() {
+        this.ComponentDockBottom.onMove.splice(this.componentDockBottomActionIndex);
+        this.componentDockBottomActionIndex = -1;
+        this.ComponentDockBottom = null;
+    }
+
+    undockComponentTop() {
+        this.ComponentDockTop.onMove.splice(this.componentDockTopActionIndex);
+        this.componentDockTopActionIndex = -1;
+        this.ComponentDockTop = null;       
+    }
+
+    private _onComponentBottomMove(dX : number, dY : number) {
+        this.start.y += dY;
+        this.start.x += dX;
+        if (this.isVertical) {
+            this.length -= dY;
+            if (this.top != null) {
+                this.top.start.x += dX;
+                this.top.length -= dX;
+            }
+        } else {
+            this.length -= dX;
+            if (this.top != null) {
+                this.top.start.y += dY;
+                this.top.length -= dY;
+            }
+        }
+    }
+
+    private _onComponentTopMove(dX : number, dY : number) {
+        if (this.isVertical) {
+            this.length += dY;
+            if (this.bottom != null) {
+                this.bottom.length += dX;
+                this.start.x += dX;
+            }
+        } else {
+            this.length += dX;
+            if (this.bottom != null) {
+                this.bottom.length += dY;
+                this.start.y += dY;
+            }
+        }
+    }
+
+    private _onClick(ev : InteractionEvent) {
         console.log("click")
         let v = this.graphic.getBounds();
         let pos = ev.data.global;
-        if (this.contains(this.bounds, pos.x, pos.y)) {
+        if (Util.contains(this.bounds, pos.x, pos.y)) {
             this.selected = true;
         } else {
             this.selected = false;
@@ -101,7 +167,7 @@ export class WireSegment {
             this.yBoundsReversed ? this.bounds.minY : this.bounds.maxY);
     }
 
-    onMouseMove(ev : InteractionEvent) {
+    private _onMouseMove(ev : InteractionEvent) {
         this.graphic.clear();
         let pos = ev.data.global;
         let dX = pos.x - this.start.x;
@@ -122,6 +188,10 @@ export class WireSegment {
             });
         }
         this._updateBounds();
+    }
+
+    private _onMouseUp() {
+        this.selected = false;
     }
 
     lockToMouseX() {
@@ -150,11 +220,20 @@ export class WireSegment {
 
     }
 
-    contains(bounds : PIXI.Bounds, x : number, y : number) {
-        let xContains = (x < bounds.maxX && x > bounds.minX)
-        let yContains = (y < bounds.maxY && y > bounds.minY)
-
-        return xContains && yContains;
+    getHeading() {
+        if (this.isVertical) {
+            if (this.length > 0) {
+                return Heading.South;
+            } else {
+                return Heading.North;
+            }
+        } else {
+            if (this.length > 0) {
+                return Heading.East;
+            } else {
+                return Heading.West;
+            }
+        }
     }
 
     private _updateBounds() {
@@ -170,7 +249,7 @@ export class WireSegment {
             this.bounds.maxX = tmp;
             this.xBoundsReversed = true;
         } else {
-            this.yBoundsReversed = false;
+            this.xBoundsReversed = false;
         }
 
         if (this.bounds.minY > this.bounds.maxY) {
@@ -193,15 +272,27 @@ export class WireSegment {
 
     private _updateLength(delta : number) {
         if (this.ComponentDockBottom != null) {
-            console.log("trigger nested add wire")
             let addWire = new WireSegment(!this.isVertical, 
                 new PIXI.Point(this.start.x, this.start.y), 0, this.stage, this.onCreateNewSegment);
-            addWire.ComponentDockBottom = this.ComponentDockBottom;
+            let componentDockBottomPtr = this.ComponentDockBottom;
+            this.undockComponentBottom();
+            addWire.addComponentDockBottom(componentDockBottomPtr);
             addWire.top = this;
-            this.ComponentDockBottom = null;
             this.bottom = addWire;
             this.onCreateNewSegment(addWire);
         }
+
+        if (this.ComponentDockTop != null) {
+            let addWire = new WireSegment(!this.isVertical, 
+                this.getEndPoint(), 0, this.stage, this.onCreateNewSegment);
+            let componentDockBottomPtr = this.ComponentDockTop;
+            this.undockComponentTop();
+            addWire.addComponentDockTop(componentDockBottomPtr);
+            addWire.bottom = this;
+            this.top = addWire;
+            this.onCreateNewSegment(addWire);
+        }
+
         if (this.bottom != null) {
             this.bottom.length += delta;
         }
@@ -221,4 +312,5 @@ export class WireSegment {
             }
         }
     }
+
 }

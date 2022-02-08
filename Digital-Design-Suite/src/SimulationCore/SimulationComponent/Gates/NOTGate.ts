@@ -23,7 +23,7 @@ export class NOTGate extends SimulationComponent {
         this.y = 500;
         this.geometry = this.calculateGeometry(1);
 
-        this.addWiringArea(this.geometry['outputWireEndX'] - 7, this.geometry['outputWireEndY'] - 3.5, 
+        this.addWiringArea(this.geometry['outputWireEndX'] - 6, this.geometry['outputWireEndY'] - 3.5, 
         0, false);
 
         this.addWiringArea(this.geometry['inputWireEndX'], this.geometry['inputWireEndY'] - 3.5, 

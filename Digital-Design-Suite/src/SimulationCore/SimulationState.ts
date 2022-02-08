@@ -29,7 +29,8 @@ export class SimulationState {
     isPanning : boolean;
     isDraggingComponent : boolean;
     draggingWireHitArea : WiringArea;
-    draggingWire : Wire;
+    private draggingWire : Wire;
+    private isDraggingWire : boolean;
     
     constructor(stage : PIXI.Container) {
         this.components = new Array<SimulationComponent>();
@@ -38,12 +39,33 @@ export class SimulationState {
         this.mode = MouseMode.SELECT;
         this.stateChanged = true;
         this.stage = stage;
+        this.draggingWire = null;
     }
 
     addComponent(component : SimulationComponent) {
         component.componentId = this.numComponents.toString();
         this.components.push(component);
         this.numComponents ++;
+    }
+
+    setDraggingWire(wire : Wire) {
+        this.draggingWire = wire;
+        wire.beginPlace();
+        this.isDragging = true;
+    }
+
+    getDraggingWire() {
+        return this.draggingWire;
+    }
+
+    stopDraggingWire() {
+        this.draggingWire.endPlace();
+        this.draggingWire = null;
+        this.isDragging = false;
+    }
+    
+    getIsDraggingWire() {
+        return this.isDragging;
     }
 
     removeComponent(componentId : string) {

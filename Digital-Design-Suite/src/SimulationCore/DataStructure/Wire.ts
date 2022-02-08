@@ -14,6 +14,7 @@ import e from "express";
 import { GlowFilter } from '@pixi/filter-glow';
 import {WireSegment} from "./WireSegment"
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
+import { Heading } from "../../Heading";
 
 export class Wire {
     graphic : PIXI.Graphics;
@@ -38,7 +39,7 @@ export class Wire {
      */
     constructor(startX : number, startY : number, dockComponent : SimulationComponent, stage : PIXI.Container) {
         console.log(stage);
-        
+
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onCreateSegment = this.onCreateSegment.bind(this);
 
@@ -58,7 +59,7 @@ export class Wire {
         startY += 3.5; 
         startX += 3.5;
         let addWire = new WireSegment(false, new PIXI.Point(startX, startY), 0, stage, this.onCreateSegment);
-        addWire.ComponentDockBottom = dockComponent;
+        addWire.addComponentDockBottom(dockComponent);
         this.segments.push(addWire);
 
         this.error = false;
@@ -82,6 +83,7 @@ export class Wire {
 
         segmentOne.unlockMouse();
         segmentTwo.unlockMouse();
+        console.log("END PLACE")
 
         this.isPlacing = false;
     }
@@ -132,7 +134,7 @@ export class Wire {
 
         let dX = x - anchor.x;
         let dY = y - anchor.y;
-        let anchorType = Math.abs(dY) > Math.abs(dX);
+        let anchorType = Math.abs(dX) > Math.abs(dY);
 
         let newEnd = new PIXI.Point(segmentOne.getEndPoint().x,segmentOne.getEndPoint().y) ;
         if (dY > 0 && anchorType) {
@@ -175,11 +177,23 @@ export class Wire {
         }
 
         segmentTwo.start = newEnd;
+
+        if (segmentOne.isVertical) {
+            segmentTwo.start.x -= 3
+        } else {
+            segmentTwo.start.y -= 3;
+        }
+
     }
 
     onCreateSegment(created : WireSegment) {
         this.segments.push(created);
     }
+
+    connectComponentToTop(component : SimulationComponent) {
+        this.segments[this.segments.length - 1].addComponentDockTop(component);
+    }
+
     draw() {
         this.graphic.clear();
         this.segments.forEach((segment : WireSegment) => {
