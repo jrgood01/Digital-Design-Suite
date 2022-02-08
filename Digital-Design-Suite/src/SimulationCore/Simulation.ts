@@ -12,9 +12,12 @@ import * as PIXI from "pixi.js"
 import * as constants from "../constants";
 import { Transistor } from "./SimulationComponent/Transistors/Transistor";
 import { InteractionEvent, InteractionManager } from "pixi.js";
-import { WiringMap } from "./DataStructure/WiringMap"
+import { WiringMap } from "./Wiring/WiringMap"
 import { WiringArea } from "./SimulationComponent/WiringArea";
-import { ConstantComponent } from "./SimulationComponent/Wiring/Constant";
+import { SimulationWarden } from "./SimulationWarden"
+import { HitAreaClickEvent } from "./SimulationEvents/HitAreaClickEvent"
+import { ComponentDragEvent } from "./SimulationEvents/ComponentDragEvent";
+import { WireEndDragAtWiringAreaEvent } from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
 
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
@@ -26,20 +29,23 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     private lastMouseX : number;
     private lastMouseY : number;
+    private simulationWarden : SimulationWarden;
 
     constructor(container : HTMLDivElement) {
         super();
         
         //Bind methods to class
         this.resizePixiSimulation = this.resizePixiSimulation.bind(this);
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
-        this.onMouseMove = this.onMouseMove.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
+  
+
+        this.onComponentDrag = this.onComponentDrag.bind(this);
+  
         this.onScroll = this.onScroll.bind(this);
         this.addComponent = this.addComponent.bind(this);
         this.simulationLoop = this.simulationLoop.bind(this);
         this.runSimulation = this.runSimulation.bind(this);
+        this.onHitAreaClick = this.onHitAreaClick.bind(this);
+        this.onWireEndDragAtWiringArea = this.onWireEndDragAtWiringArea.bind(this);
 
         //Simulation state holds data about the simulation
         this.simulationState = new SimulationState(this.stage);
@@ -57,7 +63,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         //Add a new ticker to the simulation. The ticker will
         //  run on a set interval and render simulation graphics
         this.ticker = PIXI.Ticker.shared.add(this.simulationLoop, this)
-        this.ticker.maxFPS = 10;
+        this.ticker.maxFPS = 30;
 
         //This method resizes the pixi.js render area to the
         //  size of the window
@@ -73,9 +79,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
         let v = new NOTGate(1, this.stage, this.simulationState)
         let v2 = new Transistor(this.stage, 1000, 200, this.simulationState);
         let v3 = new Transistor(this.stage, 1000, 700, this.simulationState);
-        let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
+       // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
 
-        this.simulationState.addComponent(v4);
+       // this.simulationState.addComponent(v4);
         this.simulationState.addComponent(v3)
         this.simulationState.addComponent(v2)
         this.simulationState.addComponent(v)
@@ -89,9 +95,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
         
         //Add listeners for global events
         document.addEventListener("wheel", this.onScroll)
-        this.stage.on("pointerdown", this.onMouseDown);
-        this.stage.on("mouseup", this.onMouseUp);
-        this.stage.on("mousemove", this.onMouseMove);  
+ 
+        
 
         this.simulationUpdateFrequency = 100;
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
@@ -102,6 +107,11 @@ export class DigitalDesignSimulation extends PIXI.Application{
         //We will use this to keep track of what component pins 
         //  are connected to what wires
         this.wiringMap = new WiringMap(this.simulationState);
+
+        this.simulationWarden = new SimulationWarden(this.simulationState, this.renderer);
+        this.simulationWarden.addOnHitAreaClick(this.onHitAreaClick);
+        this.simulationWarden.addOnComponentDrag(this.onComponentDrag);
+        this.simulationWarden.addOnWireEndDragAtWiringAreaEvent(this.onWireEndDragAtWiringArea);
     }
 
     /**
@@ -147,117 +157,36 @@ export class DigitalDesignSimulation extends PIXI.Application{
         }
     }
 
-
-    onMouseDown(mouseEvent : InteractionEvent) {
-        let pos = mouseEvent.data.global;
-        let hit = this.interactionManager.hitTest(new PIXI.Point(pos.x, pos.y), this.stage)
-        this.simulationState.components.forEach((component : SimulationComponent) => {
-            component.wiringAreas.forEach((val : Map<Number, WiringArea>) => {
-                val.forEach((val : WiringArea) => {
-                    if (val.graphic == hit) {
-                        this.simulationState.draggingWireHitArea = component.activeWiringArea;
-                        let addWire = this.wiringMap.addWire(
-                            component, component.activeWiringArea.lineNumber, component.activeWiringArea.x, 
-                            component.activeWiringArea.y, this.simulationState.draggingWireHitArea.input);
-                        if (addWire != null) {
-                            this.simulationState.setDraggingWire(addWire);
-                        }
-                        
-                    
-                    }
-                });
-            })
-        
-            if (component.componentTemplate == hit) {
-                component.selected = true;
-                this.simulationState.isDraggingComponent = true;
-                this.simulationState.stateChanged = true;
-                this.simulationState.SelectedComponent = component;
-                this.simulationState.stateChanged = true;
-                return;
-            } else {
-                component.selected = false;
-                this.simulationState.stateChanged = true;
-            }
-        })
-
-        if (!this.simulationState.isDraggingComponent 
-            && this.isInside(pos.x, pos.y, this.view.getBoundingClientRect())) {
-            this.simulationState.isPanning = true;
+    onHitAreaClick(e : HitAreaClickEvent) {
+            this.simulationState.draggingWireHitArea = e.component.activeWiringArea;
+            let addWire = this.wiringMap.addWire(
+                e.component, e.component.activeWiringArea.lineNumber, e.component.activeWiringArea.x, 
+                e.component.activeWiringArea.y, e.hitArea.input);
+            if (addWire != null) {
+                this.simulationState.setDraggingWire(addWire);
         }
-
-        this.simulationState.stateChanged = true;
     }
 
-    onMouseUp(mouseEvent : InteractionEvent) {
-        let pos = mouseEvent.data.global;
-        if (this.isInside(pos.x, pos.y, this.view.getBoundingClientRect()) && 
-            this.simulationState.isPanning) {
-                this.simulationState.isPanning = false;
-            }
-
-            if (this.simulationState.isDragging) {
-                let hit = this.interactionManager.hitTest(new PIXI.Point(pos.x, pos.y), this.stage)
-                this.simulationState.components.forEach((component : SimulationComponent) => {
-                    component.wiringAreas.forEach((subMap : Map<Number, WiringArea>) => {
-                        subMap.forEach((wiringArea : WiringArea) => {
-                            if (wiringArea.graphic.hitArea.contains(pos.x, pos.y)) {
-                                const addOutput = {
-                                    component : component,
-                                    componentLineNumber : wiringArea.lineNumber,
-                                    lineUpdated : false
-                                }
-
-                                this.simulationState.getDraggingWire().anchorToPoint(wiringArea.x, wiringArea.y, false, true);
-                                this.simulationState.getDraggingWire().endPlace();
-                                this.simulationState.getDraggingWire().connectComponentToTop(component);
-                                
-                                this.wiringMap.addWireMapping(component, wiringArea.input, 
-                                    wiringArea.lineNumber, this.simulationState.getDraggingWire());
-                                
-                                return                                
-                            }
-                        })
-                    })
-                });
-                this.simulationState.stopDraggingWire();
-            }
-
-            this.simulationState.isDraggingComponent = false;
+    onComponentDrag(e : ComponentDragEvent) {
+        e.component.translate(e.dX, e.dY);
+        this.wiringMap.moveComponentWires(e.component, e.x, e.y);
     }
 
-    onMouseMove(mouseEvent : InteractionEvent) {
-        let pos = mouseEvent.data.global;
-
-        let dX = 0;
-        let dY = 0;
-
-        if (this.lastMouseX == 0 || this.lastMouseY == 0) {
-            this.lastMouseX = pos.x;
-            this.lastMouseY = pos.y;
-            return;
+    onWireEndDragAtWiringArea(e : WireEndDragAtWiringAreaEvent) {
+        const addOutput = {
+            component : e.component,
+            componentLineNumber : e.wiringArea.lineNumber,
+            lineUpdated : false
         }
 
-        dX = pos.x - this.lastMouseX;
-        dY = pos.y - this.lastMouseY;
+        e.wire.anchorToPoint(e.wiringArea.x, e.wiringArea.y, false, true);
+        e.wire.endPlace();
+        e.wire.connectComponentToTop(e.component);
+
+        this.wiringMap.addWireMapping(e.component, e.wiringArea.input, 
+            e.wiringArea.lineNumber, e.wire);
         
-        if (this.simulationState.isPanning) {
-            //this.stage.pivot.x -= mouseEvent.movementX;
-            //this.stage.pivot.y -= mouseEvent.movementY;
-        }   
-
-        if (this.simulationState.isDraggingComponent) {
-            this.simulationState.SelectedComponent.translate(dX, dY);
-            this.wiringMap.moveComponentWires(this.simulationState.SelectedComponent, pos.x, pos.y);
-            this.simulationState.stateChanged = true;
-        }
-
-        if (this.simulationState.getIsDraggingWire) {
-            //this.simulationState.draggingWire.positionLastSegment(mouseEvent.x, mouseEvent.y - 30);
-        }
-
-        this.lastMouseX = pos.x;
-        this.lastMouseY = pos.y;
+        return    
     }
 
     /**
