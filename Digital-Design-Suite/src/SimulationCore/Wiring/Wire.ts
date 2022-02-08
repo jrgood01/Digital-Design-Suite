@@ -38,7 +38,7 @@ export class Wire {
      * @param startY wire endX
      */
     constructor(startX : number, startY : number, dockComponent : SimulationComponent, stage : PIXI.Container) {
-        console.log(stage);
+ 
 
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onCreateSegment = this.onCreateSegment.bind(this);
@@ -93,7 +93,7 @@ export class Wire {
 
         segmentOne.unlockMouse();
         segmentTwo.unlockMouse();
-        console.log("END PLACE")
+    
 
         this.isPlacing = false;
     }
@@ -146,53 +146,50 @@ export class Wire {
         let dY = y - anchor.y;
         let anchorType = Math.abs(dX) > Math.abs(dY);
 
-        let newEnd = new PIXI.Point(segmentOne.getEndPoint().x,segmentOne.getEndPoint().y) ;
-        if (dY > 0 && anchorType) {
-            newEnd.y -= 7;
-        } 
-
-        if (dX > 0 && !anchorType) {
-            newEnd.x -= 7;
-        } 
-
-        if (smartAnchor) {
-            if (dX > 0) {
-                dX += 8;
-            }
-        }
-
         if (anchorType) {
+            console.log("type 0")
             segmentTwo.length = dY;
             segmentTwo.isVertical = true;
 
             segmentOne.length = dX;
             segmentOne.isVertical = false;
-
+            segmentTwo.start = segmentOne.getEndPoint();
+            console.log(segmentTwo.length)
+            if (segmentTwo.length > 0) {
+                segmentTwo.start.y -= 10;
+            } else {
+                segmentTwo.start.y -= 3.5;
+            }
             if (lockMouseOnAnchor) {
                 segmentTwo.lockToMouseY();
                 segmentOne.lockToMouseX();
             }
 
         } else {
+            console.log("type 1")
             segmentTwo.length = dX;
             segmentTwo.isVertical = false;
 
             segmentOne.length = dY ;
             segmentOne.isVertical = true;
-
+            segmentTwo.start = segmentOne.getEndPoint();
             if (lockMouseOnAnchor) {
                 segmentTwo.lockToMouseX();
                 segmentOne.lockToMouseY();
             }
+
+            if (segmentTwo.length > 0) {
+                segmentTwo.start.x -= 10;
+            } else {
+                segmentTwo.start.x -= 3;
+            }
+            
         }
 
-        segmentTwo.start = newEnd;
+       // segmentTwo.start = segmentOne.getEndPoint();
 
-        if (segmentOne.isVertical) {
-            segmentTwo.start.x -= 3
-        } else {
-            segmentTwo.start.y -= 3;
-        }
+
+  
 
     }
 

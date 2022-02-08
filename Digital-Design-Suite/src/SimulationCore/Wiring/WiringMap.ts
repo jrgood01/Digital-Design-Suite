@@ -45,8 +45,6 @@ export class WiringMap {
         //If there is already a wire mapped on this wiring area we return null
         //  indicating that no wire was created
         if (this.wireMap.get(ioComponent).get(isInput).get(lineNumber) != null) {
-            console.log("Already Mapped Wire")
-            console.log(this.wireMap.get(ioComponent).get(isInput).get(lineNumber))
             return null;
         }
 

@@ -16,7 +16,7 @@ export class ConstantComponent extends SimulationComponent {
         this.componentTemplate.addChild(this.text);
 
         this.addWiringArea(this.x + 300, this.y + 100, 
-        0, true);
+        0, false);
     } 
 
     simulate() {
@@ -34,7 +34,8 @@ export class ConstantComponent extends SimulationComponent {
         }
     }
     draw() {
-        console.log(this.x)
+
+        this.setGlowColor(this.getColor())
         this.componentTemplate.clear();
         this.componentTemplate.lineStyle(10, this.getColor())
             .drawRect(this.x, this.y, 200, 200);

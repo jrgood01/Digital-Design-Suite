@@ -14,13 +14,13 @@ export class NOTGate extends SimulationComponent {
     bitWidth : number;
     simulationState : SimulationState;
 
-    constructor(bitWidth : number, stage : PIXI.Container, simulationState : SimulationState) {
+    constructor(bitWidth : number, x: number, y: number, stage : PIXI.Container, simulationState : SimulationState) {
         super(1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1), stage);
         this.input.setLineBit(0, 0, wireState.Float);
         this.bitWidth = bitWidth;
         this.simulationState = simulationState;
-        this.x = 500;
-        this.y = 500;
+        this.x = x;
+        this.y = y;
         this.geometry = this.calculateGeometry(1);
 
         this.addWiringArea(this.geometry['outputWireEndX'] - 6, this.geometry['outputWireEndY'] - 3.5, 
@@ -76,7 +76,7 @@ export class NOTGate extends SimulationComponent {
             } else {
                 outputBit = wireState.High;
             }
-            console.log(this.input.getLineBit(0, bit), this.output.getLineBit(0, bit))
+            //console.log(this.input.getLineBit(0, bit), this.output.getLineBit(0, bit))
             this.output.setLineBit(0, bit, outputBit);
         }
         

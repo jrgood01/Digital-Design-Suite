@@ -14,6 +14,8 @@ import { InteractionEvent } from "pixi.js";
 import { Heading } from "../../Heading";
 import { Util } from "../../Util";
 import { Wire } from "./Wire";
+import { GlowFilter } from '@pixi/filter-glow';
+
 export class WireSegment {
     top : WireSegment;
     bottom : WireSegment;
@@ -97,7 +99,6 @@ export class WireSegment {
         this.ComponentDockBottom = dock;
         this.ComponentDockBottom.onMove.push(this._onComponentBottomMove);
         this.componentDockBottomActionIndex = this.ComponentDockBottom.onMove.length - 1;
-        console.log(this.ComponentDockBottom.onMove)
     }
 
     addComponentDockTop(dock : SimulationComponent) {
@@ -137,7 +138,7 @@ export class WireSegment {
     }
 
     private _onComponentTopMove(dX : number, dY : number) {
-        console.log("OnComponentTopMove")
+ 
         if (this.isVertical) {
             this.length += dY;
             if (this.bottom != null) {
@@ -154,7 +155,7 @@ export class WireSegment {
     }
 
     private _onClick(ev : InteractionEvent) {
-        console.log("click")
+   
         let v = this.graphic.getBounds();
         let pos = ev.data.global;
         if (Util.contains(this.bounds, pos.x, pos.y)) {
@@ -212,6 +213,11 @@ export class WireSegment {
     }
 
     Draw() {
+        if (this.color === wireState.High) {
+            this.graphic.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : this.color})]
+        } else {
+            this.graphic.filters = [];
+        }
         this.graphic.clear();
         
         this.graphic.lineStyle(6.5, this.selected ?  Constants.General.selectedColor : this.color)

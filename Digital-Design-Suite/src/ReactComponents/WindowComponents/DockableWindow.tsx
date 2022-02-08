@@ -49,7 +49,6 @@ export const DockableWindow = (props : DockableWindowProps) => {
     const [positionX, setPositionX] = useState(props.startX);
     const [positionY, setPositionY] = useState(props.startY);
     const onDrag = (e : React.DragEvent<HTMLDivElement>) => {
-        console.log("OnDrag")
         let resetMetrics = !((e.clientX > 0) && (e.clientY > 0));
         if (!(lastDragX == -1) && !(lastDragY == -1) && !resetMetrics) {
             let deltaY = e.clientY - lastDragY;
@@ -58,8 +57,6 @@ export const DockableWindow = (props : DockableWindowProps) => {
 
             setPositionX((topDiv.getBoundingClientRect().left + deltaX));
             setPositionY((topDiv.getBoundingClientRect().top + deltaY));
-
-            //console.log(deltaX, deltaY);
         } 
       
         setLastDragX(resetMetrics ? -1 : e.clientX);

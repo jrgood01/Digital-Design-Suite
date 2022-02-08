@@ -176,19 +176,14 @@ export class SimulationWarden {
         let pos = mouseEvent.data.global;
 
         if (this.state.isDragging) {
-            let hit = this.interactionManager.hitTest(new PIXI.Point(pos.x, pos.y), this.state.stage)
-            this.state.components.forEach((component : SimulationComponent) => {
-                component.wiringAreas.forEach((subMap : Map<Number, WiringArea>) => {
-                    subMap.forEach((wiringArea : WiringArea) => {
-                        if (wiringArea.graphic.hitArea.contains(pos.x, pos.y)) {
-                            this.onWireEndDragAtWiringAreaEvent.forEach((handler : (e : WireEndDragAtWiringAreaEvent) => void) => {
-                                handler(new WireEndDragAtWiringAreaEvent(this.state.getDraggingWire(), component, wiringArea, pos.x, pos.y));
-                            });
-                            return                                
-                        }
-                    })
-                })
-            });
+
+           if (this.state.activeWiringArea != null) {
+                this.onWireEndDragAtWiringAreaEvent.forEach((handler : (e : WireEndDragAtWiringAreaEvent) => void) => {
+                    handler(new WireEndDragAtWiringAreaEvent(this.state.getDraggingWire(), this.state.activeWiringArea.component,
+                    this.state.activeWiringArea, pos.x, pos.y));
+                })               
+           }
+
             this.state.stopDraggingWire();
         }
 

@@ -9,6 +9,7 @@ import * as PIXI from "pixi.js"
 import { Wire } from "./Wiring/Wire";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 import { WiringArea } from "./SimulationComponent/WiringArea";
+import { WiringAreaActiveEvent } from "./SimulationEvents/WiringAreaActiveEvent";
 export enum MouseMode {
     PAN,
     ZOOM,
@@ -29,6 +30,7 @@ export class SimulationState {
     isPanning : boolean;
     isDraggingComponent : boolean;
     draggingWireHitArea : WiringArea;
+    activeWiringArea : WiringArea;
     private draggingWire : Wire;
     private isDraggingWire : boolean;
     
@@ -44,6 +46,15 @@ export class SimulationState {
 
     addComponent(component : SimulationComponent) {
         component.componentId = this.numComponents.toString();
+        
+        component.addOnWiringAreaActive((e : WiringAreaActiveEvent) => {
+            this.activeWiringArea = e.wiringArea;
+        })
+
+        component.addOnWiringAreaLeave(() => {
+            this.activeWiringArea = null;
+        })
+
         this.components.push(component);
         this.numComponents ++;
     }

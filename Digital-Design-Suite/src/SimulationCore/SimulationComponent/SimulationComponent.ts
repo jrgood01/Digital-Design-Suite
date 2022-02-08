@@ -11,6 +11,7 @@ import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
 import {WiringArea} from "./WiringArea"
 import { GlowFilter } from '@pixi/filter-glow';
+import { WiringAreaActiveEvent } from "../SimulationEvents/WiringAreaActiveEvent";
 
 /**
  * Represents a simulated digital component
@@ -36,12 +37,15 @@ export abstract class SimulationComponent{
 
     geometry : Record <string, number>;
 
-    activeWiringArea : WiringArea;
+    glowColor : number;
     glowOn : boolean;
 
     onMove : Array<(dX : number, dY : number) => void>;
 
     visited : boolean;
+
+    private onWiringAreaActive :  Array<(e : WiringAreaActiveEvent) => void>;
+    private onWiringAreaLeave : Array<() => void>;
 
     constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
@@ -59,11 +63,12 @@ export abstract class SimulationComponent{
 
         stage.addChild(this.componentTemplate);
         this.geometry = this.calculateGeometry(1);
-        this.activeWiringArea = null;
         this.glowOn = false;
         this.onMove = new Array<(dX : number, dY : number) => void>();
         this.visited = false;
-        //this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
+        this.glowColor = 0x0000ff;
+        this.onWiringAreaActive = new Array<(e : WiringAreaActiveEvent) => void>();
+        this.onWiringAreaLeave = new Array<() => void>();
     }
 
 
@@ -81,10 +86,19 @@ export abstract class SimulationComponent{
     
     setGlow(on : boolean) {
         if (on) {
-            this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : 0x3333FF})]
+            this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : this.glowColor})]
         } else {
             this.componentTemplate.filters = [];
         }
+
+        this.glowOn = on;
+    }
+
+    setGlowColor(color : number) {
+        if (this.glowOn) {
+            this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : color})]
+        } 
+        this.glowColor = color;
     }
     addInputLine(bitWidth : number) {
         this.input.addLine(bitWidth);
@@ -158,15 +172,15 @@ export abstract class SimulationComponent{
 
     addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean) {
         let wiringAreaGraphic = new PIXI.Graphics();
-        console.log(this.simulationState.stage);
+       
         wiringAreaGraphic.interactive = true;
         wiringAreaGraphic.alpha = 0;
         wiringAreaGraphic.lineStyle(4, 0x0000FF);
         wiringAreaGraphic.drawCircle(x + 3.5, y + 3.5, 14);
         wiringAreaGraphic.isMask = false;
-        //wiringAreaGraphic.zIndex = 100;
+   
         this.simulationState.stage.addChild(wiringAreaGraphic);
-        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 50, y - 50 , 100, 100);
+        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 100, y - 100 , 200, 200);
         
         const addWiringArea = {
             x : x,
@@ -186,7 +200,9 @@ export abstract class SimulationComponent{
         {
             if (!this.selected) {
                 wiringAreaGraphic.alpha = 1;
-                this.activeWiringArea=addWiringArea
+                this.onWiringAreaActive.forEach((handler : (e : WiringAreaActiveEvent) => void) => {
+                    handler(new WiringAreaActiveEvent(addWiringArea));
+                })
             }
         });
 
@@ -194,7 +210,9 @@ export abstract class SimulationComponent{
         {
             if (!this.selected) {
                 wiringAreaGraphic.alpha = 0;
-                this.activeWiringArea = null;
+                this.onWiringAreaLeave.forEach((handler : () => void) => {
+                    handler()
+                });
             }
         });
 
@@ -202,7 +220,14 @@ export abstract class SimulationComponent{
 
     }
 
+    addOnWiringAreaActive(handler : (e : WiringAreaActiveEvent) => void) {
+        this.onWiringAreaActive.push(handler);
+    }
     
+    addOnWiringAreaLeave(handler : () => void) {
+        this.onWiringAreaLeave.push(handler);
+    }
+
     passOutputs() {
 
     }

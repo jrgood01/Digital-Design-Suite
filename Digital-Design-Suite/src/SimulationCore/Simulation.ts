@@ -105,16 +105,14 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.simulationWarden.addOnWireEndDragAtWiringAreaEvent(this.onWireEndDragAtWiringArea);
 
         let v4 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
-        let v = new NOTGate(1, this.stage, this.simulationState)
-        let v2 = new Transistor(this.stage, 1000, 200, this.simulationState);
-        let v3 = new Transistor(this.stage, 1000, 700, this.simulationState);
+        let v2 = new NOTGate(1, 200, 200, this.stage, this.simulationState);
+        let v = new NOTGate(1, 300, 300,this.stage, this.simulationState);
         
        // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
 
        // this.simulationState.addComponent(v4);
-        this.simulationState.addComponent(v3)
-        this.simulationState.addComponent(v2)
         this.simulationState.addComponent(v)
+        this.simulationState.addComponent(v2)
         this.simulationState.addComponent(v4);
     }
 
@@ -162,10 +160,10 @@ export class DigitalDesignSimulation extends PIXI.Application{
     }
 
     onHitAreaClick(e : HitAreaClickEvent) {
-            this.simulationState.draggingWireHitArea = e.component.activeWiringArea;
+            this.simulationState.draggingWireHitArea =this.simulationState.activeWiringArea;
             let addWire = this.wiringMap.addWire(
-                e.component, e.component.activeWiringArea.lineNumber, e.component.activeWiringArea.x, 
-                e.component.activeWiringArea.y, e.hitArea.input);
+                e.component, this.simulationState.activeWiringArea.lineNumber, this.simulationState.activeWiringArea.x, 
+                this.simulationState.activeWiringArea.y, e.hitArea.input);
             if (addWire != null) {
                 this.simulationState.setDraggingWire(addWire);
         }
@@ -177,19 +175,19 @@ export class DigitalDesignSimulation extends PIXI.Application{
     }
 
     onWireEndDragAtWiringArea(e : WireEndDragAtWiringAreaEvent) {
+        console.log("wireHitArea")
         const addOutput = {
             component : e.component,
             componentLineNumber : e.wiringArea.lineNumber,
             lineUpdated : false
         }
 
-        e.wire.anchorToPoint(e.wiringArea.x, e.wiringArea.y, false, true);
         e.wire.endPlace();
         e.wire.connectComponentToTop(e.component);
 
         this.wiringMap.addWireMapping(e.component, e.wiringArea.input, 
             e.wiringArea.lineNumber, e.wire);
-        
+        e.wire.anchorToPoint(e.wiringArea.x, e.wiringArea.y, true);        
         return    
     }
 
