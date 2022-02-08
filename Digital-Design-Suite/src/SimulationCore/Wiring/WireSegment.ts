@@ -136,6 +136,7 @@ export class WireSegment {
     }
 
     private _onComponentTopMove(dX : number, dY : number) {
+        console.log("OnComponentTopMove")
         if (this.isVertical) {
             this.length += dY;
             if (this.bottom != null) {

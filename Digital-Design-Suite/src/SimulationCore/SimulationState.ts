@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import * as PIXI from "pixi.js"
-import { Wire } from "./DataStructure/Wire";
+import { Wire } from "./Wiring/Wire";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 import { WiringArea } from "./SimulationComponent/WiringArea";
 export enum MouseMode {

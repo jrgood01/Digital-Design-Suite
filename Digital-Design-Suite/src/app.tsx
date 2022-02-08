@@ -11,8 +11,8 @@ import './default.css';
 import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
+import {SimulationWarden} from "./SimulationCore/SimulationWarden"
 function render() {
-
   const containerRef = React.createRef<HTMLDivElement>();
 
   const subMenuArr: SubMenuProps[] = [
