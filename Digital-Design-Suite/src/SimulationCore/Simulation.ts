@@ -19,6 +19,7 @@ import { HitAreaClickEvent } from "./SimulationEvents/HitAreaClickEvent"
 import { ComponentDragEvent } from "./SimulationEvents/ComponentDragEvent";
 import { WireEndDragAtWiringAreaEvent } from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
 import { Wire } from "./Wiring/Wire";
+import { HexDisplay } from "./SimulationComponent/Peripheral/HexDisplay"
 
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
@@ -107,6 +108,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         let v4 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
         let v2 = new NOTGate(1, 200, 200, this.stage, this.simulationState);
         let v = new NOTGate(1, 300, 300,this.stage, this.simulationState);
+        let r = new HexDisplay(200, 200, this.simulationState.stage);
         
        // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
 
@@ -114,6 +116,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.simulationState.addComponent(v)
         this.simulationState.addComponent(v2)
         this.simulationState.addComponent(v4);
+        this.simulationState.addComponent(r);
     }
 
     /**
