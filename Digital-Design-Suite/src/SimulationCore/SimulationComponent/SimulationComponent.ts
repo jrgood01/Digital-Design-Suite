@@ -47,9 +47,10 @@ export abstract class SimulationComponent{
     private onWiringAreaActive :  Array<(e : WiringAreaActiveEvent) => void>;
     private onWiringAreaLeave : Array<() => void>;
 
-    constructor(inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, stage? : PIXI.Container) {
+    constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, simulationState : SimulationState) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
+        this.simulationState = simulationState;
 
         this.deleted = false;
         this.componentTemplate = new PIXI.Graphics();
@@ -60,8 +61,9 @@ export abstract class SimulationComponent{
         this.wiringAreas = new Map<boolean, Map<Number, WiringArea>>();
         this.wiringAreas.set(false, new Map<Number, WiringArea>());
         this.wiringAreas.set(true, new Map<Number, WiringArea>());
-
-        stage.addChild(this.componentTemplate);
+        console.log(this)
+        console.log(this.simulationState)
+        this.simulationState.stage.addChild(this.componentTemplate);
         this.geometry = this.calculateGeometry(1);
         this.glowOn = false;
         this.onMove = new Array<(dX : number, dY : number) => void>();
@@ -69,6 +71,9 @@ export abstract class SimulationComponent{
         this.glowColor = 0x0000ff;
         this.onWiringAreaActive = new Array<(e : WiringAreaActiveEvent) => void>();
         this.onWiringAreaLeave = new Array<() => void>();
+
+        this.x = x;
+        this.y = y;
     }
 
 
@@ -180,7 +185,7 @@ export abstract class SimulationComponent{
         wiringAreaGraphic.isMask = false;
    
         this.simulationState.stage.addChild(wiringAreaGraphic);
-        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 100, y - 100 , 200, 200);
+        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 50, y - 50 , 100, 100);
         
         const addWiringArea = {
             x : x,
