@@ -28,7 +28,7 @@ export class SimulationComponentIO {
     constructor(lineNum : number, bitWidths : Array<number>) {
 
         if (lineNum != bitWidths.length) {
-            throw(`Cannot create SimulationComponentIO. ${bitWidths} bitwidths declared for ${lineNum} lines Bit width array must contain lineNum elements`)
+            throw(`Cannot create SimulationComponentIO. ${bitWidths.length} bitwidths declared for ${lineNum} lines Bit width array must contain lineNum elements`)
         }
 
 

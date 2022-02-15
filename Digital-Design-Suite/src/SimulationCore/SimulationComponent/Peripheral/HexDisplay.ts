@@ -10,13 +10,13 @@
 import * as constants from "../../../constants"
 import * as PIXI from 'pixi.js'
 import { SimulationComponent } from "../SimulationComponent";
-
+import { SimulationState } from "../../SimulationState";
 export class HexDisplay extends SimulationComponent {
     private segments = Array<boolean>();
     private width = 450;
     private height = 600;
-    constructor(x : number, y : number, stage : PIXI.Container) {
-        super(7, 0, Array(7).fill(1), Array(0).fill(0), stage);
+    constructor(x : number, y : number, simulationState : SimulationState) {
+        super(x, y, 7, 0, Array(7).fill(1), Array(0).fill(0), simulationState);
         this.segments = new Array(7).fill(false);
         this.segments[0] = true;
         this.segments[3] = true;
