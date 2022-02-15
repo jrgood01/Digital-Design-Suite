@@ -107,16 +107,14 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.simulationWarden.addOnWireEndDragAtWiringAreaEvent(this.onWireEndDragAtWiringArea);
 
         let v4 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
-        let v5 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
-        let v2 = new NANDGate(1, 200, 200, 2, this.simulationState);
-        let v = new NOTGate(1, 300, 300,this.stage, this.simulationState);
+        let v5 = new HexDisplay(900, 900, this.simulationState);
+        
         //let r = new HexDisplay(200, 200, this.simulationState.stage);
         
        // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
 
        // this.simulationState.addComponent(v4);
-        this.simulationState.addComponent(v)
-        this.simulationState.addComponent(v2)
+
         this.simulationState.addComponent(v4);
         this.simulationState.addComponent(v5);
         //this.simulationState.addComponent(r);

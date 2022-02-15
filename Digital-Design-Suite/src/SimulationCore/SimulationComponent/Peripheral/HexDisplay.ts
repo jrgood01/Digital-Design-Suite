@@ -11,20 +11,32 @@ import * as constants from "../../../constants"
 import * as PIXI from 'pixi.js'
 import { SimulationComponent } from "../SimulationComponent";
 import { SimulationState } from "../../SimulationState";
+import { wireState } from "../../../SimulationCore/WireStates";
 export class HexDisplay extends SimulationComponent {
     private segments = Array<boolean>();
     private width = 450;
     private height = 600;
     constructor(x : number, y : number, simulationState : SimulationState) {
-        super(x, y, 7, 0, Array(7).fill(1), Array(0).fill(0), simulationState);
-        this.segments = new Array(7).fill(false);
-        this.segments[0] = true;
-        this.segments[3] = true;
-        this.segments[2] = true;
-        this.segments[4] = true;
-        this.segments[5] = true;
+        super(x, y, 8, 0, Array(8).fill(1), Array(0).fill(0), simulationState);
+        this.segments = new Array(8).fill(false);
+ 
         this.x = x;
         this.y = y;
+
+        for (let i = 0 ; i < 4; i ++) {
+            this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
+            .drawCircle(this.x + 120 + (i * 55), this.y + 20, 2); 
+
+            this.addWiringArea(this.x + 120 + (i * 55), this.y + 20, i, true)
+        }
+        
+        for (let i = 0 ; i < 4; i ++) {
+            this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
+            .drawCircle(this.x + 120 + (i * 55), this.y + 575, 2); 
+
+            this.addWiringArea(this.x + 120 + (i * 55), this.y + 575, i + 4, true)
+        }
+
         this.geometry = this.calculateGeometry(1);
     }
 
@@ -60,6 +72,9 @@ export class HexDisplay extends SimulationComponent {
     }
 
     draw() {
+        for (let i = 0; i < 8; i ++) {
+            this.segments[i] = this.getInputLineBit(i, 0) == wireState.High;
+        }
         this.componentTemplate.clear();
         this.componentTemplate.lineStyle(7, constants.General.componentColorStandard)
             .drawRect(this.geometry['cornerTopX'], this.geometry['cornerTopY'],
@@ -94,30 +109,17 @@ export class HexDisplay extends SimulationComponent {
         this.componentTemplate.lineStyle(25, this.segments[7] ? 0xff2222 : 0x222222)
             .drawRect(this.x + 410, this.y + 545, 1, 1)
         
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 120, this.y + 20, 2);
+        for (let i = 0 ; i < 4; i ++) {
+            this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
+            .drawCircle(this.x + 120 + (i * 55), this.y + 20, 2); 
+        }
+     
+        for (let i = 0 ; i < 4; i ++) {
+            this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
+            .drawCircle(this.x + 120 + (i * 55), this.y + 575, 2); 
+        }
 
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 175, this.y + 20, 2);
-
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 230, this.y + 20, 2);
-
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 285, this.y + 20, 2);
-
-
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 120, this.y + 575, 2);
-
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 175, this.y + 575, 2);
-
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 230, this.y + 575, 2);
-
-        this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
-            .drawCircle(this.x + 285, this.y + 575, 2);
+  
         this.updateHitArea();
     }
 }
