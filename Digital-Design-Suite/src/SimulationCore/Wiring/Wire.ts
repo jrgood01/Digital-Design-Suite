@@ -147,14 +147,14 @@ export class Wire {
         let anchorType = Math.abs(dX) > Math.abs(dY);
 
         if (anchorType) {
-            console.log("type 0")
+            
             segmentTwo.length = dY;
             segmentTwo.isVertical = true;
 
             segmentOne.length = dX;
             segmentOne.isVertical = false;
             segmentTwo.start = segmentOne.getEndPoint();
-            console.log(segmentTwo.length)
+           
             if (segmentTwo.length > 0) {
                 segmentTwo.start.y -= 10;
             } else {
@@ -166,7 +166,7 @@ export class Wire {
             }
 
         } else {
-            console.log("type 1")
+           
             segmentTwo.length = dX;
             segmentTwo.isVertical = false;
 
