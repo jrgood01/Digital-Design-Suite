@@ -6,7 +6,9 @@
 //Copyright Jacob R. Haygood 2022
 
 export const General = {
-    BgColor_1: 0x141216,
+    BgColor_1: 0x17181F,
+    BgColor_2: 0x2A2F3B,
+    BgColor_3 : 0x1A1E23,
     componentColorError : 0xCC6666,
     componentColorStandard : 0x22baff,
     componentColorHigh : 0x11ff11,
