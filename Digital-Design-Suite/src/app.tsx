@@ -39,19 +39,16 @@ function render() {
   ];
 
 
+  let simulation = new DigitalDesignSimulation(containerRef.current);
 
   ReactDOM.render(
       <React.Fragment>
         <MenuBar props={{elements:subMenuArr}}/>
-        <ToolBoxWindow currentSelection={""}/>
+        <ToolBoxWindow currentSelection={""} onBeginComponentPlace={(val : string) => {simulation.simulationWarden.beginPlace(val)}}/>
       </React.Fragment>
-      
+  , document.body);
 
-  , document.body
-  );
-
-
-  let simulation = new DigitalDesignSimulation(containerRef.current);
+  simulation.beginRender();
 }
 
 render();
