@@ -14,7 +14,7 @@ class XNORGate extends SimulationComponent {
     bitWidth : number;
 
     constructor(x : number, y : number, bitWidth : number, numInputs : number, simulationState : SimulationState) {
-        super(x, y, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1), simulationState);
+        super(x, y, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
         this.inputs = numInputs;
         this.bitWidth = bitWidth;
     }

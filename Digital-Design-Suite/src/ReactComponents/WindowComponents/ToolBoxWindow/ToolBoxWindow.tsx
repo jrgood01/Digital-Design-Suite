@@ -20,7 +20,7 @@ export const ToolBoxWindow = (props : ToolBoxWindowProps) => {
     const onSelect = (val : string) => {setCurSelected(val);}
     return (
         <DockableWindow title='ToolBox' assignedId='3' width={250} height={1000} 
-        onMouseLeave={() => {props.onBeginComponentPlace(curSelected)}} 
+        onMouseLeave={() => {props.onBeginComponentPlace(curSelected);setCurSelected("");}} 
         onMouseEnter={() => {setCurSelected("")}}>
             <div>
                 <ToolBoxElement title={"Gates"} icon={
@@ -40,7 +40,7 @@ export const ToolBoxWindow = (props : ToolBoxWindowProps) => {
 
                 <ToolBoxElement title={"Wiring"} icon={
                     <SwitchCircuitLogo  overflow={"visible"} style={{transform:"scale(.3)",paddingBottom:"10px",paddingLeft:"90px", stroke:"#22baff",fill:"#22baff"}}/>                
-                } dropDownElements={['Tunnel', 'Input Pin', 'Output Pin', 'Wire Splitter', 'Clock', 'Constant', 'Button', 'Switch']}
+                } dropDownElements={['Tunnel', 'Input Pin', 'Output Pin', 'Wire Splitter', 'Clock', 'Constant', 'Button', 'Switch', 'Vcc', 'Gnd', 'Pull Resistor']}
                 currentSelection={curSelected} onSelect={onSelect}/> 
 
                 <ToolBoxElement title={"memory"} icon={

@@ -19,12 +19,12 @@ export enum TransistorType {
 export class Transistor extends SimulationComponent {
     type : TransistorType;
 
-    constructor(stage : PIXI.Container, x : number, y : number, simulationState : SimulationState) {
-        super(x, y, 2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1), simulationState);
- 
-        this.simulationState = simulationState;
+    constructor(x : number, y : number) {
+        super(x, y, 2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));
+
         this.x = x;
         this.y = y;
+        
         this.geometry = this.calculateGeometry(1);
         this.addWiringArea(this.geometry['emitterConnectorWireFinalX'] - 4, this.geometry['emitterConnectorWireFinalY'] - 7, 
             0, false);
