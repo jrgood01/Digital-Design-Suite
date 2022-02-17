@@ -12,6 +12,7 @@ import * as PIXI from 'pixi.js'
 import {WiringArea} from "./WiringArea"
 import { GlowFilter } from '@pixi/filter-glow';
 import { WiringAreaActiveEvent } from "../SimulationEvents/WiringAreaActiveEvent";
+import { SimulationAddGraphicEvent } from "../SimulationEvents/SimulationAddGraphicEvent";
 
 /**
  * Represents a simulated digital component
@@ -42,16 +43,18 @@ export abstract class SimulationComponent{
 
     onMove : Array<(dX : number, dY : number) => void>;
 
+    onGraphicAdded : (e : SimulationAddGraphicEvent) => void;
+    onGraphicRemove : (e : SimulationAddGraphicEvent) => void;
+
     visited : boolean;
     private opacity : number;
 
     private onWiringAreaActive :  Array<(e : WiringAreaActiveEvent) => void>;
     private onWiringAreaLeave : Array<() => void>;
 
-    constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>, simulationState : SimulationState) {
+    constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
-        this.simulationState = simulationState;
 
         this.deleted = false;
         this.componentTemplate = new PIXI.Graphics();
@@ -63,7 +66,6 @@ export abstract class SimulationComponent{
         this.wiringAreas.set(false, new Map<Number, WiringArea>());
         this.wiringAreas.set(true, new Map<Number, WiringArea>());
 
-        this.simulationState.stage.addChild(this.componentTemplate);
         this.geometry = this.calculateGeometry(1);
         this.glowOn = false;
         this.onMove = new Array<(dX : number, dY : number) => void>();
@@ -74,6 +76,9 @@ export abstract class SimulationComponent{
 
         this.x = x;
         this.y = y;
+
+        this.onGraphicAdded = (e : SimulationAddGraphicEvent) => {};
+        this.onGraphicRemove = (e : SimulationAddGraphicEvent) => {};
     }
 
 
@@ -86,7 +91,6 @@ export abstract class SimulationComponent{
      */
     simulateAndPass() {
         this.simulate();
-        this.passOutputs();
     }
 
     setOpacity(newOpacity : number) {
@@ -223,7 +227,7 @@ export abstract class SimulationComponent{
         wiringAreaGraphic.drawCircle(x + 3.5, y + 3.5, 14);
         wiringAreaGraphic.isMask = false;
    
-        this.simulationState.stage.addChild(wiringAreaGraphic);
+        this.onGraphicAdded(new SimulationAddGraphicEvent(wiringAreaGraphic));
         wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 50, y - 50 , 100, 100);
         
         const addWiringArea = {
@@ -273,7 +277,18 @@ export abstract class SimulationComponent{
         this.onWiringAreaLeave.push(handler);
     }
 
-    passOutputs() {
+    setOnGraphicAdded(handler : (e : SimulationAddGraphicEvent) => void) {
+        this.onGraphicAdded = handler;
+        handler(new SimulationAddGraphicEvent(this.componentTemplate));
+        this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
+            value.forEach((wiringArea : WiringArea) => {
+                handler(new SimulationAddGraphicEvent(wiringArea.graphic));
+            });
+        });      
 
+    }
+
+    setOnGraphicRemove(handler : (e : SimulationAddGraphicEvent) => void) {
+        this.onGraphicRemove = handler;
     }
 }

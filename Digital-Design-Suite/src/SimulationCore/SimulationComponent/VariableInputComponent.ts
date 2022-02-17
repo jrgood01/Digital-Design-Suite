@@ -3,6 +3,7 @@ import { WiringArea } from "./WiringArea"
 import * as PIXI from "pixi.js"
 import * as constants from "../../constants"
 import { SimulationState } from "../SimulationState";
+import { SimulationAddGraphicEvent } from "../SimulationEvents/SimulationAddGraphicEvent";
 export abstract class VariableInputComponent extends SimulationComponent {
     numInputs : number;
     componentHeight : number;
@@ -12,8 +13,8 @@ export abstract class VariableInputComponent extends SimulationComponent {
     private inputAreaStartY : number;
 
     constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : number[], 
-        outputBitWidths : number[], simulationState : SimulationState, componentHeight : number) {
-        super(x, y, inputLines, outputLines, inputBitWidths, outputBitWidths, simulationState);
+        outputBitWidths : number[],componentHeight : number) {
+        super(x, y, inputLines, outputLines, inputBitWidths, outputBitWidths);
         
         this.drawInputAreas = this.drawInputAreas.bind(this);
 
@@ -38,7 +39,7 @@ export abstract class VariableInputComponent extends SimulationComponent {
         this.inputAreaStartY = this.y + this.inputAreaPadding;
 
         this.wiringAreas.get(true).forEach((wiringArea : WiringArea, key : number) => {
-            this.simulationState.stage.removeChild(wiringArea.graphic);
+            this.onGraphicRemove(new SimulationAddGraphicEvent(wiringArea.graphic));
         })
 
         this.wiringAreas.set(true, new Map<Number, WiringArea>());

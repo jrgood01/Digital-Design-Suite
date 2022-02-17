@@ -58,6 +58,7 @@ export class Wire {
         
         startY += 3.5; 
         startX += 3.5;
+        
         let addWire = new WireSegment(false, new PIXI.Point(startX, startY), 0, stage, this.onCreateSegment);
         addWire.addComponentDockBottom(dockComponent);
         this.segments.push(addWire);

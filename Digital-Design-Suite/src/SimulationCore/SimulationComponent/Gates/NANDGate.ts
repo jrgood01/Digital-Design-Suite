@@ -15,8 +15,8 @@ export class NANDGate extends VariableInputComponent {
     inputs : number;
     bitWidth : number;
 
-    constructor(bitWidth : number, x : number, y : number, numInputs : number, simulationState : SimulationState) {
-        super(x, y, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), simulationState, 200);
+    constructor(bitWidth : number, x : number, y : number, numInputs : number) {
+        super(x, y, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), 200);
         this.inputs = numInputs;
         this.bitWidth = bitWidth;
 
