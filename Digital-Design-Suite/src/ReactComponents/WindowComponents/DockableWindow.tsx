@@ -69,7 +69,8 @@ export const DockableWindow = (props : DockableWindowProps) => {
                 {
                     top : positionY,
                     left : positionX,
-                    position : "absolute"
+                    position : "absolute",
+    
                 }}>
                 <div style = {
                     { 

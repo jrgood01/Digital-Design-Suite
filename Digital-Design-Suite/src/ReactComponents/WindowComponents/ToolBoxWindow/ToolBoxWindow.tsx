@@ -21,31 +21,31 @@ export const ToolBoxWindow = (props : ToolBoxWindowProps) => {
             <div>
                 <ToolBoxElement title={"Gates"} icon={
                     <OrLogo  style={{transform:"scale(.4)", paddingBottom:"10px", stroke:"#22baff"}}/>
-                }/> 
+                } dropDownElements={['And', 'Not', 'Or', 'Nor', 'XOR', 'Xnor', 'Nand']}/> 
 
                 <ToolBoxElement title={"Plexers"} icon={
                     <MuxLogo  overflow={"visible"} style={{transform:"scale(.14)",paddingBottom:"70px",paddingLeft:"90px", stroke:"#22baff"}}/>                
-                }/> 
+                } dropDownElements={['Multiplexer', 'De-Multiplexer', 'Priority Encoder', 'Decoder']}/> 
 
                 <ToolBoxElement title={"Peripheral"} icon={
                     <SevenSegmentDisplayLogo  overflow={"visible"} style={{transform:"scale(.11)",paddingBottom:"70px",paddingLeft:"90px", stroke:"#22baff"}}/>                
-                }/> 
+                } dropDownElements={['7 Segment Display', 'Keyboard', 'Joystick', 'Screen', 'LCD', 'Button Matrix', 'LED', 'RGB LED', 'LED Matrix', 'RGB LED Matrix', 'Speaker', 'Rardar Display', ' Bar Graph LED', 'Speaker', 'Potentiometer']}/> 
 
                 <ToolBoxElement title={"Wiring"} icon={
                     <SwitchCircuitLogo  overflow={"visible"} style={{transform:"scale(.3)",paddingBottom:"10px",paddingLeft:"90px", stroke:"#22baff",fill:"#22baff"}}/>                
-                }/> 
+                } dropDownElements={['Tunnel', 'Input Pin', 'Output Pin', 'Wire Splitter', 'Clock', 'Constant']}/> 
 
                 <ToolBoxElement title={"memory"} icon={
                     <MemoryICLogo  overflow={"visible"} style={{transform:"scale(.35)",paddingBottom:"10px",paddingLeft:"50px", stroke:"#22baff",fill:"#22baff"}}/>                
-                }/> 
+                } dropDownElements={['RAM', 'ROM', 'Register', 'Dual-Port RAM', 'SR flip-flop', 'JK flip-flop', 'D flip-flop', 'T flip-flop']}/> 
 
                 <ToolBoxElement title={"Transistors"} icon={
                     <TransistorLogo  overflow={"visible"} style={{transform:"scale(.35)",paddingBottom:"10px",paddingLeft:"50px", stroke:"#22baff",fill:"#22baff"}}/>                
-                }/> 
+                } dropDownElements={['NPN Transistor', 'PNP Transistor']}/> 
 
                 <ToolBoxElement title={"Measurement"} icon={
                     <ScopeLogo  overflow={"visible"} style={{transform:"scale(.8)",paddingBottom:"5px",paddingLeft:"30px", stroke:"#22baff",fill:"#22baff"}}/>                
-                }/> 
+                } dropDownElements={['Digital Logic Meter', 'Level Recorder']}/> 
             </div>
         </DockableWindow>
     )
