@@ -26,4 +26,13 @@ module.exports = [
       },
     },
   },
+  {
+    type: 'asset',
+    resourceQuery: /url/, // *.svg?url
+  },
+  {
+    test: /\.svg$/i,
+    issuer: /\.[jt]sx?$/,
+    use: ['@svgr/webpack'],
+  },
 ];

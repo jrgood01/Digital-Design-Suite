@@ -12,7 +12,7 @@ import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
 import {SimulationWarden} from "./SimulationCore/SimulationWarden"
-
+import { ToolBoxWindow } from "./ReactComponents/WindowComponents/ToolBoxWindow/ToolBoxWindow"
 function render() {
   
   const containerRef = React.createRef<HTMLDivElement>();
@@ -41,9 +41,10 @@ function render() {
 
 
   ReactDOM.render(
-
-      <MenuBar props={{elements:subMenuArr}}/>
-
+      <React.Fragment>
+        <MenuBar props={{elements:subMenuArr}}/>
+        <ToolBoxWindow topLevel={[""]}/>
+      </React.Fragment>
       
 
   , document.body

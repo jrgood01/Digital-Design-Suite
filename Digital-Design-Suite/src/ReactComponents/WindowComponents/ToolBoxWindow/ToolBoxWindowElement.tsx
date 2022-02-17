@@ -11,9 +11,10 @@ const topDivStyle = {
 const TextStyle = {
     fontSize : "18px",
     fontFamily : "lato",
-    color : "#CBCBCB",
+    color : "#aaaabb",
     display : "table-cell",
-    verticalAlign : "middle"
+    verticalAlign : "middle",
+    paddingLeft: "20px"
 
 }
 
@@ -27,11 +28,9 @@ export const ToolBoxElement = (props : ToolBoxElementProps) => {
             <Material.Paper elevation={3}>
                 <div style={topDivStyle}>
                     <div style={{float: "left", width:"30%",display:"flex", alignItems:"center", justifyContent:"center", height:"100%"}}>
-                        <div style={{width:"40px", height:"40px"}}>
-                            <svg>
-                                {props.icon}
-                            </svg>
-                        </div>
+                  
+                            {props.icon}
+                    
                     </div>
                     <div style={{float: "right", width:"70%", display:"flex", alignItems:"center", height:"100%"}}>
                         <h1 style={TextStyle}>
