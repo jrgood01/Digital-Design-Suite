@@ -49,7 +49,7 @@ export abstract class VariableInputComponent extends SimulationComponent {
     }
 
     drawInputAreas(inputIsWire : boolean) {
-        console.log(this.y)
+       
         for (let i = 0; i < this.numInputs; i ++) {
             this.componentTemplate.lineStyle(7, this.getInputLineBit(i, 0))
             .moveTo(this.x, this.inputAreaStartY + i * 50)

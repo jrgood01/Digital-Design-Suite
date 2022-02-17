@@ -18,29 +18,19 @@ const TextStyle = {
 
 }
 
-const DropDownTextStyle = {
-    fontSize : "18px",
-    fontFamily : "lato",
-    color : "#aaaabb",
-    paddingTop : "7px",
-    paddingBottom : "7px",
-    marginTop : "0px",
-    marginBottom : "0px",
-    paddingLeft: "90px",
-    cursor : "Grab",
-    display : "inline-block"
-}
 
 interface ToolBoxElementProps {
     title : String;
     icon : JSX.Element;
     dropDownElements : Array<String>
+    currentSelection : String;
+    onSelect : (val : String) => void;
 }
 export const ToolBoxElement = (props : ToolBoxElementProps) => {
 
     let divRef = React.createRef<HTMLDivElement>();
     const [isDropped, setIsDropped] = React.useState(false);
-    console.log(props.dropDownElements)
+    
     return (
         <React.Fragment>
             <Material.Paper elevation={3}>
@@ -68,11 +58,24 @@ export const ToolBoxElement = (props : ToolBoxElementProps) => {
                                     pathOne = "M 42 0 V 17 Z";
                                 }
 
+                                const DropDownTextStyle = {
+                                    fontSize : "18px",
+                                    fontFamily : "lato",
+                                    color : props.currentSelection == title ? "#FFFFFF" : "#aaaabb",
+                                    paddingTop : "7px",
+                                    paddingBottom : "7px",
+                                    marginTop : "0px",
+                                    marginBottom : "0px",
+                                    paddingLeft: "90px",
+                                    cursor : "Grab",
+                                    display : "inline-block"
+                                }
+
                                 return (
-                                <div style={{display:"grid"}}>
+                                <div style={{display:"grid"}} onClick={() => {props.onSelect(title)}}>
                                     <svg style={{display:"inline-block", position:"absolute"}}>
-                                        <path d={pathOne} stroke="#22baff" stroke-width="2"/>
-                                        <path d="M 42 17 H 75 Z" stroke="#22baff" stroke-width="2"/>
+                                        <path d={pathOne} stroke="#22baff" strokeWidth="2"/>
+                                        <path d="M 42 17 H 75 Z" stroke="#22baff" strokeWidth="2"/>
                                         <circle cx = "75" cy="17" r="3.5" fill="#22baff"/>
                                     </svg>
                                     <div>

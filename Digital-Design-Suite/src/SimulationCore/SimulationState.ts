@@ -31,6 +31,8 @@ export class SimulationState {
     isDraggingComponent : boolean;
     draggingWireHitArea : WiringArea;
     activeWiringArea : WiringArea;
+    lockSelectedToCursor : boolean;
+    
     private draggingWire : Wire;
     private isDraggingWire : boolean;
     
