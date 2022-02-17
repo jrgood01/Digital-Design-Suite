@@ -14,6 +14,10 @@ import { WiringArea } from "./SimulationComponent/WiringArea"
 import { ComponentEvent } from './SimulationEvents/ComponentEvent';
 import { ComponentDragEvent } from './SimulationEvents/ComponentDragEvent';
 import { WireEndDragAtWiringAreaEvent } from './SimulationEvents/WireEndDragAtWiringAreaEvent';
+import { ANDGate } from './SimulationComponent/Gates/ANDGate';
+import { ConstantComponent } from './SimulationComponent/Wiring/Constant';
+import { NOTGate } from './SimulationComponent/Gates/NOTGate';
+import { HexDisplay } from './SimulationComponent/Peripheral/HexDisplay';
 
 export class SimulationWarden {
     state : SimulationState;
@@ -26,6 +30,7 @@ export class SimulationWarden {
     private onComponentDiselect : Array<(e : ComponentEvent) => void>;
     private onComponentDrag : Array<(e : ComponentDragEvent) => void>;
     private onWireEndDragAtWiringAreaEvent : Array<(e : WireEndDragAtWiringAreaEvent) => void>;
+    private onEndComponentPlace : Array<(e : ComponentEvent) => void>;
 
     private lastMouseX : number;
     private lastMouseY : number;
@@ -50,6 +55,7 @@ export class SimulationWarden {
         this.onComponentDiselect = new Array<(e : ComponentEvent) => void>();
         this.onComponentDrag = new Array<(e : ComponentDragEvent) => void>();
         this.onWireEndDragAtWiringAreaEvent = new Array<(e : WireEndDragAtWiringAreaEvent) => void>();
+        this.onEndComponentPlace = new Array<(e : ComponentEvent) => void>();
 
         this.lastMouseX = 0;
         this.lastMouseY = 0;
@@ -76,9 +82,12 @@ export class SimulationWarden {
         this.onWireEndDragAtWiringAreaEvent.push(handler);
     }
 
-    addComponentToStage(component : SimulationComponent) {
-        console.debug("Added component: ", component)
+    addOnEndComponentPlaceEvent(handler : (e : ComponentEvent) => void) {
+        this.onEndComponentPlace.push(handler);
+    }
 
+    addComponentToStage(component : SimulationComponent) {
+        console.debug("Added component: ", component);
     }
 
     requestPermissionToTranslate(bounds : PIXI.Rectangle, dX : number, dY : number) {
@@ -107,7 +116,15 @@ export class SimulationWarden {
     _onMouseDocumentDown(mouseEvent : InteractionEvent) {
         let pos = mouseEvent.data.global;
         let hit = this.interactionManager.hitTest(new PIXI.Point(pos.x, pos.y), this.state.stage)
-        
+        if (this.state.lockSelectedToCursor) {
+            this.state.SelectedComponent.setOpacity(1);
+            this.state.SelectedComponent = null;
+            this.state.lockSelectedToCursor = false;
+            this.onEndComponentPlace.forEach((handler : (e : ComponentEvent) => void) => {
+                handler(new ComponentEvent(this.state.SelectedComponent));
+            });
+            return;
+        }   
         this.state.components.forEach((component : SimulationComponent) => {
             component.wiringAreas.forEach((val : Map<Number, WiringArea>) => {
                 val.forEach((val : WiringArea) => {
@@ -164,6 +181,11 @@ export class SimulationWarden {
             });
         }
 
+        if (this.state.lockSelectedToCursor) {
+            this.state.SelectedComponent.setX(pos.x);
+            this.state.SelectedComponent.setY(pos.y);
+        }
+
         if (this.state.getIsDraggingWire) {
 
         }
@@ -188,6 +210,35 @@ export class SimulationWarden {
         }
 
         this.state.isDraggingComponent = false;        
+    }
+
+    beginPlace(componentName : String) {
+        if (componentName === "") 
+            return
+
+        console.log("BEGIN PLACE", componentName)
+        let addComponent : SimulationComponent;
+        switch(componentName) {
+            case "And":
+                addComponent = new ANDGate(1, 0, 0, 2, this.state);
+                break;
+            case "Constant":
+                addComponent = new ConstantComponent(this.state.stage, 0, 0, this.state, 1);
+                break;
+            case "Not":
+                addComponent = new NOTGate(1, 0, 0, this.state.stage, this.state)
+                break;
+        }
+
+
+        this.beginPlaceHelper(addComponent)
+    }
+
+    beginPlaceHelper(addComponent : SimulationComponent) {
+        this.state.addComponent(addComponent);
+        this.state.lockSelectedToCursor = true;
+        addComponent.setOpacity(.3);
+        this.state.SelectedComponent = addComponent;
     }
 
 }

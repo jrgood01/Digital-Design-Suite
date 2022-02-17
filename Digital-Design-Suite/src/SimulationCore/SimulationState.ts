@@ -31,6 +31,8 @@ export class SimulationState {
     isDraggingComponent : boolean;
     draggingWireHitArea : WiringArea;
     activeWiringArea : WiringArea;
+    lockSelectedToCursor : boolean;
+
     private draggingWire : Wire;
     private isDraggingWire : boolean;
     
@@ -45,6 +47,7 @@ export class SimulationState {
     }
 
     addComponent(component : SimulationComponent) {
+        console.log("Adding component ", component)
         component.componentId = this.numComponents.toString();
         
         component.addOnWiringAreaActive((e : WiringAreaActiveEvent) => {

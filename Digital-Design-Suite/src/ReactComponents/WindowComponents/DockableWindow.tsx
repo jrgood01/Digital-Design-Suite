@@ -27,6 +27,8 @@ interface DockableWindowProps {
     startX? : number,
     startY? : number,
     children? : JSX.Element,
+    onMouseLeave? : () => void,
+    onMouseEnter? : () => void,
     title : string,
     assignedId : string
 }
@@ -39,8 +41,9 @@ const DockableWindowDefaultProps = {
     width : 400,
     height : 300,
     startX : -1,
-    startY : -1
-    
+    startY : -1,
+    onmouseLeave : () => {},
+    onmouseEnter : () => {}
 }
 
 export const DockableWindow = (props : DockableWindowProps) => {
@@ -48,6 +51,7 @@ export const DockableWindow = (props : DockableWindowProps) => {
     const [lastDragY, setLastDragY] = useState(-1);
     const [positionX, setPositionX] = useState(props.startX);
     const [positionY, setPositionY] = useState(props.startY);
+    const [mouseInside, setMouseInside] = React.useState(false);
     const onDrag = (e : React.DragEvent<HTMLDivElement>) => {
         let resetMetrics = !((e.clientX > 0) && (e.clientY > 0));
         if (!(lastDragX == -1) && !(lastDragY == -1) && !resetMetrics) {
@@ -65,11 +69,14 @@ export const DockableWindow = (props : DockableWindowProps) => {
 
     return (
         <Draggable>
-            <div id = {props.assignedId} style = {
+            <div onMouseLeave={() => {props.onMouseLeave();setMouseInside(false)}} 
+            onMouseOver={() => {if(!mouseInside)props.onMouseEnter();setMouseInside(true)}} 
+            id = {props.assignedId} style = {
                 {
                     top : positionY,
                     left : positionX,
-                    position : "absolute"
+                    position : "absolute",
+    
                 }}>
                 <div style = {
                     { 

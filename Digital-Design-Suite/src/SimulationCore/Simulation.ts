@@ -21,6 +21,7 @@ import { WireEndDragAtWiringAreaEvent } from "./SimulationEvents/WireEndDragAtWi
 import { Wire } from "./Wiring/Wire";
 import { HexDisplay } from "./SimulationComponent/Peripheral/HexDisplay"
 import { NANDGate } from "./SimulationComponent/Gates/NANDGate";
+import { ANDGate } from "./SimulationComponent/Gates/ANDGate";
 
 export class DigitalDesignSimulation extends PIXI.Application{
     private simulationState : SimulationState;
@@ -32,92 +33,78 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     private lastMouseX : number;
     private lastMouseY : number;
-    private simulationWarden : SimulationWarden;
+   simulationWarden : SimulationWarden;
+    private lockSelectedToCursor : true;
 
     constructor(container : HTMLDivElement) {
         super();
+       //Bind methods to class
+       this.resizePixiSimulation = this.resizePixiSimulation.bind(this);
+  
+
+       this.onComponentDrag = this.onComponentDrag.bind(this);
+         
+       this.onScroll = this.onScroll.bind(this);
+       this.addComponent = this.addComponent.bind(this);
+       this.simulationLoop = this.simulationLoop.bind(this);
+       this.runSimulation = this.runSimulation.bind(this);
+       this.onHitAreaClick = this.onHitAreaClick.bind(this);
+       this.onWireEndDragAtWiringArea = this.onWireEndDragAtWiringArea.bind(this);
+       
+       //Simulation state holds data about the simulation
+       this.simulationState = new SimulationState(this.stage);
+       //We'll use the pixi.js interaction manager to determine if
+       //  clicks and other actions are inside a component.
+       this.interactionManager = new InteractionManager(this.renderer);
+       
+       //Set the pixi.js view to the size of the window
+       this.view.width = window.innerWidth;
+       this.view.height = window.innerHeight;
+
+       this.lastMouseX = 0;
+       this.lastMouseY = 0;
+       
+       //We will use this to keep track of what component pins 
+       //  are connected to what wires
+       this.wiringMap = new WiringMap(this.simulationState);
+       
+       this.simulationWarden = new SimulationWarden(this.simulationState, this.renderer);
+       this.simulationWarden.addOnHitAreaClick(this.onHitAreaClick);
+       this.simulationWarden.addOnComponentDrag(this.onComponentDrag);
+       this.simulationWarden.addOnWireEndDragAtWiringAreaEvent(this.onWireEndDragAtWiringArea);
         
-        //Bind methods to class
-        this.resizePixiSimulation = this.resizePixiSimulation.bind(this);
-  
+       //Add listeners for global events
+       document.addEventListener("wheel", this.onScroll)
+       //We want to resize the view every time the window is
+       //  resized
+       window.addEventListener('resize', this.resizePixiSimulation); 
+       this.stage.interactive = true;
+       this.stage.sortableChildren = true;
+       
+       //Set background color for render
+       this.bgColor = constants.General.BgColor_1
+       this.bg = new PIXI.Graphics();
+       this.bg.zIndex = -1000
+    }
 
-        this.onComponentDrag = this.onComponentDrag.bind(this);
-  
-        this.onScroll = this.onScroll.bind(this);
-        this.addComponent = this.addComponent.bind(this);
-        this.simulationLoop = this.simulationLoop.bind(this);
-        this.runSimulation = this.runSimulation.bind(this);
-        this.onHitAreaClick = this.onHitAreaClick.bind(this);
-        this.onWireEndDragAtWiringArea = this.onWireEndDragAtWiringArea.bind(this);
-
-        //Simulation state holds data about the simulation
-        this.simulationState = new SimulationState(this.stage);
-        //We'll use the pixi.js interaction manager to determine if
-        //  clicks and other actions are inside a component.
-        this.interactionManager = new InteractionManager(this.renderer);
-
-        //Set the pixi.js view to the size of the window
-        this.view.width = window.innerWidth;
-        this.view.height = window.innerHeight;
-
+    beginRender() {  
         //Add the view to the HTML body
         document.body.append(this.view);
-
+        
         //Add a new ticker to the simulation. The ticker will
         //  run on a set interval and render simulation graphics
         this.ticker = PIXI.Ticker.shared.add(this.simulationLoop, this)
         this.ticker.maxFPS = 30;
-
+        
         //This method resizes the pixi.js render area to the
         //  size of the window
         this.resizePixiSimulation();
-        
-        //We want to resize the view every time the window is
-        //  resized
-        window.addEventListener('resize', this.resizePixiSimulation);  
-
-        this.stage.interactive = true;
-        this.stage.sortableChildren = true;
-
-        //Set background color for render
-        this.bgColor = constants.General.BgColor_1
-        this.bg = new PIXI.Graphics();
-        this.bg.zIndex = -1000
+            
         this.stage.addChild(this.bg)
-
-        
-        //Add listeners for global events
-        document.addEventListener("wheel", this.onScroll)
- 
-        
 
         this.simulationUpdateFrequency = 1000;
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
-
-        this.lastMouseX = 0;
-        this.lastMouseY = 0;
-
-        //We will use this to keep track of what component pins 
-        //  are connected to what wires
-        this.wiringMap = new WiringMap(this.simulationState);
-
-        this.simulationWarden = new SimulationWarden(this.simulationState, this.renderer);
-        this.simulationWarden.addOnHitAreaClick(this.onHitAreaClick);
-        this.simulationWarden.addOnComponentDrag(this.onComponentDrag);
-        this.simulationWarden.addOnWireEndDragAtWiringAreaEvent(this.onWireEndDragAtWiringArea);
-
-        let v4 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
-        let v5 = new HexDisplay(900, 900, this.simulationState);
-        
-        //let r = new HexDisplay(200, 200, this.simulationState.stage);
-        
-       // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
-
-       // this.simulationState.addComponent(v4);
-
-        this.simulationState.addComponent(v4);
-        this.simulationState.addComponent(v5);
-        //this.simulationState.addComponent(r);
+ 
     }
 
     /**

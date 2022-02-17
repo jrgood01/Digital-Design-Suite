@@ -26,8 +26,8 @@ export abstract class SimulationComponent{
 
     deleted : boolean;
 
-    x : number;
-    y : number;
+    protected x : number;
+    protected y : number;
 
     selected : boolean;
 
@@ -43,6 +43,7 @@ export abstract class SimulationComponent{
     onMove : Array<(dX : number, dY : number) => void>;
 
     visited : boolean;
+    private opacity : number;
 
     private onWiringAreaActive :  Array<(e : WiringAreaActiveEvent) => void>;
     private onWiringAreaLeave : Array<() => void>;
@@ -61,8 +62,7 @@ export abstract class SimulationComponent{
         this.wiringAreas = new Map<boolean, Map<Number, WiringArea>>();
         this.wiringAreas.set(false, new Map<Number, WiringArea>());
         this.wiringAreas.set(true, new Map<Number, WiringArea>());
-        console.log(this)
-        console.log(this.simulationState)
+
         this.simulationState.stage.addChild(this.componentTemplate);
         this.geometry = this.calculateGeometry(1);
         this.glowOn = false;
@@ -87,6 +87,10 @@ export abstract class SimulationComponent{
     simulateAndPass() {
         this.simulate();
         this.passOutputs();
+    }
+
+    setOpacity(newOpacity : number) {
+        this.componentTemplate.alpha = newOpacity;4
     }
     
     setGlow(on : boolean) {
@@ -168,6 +172,41 @@ export abstract class SimulationComponent{
         })
     }
 
+    setX (x : number) {
+        let dx = x - this.x;
+        this.x = x;
+
+        this.geometry = this.calculateGeometry(1);
+ 
+        this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
+            value.forEach((wiringArea : WiringArea) => {
+                wiringArea.graphic.x += dx;
+                wiringArea.x += dx;
+            });
+        });      
+
+        this.onMove.forEach((f : (dX : number, dY : number) => void) => {
+            f(dx, 0);
+        })
+    }
+
+    setY (y : number) {
+        let dy = y - this.y;
+        this.y = y;
+        this.geometry = this.calculateGeometry(1);
+ 
+        this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
+            value.forEach((wiringArea : WiringArea) => {
+                wiringArea.graphic.y += dy;
+                wiringArea.y += dy;
+            });
+        });      
+
+        this.onMove.forEach((f : (dX : number, dY : number) => void) => {
+            f(0, dy);
+        })
+    }
+
     updateHitArea() {
         this.componentTemplate.hitArea = new PIXI.Rectangle(
             this.componentTemplate.getBounds().x, this.componentTemplate.getBounds().y,
@@ -222,8 +261,9 @@ export abstract class SimulationComponent{
         });
 
         this.wiringAreas.get(isInput).set(lineNumber, addWiringArea);
-
     }
+
+
 
     addOnWiringAreaActive(handler : (e : WiringAreaActiveEvent) => void) {
         this.onWiringAreaActive.push(handler);

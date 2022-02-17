@@ -12,7 +12,7 @@ import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
 import {SimulationWarden} from "./SimulationCore/SimulationWarden"
-
+import { ToolBoxWindow } from "./ReactComponents/WindowComponents/ToolBoxWindow/ToolBoxWindow"
 function render() {
   
   const containerRef = React.createRef<HTMLDivElement>();
@@ -39,18 +39,16 @@ function render() {
   ];
 
 
+  let simulation = new DigitalDesignSimulation(containerRef.current);
 
   ReactDOM.render(
+      <React.Fragment>
+        <MenuBar props={{elements:subMenuArr}}/>
+        <ToolBoxWindow currentSelection={""} onBeginComponentPlace={(val : string) => {simulation.simulationWarden.beginPlace(val)}}/>
+      </React.Fragment>
+  , document.body);
 
-      <MenuBar props={{elements:subMenuArr}}/>
-
-      
-
-  , document.body
-  );
-
-
-  let simulation = new DigitalDesignSimulation(containerRef.current);
+  simulation.beginRender();
 }
 
 render();
