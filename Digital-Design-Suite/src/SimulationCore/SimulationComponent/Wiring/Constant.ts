@@ -13,13 +13,27 @@ export class ConstantComponent extends SimulationComponent {
         this.y = y;
         this.text = new PIXI.Text(this.value.toString());
         this.componentTemplate.addChild(this.text);
-
-        this.addWiringArea(this.x + 300, this.y + 100, 
+        this.geometry = this.calculateGeometry(1);
+        this.addWiringArea(this.geometry['outLineEndX'] - 3.5, this.geometry['outLineEndY'] - 3.5, 
         0, false);
     } 
 
     simulate() {
         this.output.setLineBit(0, 0, wireState.High)
+    }
+
+    calculateGeometry(scaler : number) {
+        let retMap = {} as Record<string, number>;
+        retMap['sideLength'] = 200 * scaler;
+        retMap['outLineStartX'] = this.x + retMap['sideLength'];
+        retMap['outLineStartY'] = this.y + retMap['sideLength'] / 2;
+
+        retMap['outLineLength'] = 100 * scaler;
+
+        retMap['outLineEndX'] = retMap['outLineStartX'] + retMap['outLineLength'];
+        retMap['outLineEndY'] = retMap['outLineStartY'];
+
+         return retMap;
     }
 
     getColor() {
@@ -32,15 +46,16 @@ export class ConstantComponent extends SimulationComponent {
             return constants.General.componentColorLow;
         }
     }
+
     draw() {
 
         this.setGlowColor(this.getColor())
         this.componentTemplate.clear();
         this.componentTemplate.lineStyle(10, this.getColor())
-            .drawRect(this.x, this.y, 200, 200);
+            .drawRect(this.x, this.y, this.geometry['sideLength'], this.geometry['sideLength']);
         this.componentTemplate.lineStyle(7, this.getColor())
-            .moveTo(this.x + 200, this.y + 100)
-            .lineTo(this.x + 300, this.y + 100)
+            .moveTo(this.geometry['outLineStartX'], this.geometry['outLineStartY'])
+            .lineTo(this.geometry['outLineEndX'], this.geometry['outLineEndY'])
         this.text.style = {fontFamily : 'Ariel', fontSize : 60, fill : this.getColor()}
         this.text.position.x = this.x + 120 - this.text.width;
         this.text.position.y = this.y + 130 - this.text.height;
