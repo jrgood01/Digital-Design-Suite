@@ -18,9 +18,10 @@ const createSplashWindow = (): void => {
   });
 
   splashWindow.show();
+  splashWindow.loadFile("./src/Static/PNG/splash_DLL.png")
+  createMainWindow();
   setTimeout(() => {
     splashWindow.hide();
-    createMainWindow();
   }, 6000);
 }
 
@@ -30,6 +31,10 @@ const createMainWindow = (): void => {
     height: 800,
     width: 1200,
   });
+  mainWindow.hide();
+  setTimeout(() => {
+    mainWindow.show();
+  }, 6000);
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);

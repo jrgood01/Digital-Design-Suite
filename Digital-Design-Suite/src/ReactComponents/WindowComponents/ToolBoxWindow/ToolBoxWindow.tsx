@@ -10,7 +10,7 @@ import TransistorLogo from "../../../Static/SVG/Transistor.svg"
 import ScopeLogo from "../../../Static/SVG/scope.svg"
 
 interface ToolBoxWindowProps {
-    topLevel : Array<String>
+    currentSelection : String;
 }
 
 

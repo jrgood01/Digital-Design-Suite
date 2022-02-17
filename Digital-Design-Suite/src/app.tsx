@@ -43,7 +43,7 @@ function render() {
   ReactDOM.render(
       <React.Fragment>
         <MenuBar props={{elements:subMenuArr}}/>
-        <ToolBoxWindow topLevel={[""]}/>
+        <ToolBoxWindow currentSelection={""}/>
       </React.Fragment>
       
 
