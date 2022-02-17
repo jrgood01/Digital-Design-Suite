@@ -215,18 +215,23 @@ export class SimulationWarden {
     beginPlace(componentName : String) {
         if (componentName === "") 
             return
-            
+
         console.log("BEGIN PLACE", componentName)
         let addComponent : SimulationComponent;
+        switch(componentName) {
+            case "And":
+                addComponent = new ANDGate(1, 0, 0, 2, this.state);
+                break;
+            case "Constant":
+                addComponent = new ConstantComponent(this.state.stage, 0, 0, this.state, 1);
+                break;
+            case "Not":
+                addComponent = new NOTGate(1, 0, 0, this.state.stage, this.state)
+                break;
+        }
 
-        let componentMapping = {
-            "And" : new ANDGate(1, 0, 0, 2, this.state),
-            "Constant" : new ConstantComponent(this.state.stage, 0, 0, this.state, 1),
-            "Not" : new NOTGate(1, 0, 0, this.state.stage, this.state),
-            "7 Segment Display" : new HexDisplay(0, 0, this.state)
-        } as Record<string, SimulationComponent>;
 
-        this.beginPlaceHelper(componentMapping[componentName.toString()])
+        this.beginPlaceHelper(addComponent)
     }
 
     beginPlaceHelper(addComponent : SimulationComponent) {

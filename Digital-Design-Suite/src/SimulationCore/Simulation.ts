@@ -104,19 +104,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
         this.simulationUpdateFrequency = 1000;
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
-        
-        let v4 = new ConstantComponent(this.stage, 900, 900, this.simulationState, 1);
-        let v5 = new HexDisplay(900, 900, this.simulationState);
-                
-        //let r = new HexDisplay(200, 200, this.simulationState.stage);
-                
-        // let v4 = new ConstantComponent(this.stage, 400, 700, this.simulationState, 1);
-        
-        // this.simulationState.addComponent(v4);
-        
-        this.simulationState.addComponent(v4);
-        this.simulationState.addComponent(v5);
-        //this.simulationState.addComponent(r);
+ 
     }
 
     /**

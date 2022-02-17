@@ -173,7 +173,7 @@ export abstract class SimulationComponent{
     }
 
     setX (x : number) {
-        let dx = this.x - x;
+        let dx = x - this.x;
         this.x = x;
 
         this.geometry = this.calculateGeometry(1);
@@ -181,29 +181,29 @@ export abstract class SimulationComponent{
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.x += dx;
-                wiringArea.x += x;
+                wiringArea.x += dx;
             });
         });      
 
         this.onMove.forEach((f : (dX : number, dY : number) => void) => {
-            f(x, 0);
+            f(dx, 0);
         })
     }
 
     setY (y : number) {
-        let dy = this.y - y;
+        let dy = y - this.y;
         this.y = y;
         this.geometry = this.calculateGeometry(1);
  
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.y += dy;
-                wiringArea.y += y;
+                wiringArea.y += dy;
             });
         });      
 
         this.onMove.forEach((f : (dX : number, dY : number) => void) => {
-            f(0, y);
+            f(0, dy);
         })
     }
 
