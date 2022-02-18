@@ -24,7 +24,10 @@ import { NANDGate } from "./SimulationComponent/Gates/NANDGate";
 import { HexDisplay } from "./SimulationComponent/Peripheral/HexDisplay";
 import { SimulationAddGraphicEvent } from "./SimulationEvents/SimulationAddGraphicEvent";
 
+const minStageScale = .14;
+const maxStageScale = 1.5;
 export class DigitalDesignSimulation extends PIXI.Application{
+
     private simulationState : SimulationState;
     private simulationUpdateFrequency : number;
     private interactionManager : InteractionManager;
@@ -36,6 +39,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
     private lastMouseY : number;
   
     private lockSelectedToCursor : true;
+    private container : PIXI.Container;
 
     constructor(container : HTMLDivElement) {
         super();
@@ -106,8 +110,11 @@ export class DigitalDesignSimulation extends PIXI.Application{
         //This method resizes the pixi.js render area to the
         //  size of the window
         this.resizePixiSimulation();
-            
-        this.stage.addChild(this.bg)
+        this.container = new PIXI.Container();
+        this.stage.addChild(this.container);
+        this.container.cacheAsBitmap = false;
+        this.stage.cacheAsBitmap = false;
+        this.container.addChild(this.bg)
 
         this.simulationUpdateFrequency = 1000;
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
@@ -143,10 +150,30 @@ export class DigitalDesignSimulation extends PIXI.Application{
     }
 
     onScroll(scrollEvent : WheelEvent) {
+
         if (this.isInside(scrollEvent.clientX, scrollEvent.clientY, 
             this.view.getBoundingClientRect())) {
-                this.stage.scale.x -= scrollEvent.deltaY / 1000;
-                this.stage.scale.y -= scrollEvent.deltaY / 1000;
+                let delta = scrollEvent.deltaY;
+                if (delta > 0) {
+                    if (this.container.scale.x > minStageScale) {
+                        this.container.scale.x -= Math.sqrt(delta) / 200;
+                        this.container.scale.y -= Math.sqrt(delta) / 200;
+                        this.bg.width *= 1 / this.container.scale.x;
+                        this.bg.height *= 1 / this.container.scale.x;
+                    }
+                } else {
+                    if (this.container.scale.x < maxStageScale) {
+                        delta = Math.abs(delta);
+                        this.container.scale.x += Math.sqrt(delta) / 200;
+                        this.container.scale.y += Math.sqrt(delta) / 200;
+                        this.bg.width /= 1 / Math.abs(this.container.scale.x);
+                        this.bg.height /= 1 / Math.abs(this.container.scale.x);
+                    }
+                }
+                this.simulationState.components.forEach((c : SimulationComponent) => {
+                    c.updateHitArea();
+                })
+            this.interactionManager.update();
         }
 
     }
@@ -226,7 +253,13 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     _onMouseDocumentDown(mouseEvent : InteractionEvent) {
         let pos = mouseEvent.data.global;
-        let hit = this.interactionManager.hitTest(new PIXI.Point(pos.x, pos.y), this.simulationState.stage)
+        let localPos = this.stage.toLocal(pos);
+        console.log(localPos)
+        //this.simulationState.stage.addChild(new PIXI.Graphics().beginFill(0xff0000).drawRect(localPos.x, localPos.y, 10, 10))
+        let hit = this.interactionManager.hitTest(new PIXI.Point(localPos.x, localPos.y), this.container)
+
+        console.log("====")
+        console.log(hit);
         if (this.simulationState.lockSelectedToCursor) {
             this.simulationState.SelectedComponent.setOpacity(1);
             this.simulationState.SelectedComponent = null;
@@ -263,6 +296,11 @@ export class DigitalDesignSimulation extends PIXI.Application{
         let pos = mouseEvent.data.global;
         let dX = 0;
         let dY = 0;
+        let localPos = this.stage.toLocal(pos);
+        //console.log("Raw: ",pos);
+        //console.log("Local: ",this.stage.toLocal(pos))
+       // console.log("Stage Scale: ",this.stage.scale.x, this.stage.scale.y);
+        //console.log("RAW / LOCAL: ", this.stage.scale.x / this.stage.toLocal(pos).x)
 
         if (this.lastMouseX == 0 || this.lastMouseY == 0) {
             this.lastMouseX = pos.x;
@@ -278,8 +316,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
         }
 
         if (this.simulationState.lockSelectedToCursor) {
-            this.simulationState.SelectedComponent.setX(pos.x);
-            this.simulationState.SelectedComponent.setY(pos.y);
+            this.simulationState.SelectedComponent.setX(localPos.x);
+            this.simulationState.SelectedComponent.setY(localPos.y);
         }
 
         if (this.simulationState.getIsDraggingWire) {
@@ -308,11 +346,11 @@ export class DigitalDesignSimulation extends PIXI.Application{
     }
 
     onSimulationGraphicAdd(e : SimulationAddGraphicEvent) {
-        this.simulationState.stage.addChild(e.graphic);
+        this.container.addChild(e.graphic);
     }
 
     onSimulationGraphicRemove(e : SimulationAddGraphicEvent) {
-        this.simulationState.stage.removeChild(e.graphic);
+        this.container.removeChild(e.graphic);
     }
 
     beginPlace(componentName : String) {

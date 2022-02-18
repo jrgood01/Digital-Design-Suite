@@ -90,6 +90,7 @@ export class NOTGate extends SimulationComponent {
     }
 
     draw() {
+        console.log(this.x, this.y);
         this.componentTemplate.clear();
 
         const colors = {
