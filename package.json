@@ -2,6 +2,10 @@
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "@mui/material": "^5.4.2"
+    "@mui/material": "^5.4.2",
+    "electron-forge": "^5.2.4"
+  },
+  "devDependencies": {
+    "electron-prebuilt-compile": "^8.2.0"
   }
 }
