@@ -18,7 +18,7 @@ export class ANDGate extends VariableInputComponent {
     bitWidth : number;
 
     constructor(bitWidth : number,x: number, y: number, numInputs : number) {
-        super(x, y, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), 200);
+        super(x, y, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), 180);
         this.inputs = numInputs;
         this.bitWidth = bitWidth;
 
@@ -32,9 +32,9 @@ export class ANDGate extends VariableInputComponent {
 
         retMap['startX'] = this.x;
         retMap['startY'] = this.y;
-        retMap['componentHeight'] = 200;
+        retMap['componentHeight'] = 180;
 
-        retMap['width1'] = 90;
+        retMap['width1'] = 78;
 
         retMap['arcCenterX'] = this.x + retMap['width1'];
         retMap['arcCenterY'] = (retMap['startY'] + retMap['componentHeight'] / 2)
@@ -47,7 +47,7 @@ export class ANDGate extends VariableInputComponent {
         
         retMap['outputWireStartX'] = retMap['startX'] + retMap['componentHeight'] - 7;
         retMap['outputWireStartY'] = (retMap['startY'] + retMap['componentHeight'] / 2);
-        retMap['outputWireLength'] = 70;
+        retMap['outputWireLength'] = 68;
 
         retMap['inputSpacingLen'] = retMap['componentHeight'] / 5;
  

@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 export const General = {
-    BgColor_1: 0x17181F,
+    BgColor_1: 0x07080F,
     BgColor_2: 0x2A2F3B,
     BgColor_3 : 0x1A1E23,
     componentColorError : 0xCC6666,

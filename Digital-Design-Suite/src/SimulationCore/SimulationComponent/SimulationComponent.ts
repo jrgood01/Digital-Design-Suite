@@ -13,6 +13,8 @@ import {WiringArea} from "./WiringArea"
 import { GlowFilter } from '@pixi/filter-glow';
 import { WiringAreaActiveEvent } from "../SimulationEvents/WiringAreaActiveEvent";
 import { SimulationAddGraphicEvent } from "../SimulationEvents/SimulationAddGraphicEvent";
+import {SimulationGrid} from "../SimulationGrid";
+import {Point} from "pixi.js";
 
 /**
  * Represents a simulated digital component
@@ -51,6 +53,8 @@ export abstract class SimulationComponent{
 
     private onWiringAreaActive :  Array<(e : WiringAreaActiveEvent) => void>;
     private onWiringAreaLeave : Array<() => void>;
+
+    protected grid : SimulationGrid;
 
     constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>) {
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
@@ -91,6 +95,10 @@ export abstract class SimulationComponent{
      */
     simulateAndPass() {
         this.simulate();
+    }
+
+    setGrid(grid : SimulationGrid) {
+        this.grid = grid;
     }
 
     setOpacity(newOpacity : number) {
@@ -177,17 +185,21 @@ export abstract class SimulationComponent{
     }
 
     setX (x : number) {
+        if (this.grid) {
+            x = this.grid.snapToGrid(new Point(x, 0)).x;
+        }
+
         let dx = x - this.x;
         this.x = x;
 
         this.geometry = this.calculateGeometry(1);
- 
+
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.x += dx;
                 wiringArea.x += dx;
             });
-        });      
+        });
 
         this.onMove.forEach((f : (dX : number, dY : number) => void) => {
             f(dx, 0);
@@ -195,21 +207,26 @@ export abstract class SimulationComponent{
     }
 
     setY (y : number) {
+        if (this.grid) {
+            y = this.grid.snapToGrid(new Point(0, y)).y;
+        }
+
         let dy = y - this.y;
         this.y = y;
         this.geometry = this.calculateGeometry(1);
- 
+
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.y += dy;
                 wiringArea.y += dy;
             });
-        });      
+        });
 
         this.onMove.forEach((f : (dX : number, dY : number) => void) => {
             f(0, dy);
         })
     }
+
 
     updateHitArea() {
         this.componentTemplate.hitArea = new PIXI.Rectangle(
@@ -228,7 +245,7 @@ export abstract class SimulationComponent{
         wiringAreaGraphic.isMask = false;
    
         this.onGraphicAdded(new SimulationAddGraphicEvent(wiringAreaGraphic));
-        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 50, y - 50 , 100, 100);
+        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 20, y - 20 , 100, 100);
         
         const addWiringArea = {
             x : x,
