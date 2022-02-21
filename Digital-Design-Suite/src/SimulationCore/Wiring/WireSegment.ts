@@ -437,7 +437,6 @@ export class WireSegment {
     }
 
     padSegment() {
-        console.log("PAD");
         switch (this.heading) {
             case (Heading.South):
                 this.length += 6;

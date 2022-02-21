@@ -121,50 +121,105 @@ export abstract class SimulationComponent{
         } 
         this.glowColor = color;
     }
+
+    /**
+     * Add an input line to the component
+     * @param bitWidth bitwidth of input line
+     */
     addInputLine(bitWidth : number) {
         this.input.addLine(bitWidth);
     }
 
-    deleteLine(lineNumber : number) {
+    /**
+     * Delete an input line from the component
+     * @param lineNumber input line number to delete
+     */
+    deleteInputLine(lineNumber : number) {
         this.input.removeLine(lineNumber);
     }
 
+    /**
+     * Add an output line to the component
+     * @param bitWidth bitwidth of output line to add
+     */
     addOutputLine(bitWidth : number) {
         this.output.addLine(bitWidth);
     }
 
+    /**
+     * Delete an output line from the component
+     * @param lineNumber number of output line to delete
+     */
     deleteOutputLine(lineNumber : number) {
         this.output.removeLine(lineNumber);
     }
 
+    /**
+     * Change the bitwidth of an input line
+     * @param lineNumber number of line to change bitwidth
+     * @param newBitWidth new bitwidth
+     */
     changeInputBitWidth(lineNumber : number, newBitWidth : number) {
         this.input.changeBitSize(lineNumber, newBitWidth);
     }
 
+    /**
+     * Change the bit width of an output line
+     * @param lineNumber line number to change bitwidth on
+     * @param newBitWidth new bitwidth
+     */
     changeOutputBitWidth(lineNumber : number, newBitWidth : number) {
         this.output.changeBitSize(lineNumber, newBitWidth);
     }
 
+    /**
+     * Get the state of an input line
+     * @param lineNumber line number of input
+     */
     getInputLine(lineNumber : number) {
         return this.input.getLineValue(lineNumber);
     }
 
+    /**
+     * Get the state of an output line
+     * @param lineNumber line number of output
+     */
     getOutputLine(lineNumber : number) {
         return this.output.getLineValue(lineNumber);
     }
 
+    /**
+     * Get a specified bit state from an input line
+     * @param lineNumber line number to get state from
+     * @param bitNumber bit number
+     */
     getInputLineBit(lineNumber : number, bitNumber : number) {
         return this.input.getLineBit(lineNumber, bitNumber);
     }
 
+    /**
+     * Get a specified bit state from an output line
+     * @param lineNumber line number to get state from
+     * @param bitNumber bit number
+     */
     getOutputLineBit(lineNumber : number, bitNumber : number) {
         return this.output.getLineBit(lineNumber, bitNumber);
     }
 
+    /**
+     * Set the value of an input line
+     * @param lineNumber line number to set
+     * @param value value of line
+     */
     setInputLine(lineNumber : number, value : Array<wireState>) {
         this.input.setLineValue(lineNumber, value);
     }
 
+    /**
+     * Translate the component
+     * @param x dX
+     * @param y dY
+     */
     translate (x : number, y : number) {
         this.x += x;
         this.y += y;
@@ -172,6 +227,7 @@ export abstract class SimulationComponent{
  
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
+                console.log(this.wiringAreas)
                 wiringArea.graphic.x += x;
                 wiringArea.graphic.y += y;
                 wiringArea.x += x;
@@ -184,6 +240,10 @@ export abstract class SimulationComponent{
         })
     }
 
+    /**
+     * Set the x location of the component
+     * @param x new x location
+     */
     setX (x : number) {
         if (this.grid) {
             x = this.grid.snapToGrid(new Point(x, 0)).x;
@@ -191,7 +251,7 @@ export abstract class SimulationComponent{
 
         let dx = x - this.x;
         this.x = x;
-
+        console.log(this.wiringAreas.get(false).get(0))
         this.geometry = this.calculateGeometry(1);
 
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
@@ -206,6 +266,10 @@ export abstract class SimulationComponent{
         })
     }
 
+    /**
+     * Set the y location of the component
+     * @param y new y location
+     */
     setY (y : number) {
         if (this.grid) {
             y = this.grid.snapToGrid(new Point(0, y)).y;
@@ -228,6 +292,9 @@ export abstract class SimulationComponent{
     }
 
 
+    /**
+     * Update the bounds of the component's hit area
+     */
     updateHitArea() {
         this.componentTemplate.hitArea = new PIXI.Rectangle(
             this.componentTemplate.getBounds().x, this.componentTemplate.getBounds().y,
@@ -235,6 +302,13 @@ export abstract class SimulationComponent{
             this.componentTemplate.getBounds().height + 50)
     }
 
+    /**
+     * Add a wiring area to the component
+     * @param x x location of wiring area
+     * @param y y location of wiring area
+     * @param lineNumber line number to map to
+     * @param isInput is this mapped to an input line?
+     */
     addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean) {
         let wiringAreaGraphic = new PIXI.Graphics();
        
@@ -301,8 +375,7 @@ export abstract class SimulationComponent{
             value.forEach((wiringArea : WiringArea) => {
                 handler(new SimulationAddGraphicEvent(wiringArea.graphic));
             });
-        });      
-
+        });
     }
 
     setOnGraphicRemove(handler : (e : SimulationAddGraphicEvent) => void) {

@@ -1,3 +1,10 @@
+//Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
+//
+//  You may not re-dsitrubte this software with modification or use this software
+//  for commercial purposes without written permission from the owner
+//
+//Copyright Jacob R. Haygood 2022
+
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
 import {WiringArea} from "./SimulationComponent/WiringArea";
 
@@ -25,7 +32,6 @@ export class CustomHitDetector {
         this.simulationComponents.forEach((component : SimulationComponent) => {
             component.wiringAreas.forEach((val: Map<Number, WiringArea>) => {
                 val.forEach((val: WiringArea) => {
-                    console.log(x, y, val.graphic.hitArea)
                     if (val.graphic.hitArea.contains(x, y)) {
                         retVal = val;
                     }
@@ -42,14 +48,9 @@ export class CustomHitDetector {
      * @param y y location of mouse
      */
     detectHitComponent(x : number, y : number) : SimulationComponent {
-        console.log("R")
-
         for (let c of this.simulationComponents) {
             if (c.componentTemplate.hitArea.contains(x, y)) {
-                console.log(c)
-                console.log("point hit detect component")
                 return c;
-
             }
         }
 

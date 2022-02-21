@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
-import {MouseMode, SimulationState} from "./SimulationState";
+import {SimulationState} from "./SimulationState";
 import { NOTGate } from "./SimulationComponent/Gates/NOTGate";
 import { ConstantComponent } from "./SimulationComponent/Wiring/Constant"
 import * as PIXI from "pixi.js"
@@ -17,7 +17,6 @@ import { HitAreaClickEvent } from "./SimulationEvents/HitAreaClickEvent"
 import { ComponentDragEvent } from "./SimulationEvents/ComponentDragEvent";
 import { WireEndDragAtWiringAreaEvent } from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
 import { Wire } from "./Wiring/Wire";
-import { WiringArea } from "./SimulationComponent/WiringArea";
 import { ANDGate } from "./SimulationComponent/Gates/ANDGate";
 import { NANDGate } from "./SimulationComponent/Gates/NANDGate";
 import { HexDisplay } from "./SimulationComponent/Peripheral/HexDisplay";
@@ -41,11 +40,10 @@ export class DigitalDesignSimulation extends PIXI.Application{
   
     private grid : SimulationGrid;
     private container : PIXI.Container;
-    private updated : boolean;
 
     private hitDetector : CustomHitDetector;
 
-    constructor(container : HTMLDivElement) {
+    constructor() {
         super();
        //Bind methods to class
        this.resizePixiSimulation = this.resizePixiSimulation.bind(this);
@@ -133,11 +131,13 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * Add a component to the simulation
      * @param component component to add
      */
+
     addComponent(component : SimulationComponent) {
         this.simulationState.addComponent(component);
     }
 
     //Renders the simulation graphics on a set interval
+
     simulationLoop(delta : number){
         this.bg.clear();
         this.bg.beginFill(this.bgColor) 
@@ -153,6 +153,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * Runs on an interval faster than pixi.js can render. This
      *  simulates the state of the components and wires
      */
+
     runSimulation() {
         this.updateSimulationComponents();
     }
@@ -160,10 +161,10 @@ export class DigitalDesignSimulation extends PIXI.Application{
     /**
      * This fires when the window is resized
      */
+
     resizePixiSimulation() {
         this.renderer.resize(window.innerWidth, 
             window.innerHeight);
-
     }
 
     /**
@@ -247,15 +248,14 @@ export class DigitalDesignSimulation extends PIXI.Application{
      *  2) Hit on wiring area
      *  3) Hit with no target
      */
+
     _onMouseDocumentDown(mouseEvent : InteractionEvent) {
-        console.log("V")
         let pos = mouseEvent.data.global;
         let localPos = this.stage.toLocal(pos);
         //this.simulationState.stage.addChild(new PIXI.Graphics().beginFill(0xff0000).drawRect(localPos.x, localPos.y, 10, 10))
         //let hit = this.interactionManager.hitTest(new PIXI.Point(localPos.x, localPos.y), this.container)
         let wiringAreaHit = this.hitDetector.detectHitWiringArea(localPos.x, localPos.y);
         let componentHit = this.hitDetector.detectHitComponent(localPos.x, localPos.y);
-        console.log(componentHit, wiringAreaHit)
         if (this.simulationState.lockSelectedToCursor) {
             this.simulationState.SelectedComponent.setOpacity(1);
             this.simulationState.SelectedComponent = null;
@@ -268,7 +268,6 @@ export class DigitalDesignSimulation extends PIXI.Application{
             return;
         }
         if (componentHit) {
-            console.log("HIT")
             componentHit.selected = true;
             this.simulationState.isDraggingComponent = true;
             this.simulationState.stateChanged = true;
@@ -291,6 +290,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      *  2) component place
      *  3) wire drag
      */
+
     _onMouseMove(mouseEvent : InteractionEvent) {
         let pos = this.stage.toLocal(mouseEvent.data.global);
         let dX = 0;
@@ -328,8 +328,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * check for:
      *  1) End wire drag
      *  2) End wire drag at WiringArea
-     *
      */
+
     _onMouseUp(mouseEvent : InteractionEvent) {
         let pos = this.stage.toLocal(mouseEvent.data.global);
 
@@ -352,6 +352,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * @param scrollEvent
      * If mouse inside bounds of canvas, scale grid and simulation elements
      */
+
     _onScroll(scrollEvent : WheelEvent) {
         if (CustomHitDetector.isInside(scrollEvent.clientX, scrollEvent.clientY,
             this.view.getBoundingClientRect())) {
@@ -386,20 +387,22 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     /**
      * Called by simulation components to add component graphics to simulation
-     * I don't want to pass SimulationState or stage to subclasses to reduce
+     * I don't want to pass SimulationState or stage to simulation components to reduce
      * coupling
      * @param e
      */
+
     onSimulationGraphicAdd(e : SimulationAddGraphicEvent) {
         this.container.addChild(e.graphic);
     }
 
     /**
      * Called by simulation components to add component graphics to simulation
-     * I don't want to pass SimulationState or stage to subclasses to reduce
+     * I don't want to pass SimulationState or stage to simulation components to reduce
      * coupling
      * @param e
      */
+
     onSimulationGraphicRemove(e : SimulationAddGraphicEvent) {
         this.container.removeChild(e.graphic);
     }
@@ -415,6 +418,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * Fires when a WiringArea is clicked
      * @param e
      */
+
     onHitAreaClick(e : HitAreaClickEvent) {
         this.simulationState.draggingWireHitArea =this.simulationState.activeWiringArea;
         let addWire = this.wiringMap.addWire(
@@ -431,6 +435,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * Fires when component drag detected
      * @param e
      */
+
     onComponentDrag(e : ComponentDragEvent) {
         let gridPoint = this.grid.snapToGrid(new PIXI.Point(e.x, e.y));
         e.component.setX(gridPoint.x);
@@ -442,6 +447,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * Calls when a wire drag finished at a WiringArea
      * @param e
      */
+
     onWireEndDragAtWiringArea(e : WireEndDragAtWiringAreaEvent) {
         e.wire.endPlace();
         e.wire.connectComponentToTop(e.component);
