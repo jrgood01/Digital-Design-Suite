@@ -1,6 +1,6 @@
 //Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
 //
-//  You may not re-dsitrubte this software with modification or use this software 
+//  You may not re-distribute this software with modification or use this software
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
@@ -227,11 +227,11 @@ export abstract class SimulationComponent{
  
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
-                console.log(this.wiringAreas)
                 wiringArea.graphic.x += x;
                 wiringArea.graphic.y += y;
                 wiringArea.x += x;
                 wiringArea.y += y;
+                wiringArea.graphic.hitArea = new PIXI.Rectangle(wiringArea.x - 20, wiringArea.y - 20 , 100, 100);
             });
         });      
 
@@ -251,13 +251,13 @@ export abstract class SimulationComponent{
 
         let dx = x - this.x;
         this.x = x;
-        console.log(this.wiringAreas.get(false).get(0))
         this.geometry = this.calculateGeometry(1);
 
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.x += dx;
                 wiringArea.x += dx;
+                wiringArea.graphic.hitArea = new PIXI.Rectangle(wiringArea.x - 20, wiringArea.y - 20 , 100, 100);
             });
         });
 
@@ -283,6 +283,7 @@ export abstract class SimulationComponent{
             value.forEach((wiringArea : WiringArea) => {
                 wiringArea.graphic.y += dy;
                 wiringArea.y += dy;
+                wiringArea.graphic.hitArea = new PIXI.Rectangle(wiringArea.x - 20, wiringArea.y - 20 , 100, 100);
             });
         });
 
@@ -333,9 +334,9 @@ export abstract class SimulationComponent{
             graphic : wiringAreaGraphic
         }
 
-        wiringAreaGraphic.cursor = "grab"
+        //wiringAreaGraphic.cursor = "grab"
 
-        wiringAreaGraphic.on("mouseover", () => 
+       /* wiringAreaGraphic.on("mouseover", () =>
         {
             if (!this.selected) {
                 wiringAreaGraphic.alpha = 1;
@@ -354,6 +355,8 @@ export abstract class SimulationComponent{
                 });
             }
         });
+
+        */
 
         this.wiringAreas.get(isInput).set(lineNumber, addWiringArea);
     }

@@ -1,6 +1,6 @@
 //Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
 //
-//  You may not re-dsitrubte this software with modification or use this software 
+//  You may not re-distribute this software with modification or use this software
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
@@ -42,6 +42,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
     private container : PIXI.Container;
 
     private hitDetector : CustomHitDetector;
+    private cursorGraphic : PIXI.Graphics;
 
     constructor() {
         super();
@@ -102,6 +103,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
        this.hitDetector = new CustomHitDetector();
        this.hitDetector.setSimulationComponentArray(this.simulationState.components);
 
+       this.cursorGraphic = new PIXI.Graphics();
+
     }
 
     beginRender() {  
@@ -123,8 +126,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.container.addChild(this.bg);
         this.container.addChild(this.grid.graphic);
         this.simulationUpdateFrequency = 1000;
+        this.container.addChild(this.cursorGraphic)
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
- 
+
     }
 
     /**
@@ -251,11 +255,12 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     _onMouseDocumentDown(mouseEvent : InteractionEvent) {
         let pos = mouseEvent.data.global;
-        let localPos = this.stage.toLocal(pos);
+        let localPos = this.container.toLocal(pos);
         //this.simulationState.stage.addChild(new PIXI.Graphics().beginFill(0xff0000).drawRect(localPos.x, localPos.y, 10, 10))
         //let hit = this.interactionManager.hitTest(new PIXI.Point(localPos.x, localPos.y), this.container)
         let wiringAreaHit = this.hitDetector.detectHitWiringArea(localPos.x, localPos.y);
         let componentHit = this.hitDetector.detectHitComponent(localPos.x, localPos.y);
+
         if (this.simulationState.lockSelectedToCursor) {
             this.simulationState.SelectedComponent.setOpacity(1);
             this.simulationState.SelectedComponent = null;
@@ -292,7 +297,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      */
 
     _onMouseMove(mouseEvent : InteractionEvent) {
-        let pos = this.stage.toLocal(mouseEvent.data.global);
+        let pos = this.container.toLocal(mouseEvent.data.global);
         let dX = 0;
         let dY = 0;
 
@@ -304,6 +309,26 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
         dX = pos.x - this.lastMouseX;
         dY = pos.y - this.lastMouseY;
+
+        let componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
+        let wireAreaHit = this.hitDetector.detectHitWiringArea(pos.x, pos.y);
+        if (componentHit || wireAreaHit) {
+            document.body.style.cursor = "grab";
+        } else {
+            document.body.style.cursor = "pointer"
+        }
+
+        if (wireAreaHit) {
+            if (this.simulationState.activeWiringArea)
+                this.simulationState.activeWiringArea.graphic.alpha = 0;
+            wireAreaHit.graphic.alpha = 1;
+            this.simulationState.activeWiringArea = wireAreaHit;
+        } else {
+            if (this.simulationState.activeWiringArea)
+                this.simulationState.activeWiringArea.graphic.alpha = 0;
+            this.simulationState.activeWiringArea = null;
+        }
+
         if (this.simulationState.isDraggingComponent) {
             let event = new ComponentDragEvent(this.simulationState.SelectedComponent, pos.x, pos.y, dX, dY);
             this.onComponentDrag(event);
@@ -422,8 +447,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
     onHitAreaClick(e : HitAreaClickEvent) {
         this.simulationState.draggingWireHitArea =this.simulationState.activeWiringArea;
         let addWire = this.wiringMap.addWire(
-            e.component, this.simulationState.activeWiringArea.lineNumber, this.simulationState.activeWiringArea.x,
-            this.simulationState.activeWiringArea.y, e.hitArea.input);
+            e.component, e.hitArea.lineNumber, e.hitArea.x,
+            e.hitArea.y, e.hitArea.input);
 
         if (addWire != null) {
             addWire.setGrid(this.grid);
