@@ -11,9 +11,8 @@ import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 import { WiringArea } from "./SimulationComponent/WiringArea";
 import { WiringAreaActiveEvent } from "./SimulationEvents/WiringAreaActiveEvent";
 export enum MouseMode {
-    PAN,
-    ZOOM,
-    SELECT
+    STANDARD = "pointer",
+    PAN = "all-scroll",
 }
 
 export class SimulationState {
@@ -40,7 +39,7 @@ export class SimulationState {
         this.components = new Array<SimulationComponent>();
         this.numComponents = 0;
         this.scale = 1;
-        this.mode = MouseMode.SELECT;
+        this.mode = MouseMode.STANDARD;
         this.stateChanged = true;
         this.stage = stage;
         this.draggingWire = null;

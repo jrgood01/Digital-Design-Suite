@@ -49,7 +49,6 @@ export abstract class SimulationComponent{
     onGraphicRemove : (e : SimulationAddGraphicEvent) => void;
 
     visited : boolean;
-    private opacity : number;
 
     private onWiringAreaActive :  Array<(e : WiringAreaActiveEvent) => void>;
     private onWiringAreaLeave : Array<() => void>;

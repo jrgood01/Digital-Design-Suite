@@ -66,7 +66,7 @@ export class Wire {
         this.error = false;
         this.grid = null;
 
-        stage.on("pointermove", this.onMouseMove);
+        document.addEventListener("mousemove", this.onMouseMove);
     }
 
     setGrid(grid : SimulationGrid) {
@@ -140,9 +140,10 @@ export class Wire {
         }
     } 
 
-    onMouseMove(ev : any) : any {
-        let pos = ev.data.global;
+    onMouseMove(ev : PointerEvent) {
+        let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
         if (this.isPlacing) {
+            console.log(pos.x, pos.y)
             this.anchorToPoint(pos.x, pos.y, true);
         }
     }
@@ -199,8 +200,6 @@ export class Wire {
             segmentTwo.padSegment();
         }
         segmentTwo.padSegment();
-       // segmentTwo.start = segmentOne.getEndPoint();
-
     }
 
 

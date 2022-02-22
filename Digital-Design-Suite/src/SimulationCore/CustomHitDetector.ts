@@ -8,10 +8,6 @@
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
 import {WiringArea} from "./SimulationComponent/WiringArea";
 
-/**
- * Custom hit detector. I had to make this because PIXI.js does not handle
- * interactions witth zooming and panning well at the moment.
- */
 export class CustomHitDetector {
     private simulationComponents : Array<SimulationComponent>;
     constructor() {
@@ -51,7 +47,6 @@ export class CustomHitDetector {
         for (let c of this.simulationComponents) {
             if (c.componentTemplate.hitArea.contains(x, y)) {
                 return c;
-
             }
         }
 

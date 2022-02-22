@@ -85,7 +85,7 @@ export class WireSegment {
         this.xBoundsReversed = false;
         this.yBoundsReversed = false;
 
-        this.stage.on("pointermove", this._onMouseMove)
+        document.addEventListener("mousemove", this._onMouseMove)
         this.stage.on("pointerdown", this._onClick);
         this.stage.on("pointerup", this._onMouseUp);
 
@@ -245,9 +245,10 @@ export class WireSegment {
             this.yBoundsReversed ? this.bounds.minY : this.bounds.maxY);
     }
 
-    private _onMouseMove(ev : InteractionEvent) {
+    private _onMouseMove(ev : PointerEvent) {
         this.graphic.clear();
-        let pos = ev.data.global;
+        let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
+        console.log(pos)
         let x = pos.x;
         let y = pos.y;
 

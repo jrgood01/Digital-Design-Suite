@@ -6,21 +6,21 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
-import {SimulationState} from "./SimulationState";
-import { NOTGate } from "./SimulationComponent/Gates/NOTGate";
-import { ConstantComponent } from "./SimulationComponent/Wiring/Constant"
+import {MouseMode, SimulationState} from "./SimulationState";
+import {NOTGate} from "./SimulationComponent/Gates/NOTGate";
+import {ConstantComponent} from "./SimulationComponent/Wiring/Constant"
 import * as PIXI from "pixi.js"
+import {InteractionEvent, InteractionManager} from "pixi.js"
 import * as constants from "../constants";
-import { InteractionEvent, InteractionManager } from "pixi.js";
-import { WiringMap } from "./Wiring/WiringMap"
-import { HitAreaClickEvent } from "./SimulationEvents/HitAreaClickEvent"
-import { ComponentDragEvent } from "./SimulationEvents/ComponentDragEvent";
-import { WireEndDragAtWiringAreaEvent } from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
-import { Wire } from "./Wiring/Wire";
-import { ANDGate } from "./SimulationComponent/Gates/ANDGate";
-import { NANDGate } from "./SimulationComponent/Gates/NANDGate";
-import { HexDisplay } from "./SimulationComponent/Peripheral/HexDisplay";
-import { SimulationAddGraphicEvent } from "./SimulationEvents/SimulationAddGraphicEvent";
+import {WiringMap} from "./Wiring/WiringMap"
+import {HitAreaClickEvent} from "./SimulationEvents/HitAreaClickEvent"
+import {ComponentDragEvent} from "./SimulationEvents/ComponentDragEvent";
+import {WireEndDragAtWiringAreaEvent} from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
+import {Wire} from "./Wiring/Wire";
+import {ANDGate} from "./SimulationComponent/Gates/ANDGate";
+import {NANDGate} from "./SimulationComponent/Gates/NANDGate";
+import {HexDisplay} from "./SimulationComponent/Peripheral/HexDisplay";
+import {SimulationAddGraphicEvent} from "./SimulationEvents/SimulationAddGraphicEvent";
 import {SimulationGrid} from "./SimulationGrid";
 import {CustomHitDetector} from "./CustomHitDetector";
 
@@ -63,7 +63,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
        this._onMouseDocumentDown = this._onMouseDocumentDown.bind(this);
        this._onMouseMove = this._onMouseMove.bind(this);
        this._onMouseUp = this._onMouseUp.bind(this);
-       
+       this._onKeyDown = this._onKeyDown.bind(this);
+
        //Simulation state holds data about the simulation
        this.simulationState = new SimulationState(this.stage);
        this.simulationState.stage.on("pointerdown", this._onMouseDocumentDown);
@@ -81,13 +82,12 @@ export class DigitalDesignSimulation extends PIXI.Application{
        this.lastMouseX = 0;
        this.lastMouseY = 0;
        
-       //We will use this to keep track of what component pins 
-       //  are connected to what wires
-       this.wiringMap = new WiringMap(this.simulationState);
-       
         
        //Add listeners for global events
        document.addEventListener("wheel", this._onScroll)
+
+        //Keyboard events
+        document.addEventListener("keydown", this._onKeyDown)
        //We want to resize the view every time the window is
        //  resized
        window.addEventListener('resize', this.resizePixiSimulation); 
@@ -125,6 +125,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.stage.cacheAsBitmap = false;
         this.container.addChild(this.bg);
         this.container.addChild(this.grid.graphic);
+        //We will use this to keep track of what component pins
+        //  are connected to what wires
+        this.wiringMap = new WiringMap(this.container);
         this.simulationUpdateFrequency = 1000;
         this.container.addChild(this.cursorGraphic)
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
@@ -255,12 +258,11 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     _onMouseDocumentDown(mouseEvent : InteractionEvent) {
         let pos = mouseEvent.data.global;
-        let localPos = this.container.toLocal(pos);
+        let local = this.container.toLocal(pos);
         //this.simulationState.stage.addChild(new PIXI.Graphics().beginFill(0xff0000).drawRect(localPos.x, localPos.y, 10, 10))
         //let hit = this.interactionManager.hitTest(new PIXI.Point(localPos.x, localPos.y), this.container)
-        let wiringAreaHit = this.hitDetector.detectHitWiringArea(localPos.x, localPos.y);
-        let componentHit = this.hitDetector.detectHitComponent(localPos.x, localPos.y);
-
+        let wiringAreaHit = this.hitDetector.detectHitWiringArea(local.x, local.y);
+        let componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
         if (this.simulationState.lockSelectedToCursor) {
             this.simulationState.SelectedComponent.setOpacity(1);
             this.simulationState.SelectedComponent = null;
@@ -273,6 +275,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
             return;
         }
         if (componentHit) {
+            console.log(componentHit)
             componentHit.selected = true;
             this.simulationState.isDraggingComponent = true;
             this.simulationState.stateChanged = true;
@@ -309,15 +312,19 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
         dX = pos.x - this.lastMouseX;
         dY = pos.y - this.lastMouseY;
+        document.body.style.cursor = this.simulationState.mode;
 
+        if (this.simulationState.mode == MouseMode.PAN) {
+            this.container.pivot.x += dX / 120;
+            this.container.pivot.y += dY / 120;
+            this.grid.update();
+            return;
+        }
         let componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
         let wireAreaHit = this.hitDetector.detectHitWiringArea(pos.x, pos.y);
         if (componentHit || wireAreaHit) {
             document.body.style.cursor = "grab";
-        } else {
-            document.body.style.cursor = "pointer"
         }
-
         if (wireAreaHit) {
             if (this.simulationState.activeWiringArea)
                 this.simulationState.activeWiringArea.graphic.alpha = 0;
@@ -398,9 +405,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
                     this.bg.height /= 1 / Math.abs(this.container.scale.x);
                 }
             }
-            this.simulationState.components.forEach((c : SimulationComponent) => {
-                c.updateHitArea();
-            })
+
             this.grid.update();
 
             this.grid.setXMax(this.bg.width);
@@ -481,5 +486,16 @@ export class DigitalDesignSimulation extends PIXI.Application{
             e.wiringArea.lineNumber, e.wire);
         e.wire.anchorToPoint(e.wiringArea.x, e.wiringArea.y, true);
         return
+    }
+
+    _onKeyDown(ev : KeyboardEvent) {
+        if (ev.ctrlKey && ev.key == "p") {
+            if (this.simulationState.mode != MouseMode.PAN)
+                this.simulationState.mode = MouseMode.PAN;
+            else
+                this.simulationState.mode = MouseMode.STANDARD
+
+        }
+
     }
 }
