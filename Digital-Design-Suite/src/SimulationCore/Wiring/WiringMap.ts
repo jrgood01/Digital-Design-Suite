@@ -1,18 +1,18 @@
 //Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
 //
-//  You may not re-dsitrubte this software with modification or use this software 
+//  You may not re-distribute this software with modification or use this software
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
 
-import { Component } from "react";
+import * as PIXI from "pixi.js"
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { SimulationState } from "../SimulationState";
 import { Wire } from "./Wire";
 
 export class WiringMap {
     //Contains useful information about the simulation
-    private simulationState : SimulationState;
+    private refContainer : PIXI.Container;
 
     //We will store the component to wire map in a Map of Maps
     //  the submap of each component contains two entires.
@@ -20,8 +20,8 @@ export class WiringMap {
     //  entry represents output maps. 
     private wireMap : Map<SimulationComponent, Map<boolean, Map<number, Wire>>>
 
-    constructor(simulationState : SimulationState) {
-        this.simulationState = simulationState;
+    constructor(refContainer : PIXI.Container) {
+        this.refContainer = refContainer;
         this.wireMap = new Map<SimulationComponent, Map<boolean, Map<number, Wire>>>();
     }
 
@@ -49,7 +49,7 @@ export class WiringMap {
         }
 
         //Create a new wire with the passed start coordinates
-        let addWire = new Wire(startX, startY, ioComponent, this.simulationState.stage);
+        let addWire = new Wire(startX, startY, ioComponent, this.refContainer);
         const inputConnection = 
         {
             component: ioComponent, 
@@ -65,7 +65,7 @@ export class WiringMap {
 
         //Add the wire to the map
         this.wireMap.get(ioComponent).get(isInput).set(lineNumber, addWire);
-        this.simulationState.stage.addChild(addWire.graphic);
+        this.refContainer.addChild(addWire.graphic);
         ioComponent.setGlow(true);
         return addWire;
     }

@@ -13,8 +13,6 @@ import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
 import { ToolBoxWindow } from "./ReactComponents/WindowComponents/ToolBoxWindow/ToolBoxWindow"
 function render() {
-  
-  const containerRef = React.createRef<HTMLDivElement>();
 
   const subMenuArr: SubMenuProps[] = [
     { title: "File", values: [
@@ -38,7 +36,7 @@ function render() {
   ];
 
 
-  let simulation = new DigitalDesignSimulation(containerRef.current);
+  let simulation = new DigitalDesignSimulation();
 
   ReactDOM.render(
       <React.Fragment>

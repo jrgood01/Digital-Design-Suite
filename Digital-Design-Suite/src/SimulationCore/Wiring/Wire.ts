@@ -1,10 +1,9 @@
 //Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
 //
-//  You may not re-dsitrubte this software with modification or use this software 
+//  You may not re-distribute this software with modification or use this software
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
-
 import * as PIXI from "pixi.js";
 import { wireState } from "../WireStates";
 import { ComponentConnection } from "./ComponentConnection";
@@ -15,6 +14,7 @@ import { GlowFilter } from '@pixi/filter-glow';
 import {WireSegment} from "./WireSegment"
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { Heading } from "../../Heading";
+import {SimulationGrid} from "../SimulationGrid";
 
 export class Wire {
     graphic : PIXI.Graphics;
@@ -31,7 +31,7 @@ export class Wire {
     private bitWidth : number;
     private isPlacing : boolean;
     private stage : PIXI.Container;
-
+    private grid : SimulationGrid;
     /**
      * Create new wire
      * @param startX wire startX
@@ -64,8 +64,16 @@ export class Wire {
         this.segments.push(addWire);
 
         this.error = false;
+        this.grid = null;
 
-        stage.on("pointermove", this.onMouseMove);
+        document.addEventListener("mousemove", this.onMouseMove);
+    }
+
+    setGrid(grid : SimulationGrid) {
+        this.grid = grid;
+        this.segments.forEach((s : WireSegment) => {
+            s.setGrid(grid);
+        })
     }
 
     AllInputsVisited () {
@@ -102,10 +110,11 @@ export class Wire {
     addSegmentTop(length : number) {
         let lastSegment = this.segments[this.segments.length - 1];
         let lastSegmentEndPoint = lastSegment.getEndPoint();
-        let addSegment = new WireSegment(lastSegment.isVertical, lastSegmentEndPoint, 0, 
+        let addSegment = new WireSegment(lastSegment.getIsVertical(), lastSegmentEndPoint, 0,
             this.stage, this.onCreateSegment);
         lastSegment.top = addSegment;
         addSegment.bottom = lastSegment
+        addSegment.setGrid(this.grid);
         this.segments.push(addSegment);
     }
 
@@ -131,9 +140,10 @@ export class Wire {
         }
     } 
 
-    onMouseMove(ev : any) : any {
-        let pos = ev.data.global;
+    onMouseMove(ev : PointerEvent) {
+        let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
         if (this.isPlacing) {
+            console.log(pos.x, pos.y)
             this.anchorToPoint(pos.x, pos.y, true);
         }
     }
@@ -141,25 +151,28 @@ export class Wire {
     anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false, smartAnchor : boolean = false) {
         let segmentOne = this.segments[this.segments.length - 2]
         let segmentTwo = this.segments[this.segments.length - 1]
-        let anchor = segmentOne.start;
-
+        let anchor = segmentOne.getStartPoint();
+        if (this.grid) {
+            let gridPoint = this.grid.snapToGrid(new Point(x, y));
+            x = gridPoint.x;
+            y = gridPoint.y;
+        }
         let dX = x - anchor.x;
         let dY = y - anchor.y;
         let anchorType = Math.abs(dX) > Math.abs(dY);
-
         if (anchorType) {
             
-            segmentTwo.length = dY;
-            segmentTwo.isVertical = true;
+            segmentTwo.setLength(dY);
+            segmentTwo.setIsVertical(true);
 
-            segmentOne.length = dX;
-            segmentOne.isVertical = false;
-            segmentTwo.start = segmentOne.getEndPoint();
+            segmentOne.setLength(dX);
+            segmentOne.setIsVertical(false);
+            segmentTwo.setStartPoint(segmentOne.getEndPoint());
            
-            if (segmentTwo.length > 0) {
-                segmentTwo.start.y -= 10;
+            if (segmentTwo.getLength() > 0) {
+                segmentTwo.incrementStartY(-10);
             } else {
-                segmentTwo.start.y -= 3.5;
+                segmentTwo.incrementStartY(-3.5);
             }
             if (lockMouseOnAnchor) {
                 segmentTwo.lockToMouseY();
@@ -168,31 +181,27 @@ export class Wire {
 
         } else {
            
-            segmentTwo.length = dX;
-            segmentTwo.isVertical = false;
+            segmentTwo.setLength(dX);
+            segmentTwo.setIsVertical(false);
 
-            segmentOne.length = dY ;
-            segmentOne.isVertical = true;
-            segmentTwo.start = segmentOne.getEndPoint();
+            segmentOne.setLength(dY);
+            segmentOne.setIsVertical(true);
+            segmentTwo.setStartPoint(segmentOne.getEndPoint());
             if (lockMouseOnAnchor) {
                 segmentTwo.lockToMouseX();
                 segmentOne.lockToMouseY();
             }
 
-            if (segmentTwo.length > 0) {
-                segmentTwo.start.x -= 10;
+            if (segmentTwo.getLength() > 0) {
+                segmentTwo.incrementStartX(-10);
             } else {
-                segmentTwo.start.x -= 3;
+                segmentTwo.incrementStartX(-3);
             }
-            
+            segmentTwo.padSegment();
         }
-
-       // segmentTwo.start = segmentOne.getEndPoint();
-
-
-  
-
+        segmentTwo.padSegment();
     }
+
 
     onCreateSegment(created : WireSegment) {
         this.segments.push(created);
@@ -248,6 +257,7 @@ export class Wire {
         
 
     }
+
     draw() {
         this.graphic.clear();
         this.segments.forEach((segment : WireSegment) => {

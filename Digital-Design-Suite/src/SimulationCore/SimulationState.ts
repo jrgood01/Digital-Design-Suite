@@ -1,6 +1,6 @@
 //Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
 //
-//  You may not re-dsitrubte this software with modification or use this software 
+//  You may not re-distribute this software with modification or use this software
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
@@ -11,9 +11,8 @@ import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
 import { WiringArea } from "./SimulationComponent/WiringArea";
 import { WiringAreaActiveEvent } from "./SimulationEvents/WiringAreaActiveEvent";
 export enum MouseMode {
-    PAN,
-    ZOOM,
-    SELECT
+    STANDARD = "pointer",
+    PAN = "all-scroll",
 }
 
 export class SimulationState {
@@ -40,14 +39,13 @@ export class SimulationState {
         this.components = new Array<SimulationComponent>();
         this.numComponents = 0;
         this.scale = 1;
-        this.mode = MouseMode.SELECT;
+        this.mode = MouseMode.STANDARD;
         this.stateChanged = true;
         this.stage = stage;
         this.draggingWire = null;
     }
 
     addComponent(component : SimulationComponent) {
-        console.log("Adding component ", component)
         component.componentId = this.numComponents.toString();
         
         component.addOnWiringAreaActive((e : WiringAreaActiveEvent) => {
