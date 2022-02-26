@@ -46,7 +46,7 @@ export class WiringArea extends DrawableClass{
         this.draw();
     }
     updateHitArea() {
-        this.graphic.hitArea = new PIXI.Rectangle(this.x - 20, this.y - 20 , 100, 100);
+        this.graphic.hitArea = new PIXI.Rectangle(this.x - 20, this.y - 20 , 40, 40);
     }
 
 }
