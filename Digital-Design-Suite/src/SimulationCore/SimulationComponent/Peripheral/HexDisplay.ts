@@ -16,8 +16,8 @@ export class HexDisplay extends SimulationComponent {
     private segments = Array<boolean>();
     private width = 450;
     private height = 600;
-    constructor(x : number, y : number) {
-        super(x, y, 8, 0, Array(8).fill(1), Array(0).fill(0));
+    constructor(x : number, y : number, container : PIXI.Container) {
+        super(x, y, container, 8, 0, Array(8).fill(1), Array(0).fill(0));
         this.segments = new Array(8).fill(false);
  
         this.x = x;

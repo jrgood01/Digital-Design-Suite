@@ -6,8 +6,8 @@ import { wireState } from "../../../SimulationCore/WireStates";
 export class ConstantComponent extends SimulationComponent {
     value : number;
     private text : PIXI.Text;
-    constructor(x : number, y : number, bitSize : number) {
-        super(x, y, 0, 1, Array<number>(0).fill(1), Array<number>(1).fill(bitSize));
+    constructor(x : number, y : number, container : PIXI.Container, bitSize : number) {
+        super(x, y, container, 0, 1, Array<number>(0).fill(1), Array<number>(1).fill(bitSize));
         this.value = Math.pow(2, bitSize) - 1; //set value to max
         this.x = x;
         this.y = y;

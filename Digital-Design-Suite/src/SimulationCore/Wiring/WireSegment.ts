@@ -248,7 +248,6 @@ export class WireSegment {
     private _onMouseMove(ev : PointerEvent) {
         this.graphic.clear();
         let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
-        console.log(pos)
         let x = pos.x;
         let y = pos.y;
 

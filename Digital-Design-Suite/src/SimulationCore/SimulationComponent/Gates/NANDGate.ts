@@ -5,9 +5,8 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationComponent} from "../SimulationComponent"
+import * as PIXI from 'pixi.js'
 import { wireState } from "../../WireStates";
-import { SimulationState } from "../../SimulationState";
 import { VariableInputComponent } from "../VariableInputComponent";
 import * as constants from "../../../constants"
 
@@ -15,8 +14,8 @@ export class NANDGate extends VariableInputComponent {
     inputs : number;
     bitWidth : number;
 
-    constructor(bitWidth : number, x : number, y : number, numInputs : number) {
-        super(x, y, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), 200);
+    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
+        super(x, y, container, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), 200);
         this.inputs = numInputs;
         this.bitWidth = bitWidth;
 
@@ -26,7 +25,7 @@ export class NANDGate extends VariableInputComponent {
     }
 
     calculateGeometry(scaler: number): Record<string, number> {
-        let retMap = {} as Record<string, number>
+        const retMap = {} as Record<string, number>
 
         retMap['startX'] = this.x;
         retMap['startY'] = this.y;

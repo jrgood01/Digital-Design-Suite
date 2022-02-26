@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import { SimulationComponent } from "./SimulationComponent";
-import { WiringArea } from "./WiringArea"
+import { WiringArea } from "../Wiring/WiringArea"
 import * as PIXI from "pixi.js"
 import * as constants from "../../constants"
 import { SimulationState } from "../SimulationState";
@@ -19,9 +19,9 @@ export abstract class VariableInputComponent extends SimulationComponent {
     private inputAreaPadding : number;
     private inputAreaStartY : number;
 
-    constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : number[], 
+    constructor(x : number, y : number, container : PIXI.Container, inputLines : number, outputLines : number, inputBitWidths : number[],
         outputBitWidths : number[],componentHeight : number) {
-        super(x, y, inputLines, outputLines, inputBitWidths, outputBitWidths);
+        super(x, y, container, inputLines, outputLines, inputBitWidths, outputBitWidths);
         
         this.drawInputAreas = this.drawInputAreas.bind(this);
 
@@ -46,10 +46,10 @@ export abstract class VariableInputComponent extends SimulationComponent {
         this.inputAreaStartY = (this.y + this.inputAreaPadding);
 
         this.wiringAreas.get(true).forEach((wiringArea : WiringArea, key : number) => {
-            this.onGraphicRemove(new SimulationAddGraphicEvent(wiringArea.graphic));
+            this.onGraphicRemove(new SimulationAddGraphicEvent(wiringArea.getGraphic()));
         })
 
-        this.wiringAreas.set(true, new Map<Number, WiringArea>());
+        this.wiringAreas.set(true, new Map<number, WiringArea>());
 
         for (let i = 0; i < this.numInputs; i ++) {
             let yPoint = this.inputAreaStartY + i * 50 - 3.5;

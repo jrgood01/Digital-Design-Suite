@@ -8,13 +8,14 @@
 import {SimulationComponent} from "../SimulationComponent"
 import { wireState } from "../../WireStates";
 import { SimulationState } from "../../SimulationState";
+import * as PIXI from 'pixi.js'
 
 class ORGate extends SimulationComponent {
     inputs : number;
     bitWidth : number;
 
-    constructor(x : number, y : number, bitWidth : number, numInputs : number, simulationState : SimulationState) {
-        super(x, y, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
+    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number, simulationState : SimulationState) {
+        super(x, y, container, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
         this.inputs = numInputs;
         this.bitWidth = bitWidth;
     }

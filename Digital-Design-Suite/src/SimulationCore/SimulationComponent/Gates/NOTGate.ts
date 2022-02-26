@@ -14,8 +14,8 @@ export class NOTGate extends SimulationComponent {
     bitWidth : number;
     simulationState : SimulationState;
 
-    constructor(bitWidth : number, x: number, y: number) {
-        super(x, y, 1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1));
+    constructor(x: number, y: number, container : PIXI.Container, bitWidth : number) {
+        super(x, y, container, 1, 1, Array(bitWidth).fill(1), Array(bitWidth).fill(1));
         this.input.setLineBit(0, 0, wireState.Float);
         this.bitWidth = bitWidth;
         this.x = x;

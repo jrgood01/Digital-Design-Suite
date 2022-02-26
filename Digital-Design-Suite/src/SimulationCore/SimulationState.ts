@@ -8,7 +8,7 @@
 import * as PIXI from "pixi.js"
 import { Wire } from "./Wiring/Wire";
 import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
-import { WiringArea } from "./SimulationComponent/WiringArea";
+import { WiringArea } from "./Wiring/WiringArea";
 import { WiringAreaActiveEvent } from "./SimulationEvents/WiringAreaActiveEvent";
 export enum MouseMode {
     STANDARD = "pointer",
@@ -33,7 +33,7 @@ export class SimulationState {
     lockSelectedToCursor : boolean;
 
     private draggingWire : Wire;
-    private isDraggingWire : boolean;
+
     
     constructor(stage : PIXI.Container) {
         this.components = new Array<SimulationComponent>();

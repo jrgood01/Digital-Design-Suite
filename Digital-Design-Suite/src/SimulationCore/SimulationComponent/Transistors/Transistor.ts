@@ -19,8 +19,8 @@ export enum TransistorType {
 export class Transistor extends SimulationComponent {
     type : TransistorType;
 
-    constructor(x : number, y : number) {
-        super(x, y, 2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));
+    constructor(x : number, y : number, container : PIXI.Container) {
+        super(x, y, container, 2, 1, Array<number>(2).fill(1), Array<number>(1).fill(1));
 
         this.x = x;
         this.y = y;
