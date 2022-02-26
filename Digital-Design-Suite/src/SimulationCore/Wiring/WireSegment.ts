@@ -232,7 +232,7 @@ export class WireSegment {
 
     private _onClick(ev : InteractionEvent) {
 
-        let pos = ev.data.global;
+        const pos = ev.data.global;
         if (Util.contains(this.bounds, pos.x, pos.y)) {
             this.selected = true;
         } else {

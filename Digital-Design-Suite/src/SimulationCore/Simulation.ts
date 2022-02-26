@@ -453,10 +453,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 this.simulationState.setDraggingWire(addWire);
             }
         } else {
-            console.log("Wire Hit")
             const wireHitArea = hitArea as WireWiringArea;
             console.log(wireHitArea.getWire())
-            wireHitArea.getWire().beginPlace();
+            wireHitArea.getWire().beginPlace(true);
             this.simulationState.setDraggingWire(wireHitArea.getWire());
         }
     }

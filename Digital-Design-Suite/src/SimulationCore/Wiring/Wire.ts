@@ -101,10 +101,9 @@ export class Wire {
         if (this.segments.length == 1) {
             this.addSegmentTop(0);
         } else {
-            this.addSegmentTop(0);
+            this.addSegmentTop(0, extending);
             this.addSegmentTop(0);
         }
-
         this.isPlacing = true;
     }
 
@@ -119,8 +118,8 @@ export class Wire {
     }
 
     setHitArea() {
-        let lastSegment = this.segments[this.segments.length - 1];
-        let endPoint = lastSegment.getEndPoint();
+        const lastSegment = this.segments[this.segments.length - 1];
+        const endPoint = lastSegment.getEndPoint();
         if (lastSegment.getIsVertical()) {
             endPoint.x -= 10;
         } else {
@@ -130,12 +129,21 @@ export class Wire {
         this.wiringArea.setOffset(lastSegment.getHeading())
     }
 
-    addSegmentTop(length : number) {
+    addSegmentTop(length : number, isExtending? : boolean) {
         const lastSegment = this.segments[this.segments.length - 1];
         const lastSegmentEndPoint = lastSegment.getEndPoint();
+        if (isExtending) {
+            console.log("EXTENDING SEGMENT")
+            if (lastSegment.getIsVertical()) {
+                lastSegmentEndPoint.x -= 23.5;
+            } else {
+                lastSegmentEndPoint.y -= 23.5;
+            }
+        }
         const addSegment = new WireSegment(lastSegment.getIsVertical(),
             lastSegmentEndPoint, 0,
             this.stage, this.onCreateSegment);
+
         lastSegment.top = addSegment;
         addSegment.bottom = lastSegment
         addSegment.setGrid(this.grid);
