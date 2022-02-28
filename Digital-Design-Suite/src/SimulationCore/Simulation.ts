@@ -480,8 +480,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
         if (wiringArea instanceof  ComponentWiringArea) {
             const componentWiringArea = wiringArea as ComponentWiringArea;
             wire.endPlace();
+            wire.removeWiringArea();
             wire.connectComponentToTop(wiringArea.getComponent());
-
+            wire.removeWiringArea();
             this.wiringMap.addWireMapping(wiringArea.getComponent(), wiringArea.getIsInput(),
                 wiringArea.getLineNumber(), wire);
             wire.anchorToPoint(wiringArea.getX(), wiringArea.getY()

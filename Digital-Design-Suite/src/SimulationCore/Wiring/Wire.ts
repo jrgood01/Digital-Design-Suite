@@ -21,9 +21,6 @@ import {WireWiringArea} from "./WireWiringArea";
 export class Wire {
     graphic : PIXI.Graphics;
 
-    private visited : boolean;
-    private lastState : boolean;
-
     private segments : Array<WireSegment>
     private state : Array<wireState>
 
@@ -73,6 +70,9 @@ export class Wire {
         document.addEventListener("mousemove", this.onMouseMove);
     }
 
+    /**
+     * Create the wiring area to extend wire
+     */
     generateWiringArea() {
         this.wiringArea = new WireWiringArea(0, 0, this.stage, this);
         console.log(this.wiringArea)
@@ -80,6 +80,14 @@ export class Wire {
         return this.wiringArea;
     }
 
+    removeWiringArea() {
+        if (this.wiringArea)
+            this.wiringArea.unRegister();
+        this.wiringArea = null;
+    }
+    /**
+     * @param grid Grid to lock wire to
+     */
     setGrid(grid : SimulationGrid) {
         this.grid = grid;
         this.segments.forEach((s : WireSegment) => {
@@ -118,6 +126,9 @@ export class Wire {
     }
 
     setHitArea() {
+        if (!this.wiringArea)
+            return;
+
         const lastSegment = this.segments[this.segments.length - 1];
         const endPoint = lastSegment.getEndPoint();
         if (lastSegment.getIsVertical()) {

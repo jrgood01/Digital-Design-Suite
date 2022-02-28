@@ -103,7 +103,7 @@ export class WireSegment {
     }
 
     setHeading(pad? : boolean) {
-        let startHeading = this.heading;
+        const startHeading = this.heading;
 
         if (this.isVertical) {
             if (this.length > 0) {

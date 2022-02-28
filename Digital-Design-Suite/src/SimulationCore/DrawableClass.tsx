@@ -63,4 +63,12 @@ export abstract class DrawableClass {
         this.draw();
         this.updateHitArea();
     }
+
+    register() {
+        this.container.addChild(this.graphic);
+    }
+
+    unRegister() {
+        this.container.removeChild(this.graphic);
+    }
 }
