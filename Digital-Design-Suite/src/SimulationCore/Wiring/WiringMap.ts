@@ -7,8 +7,8 @@
 
 import * as PIXI from "pixi.js"
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
-import { SimulationState } from "../SimulationState";
 import { Wire } from "./Wire";
+import {WireWiringArea} from "./WireWiringArea";
 
 export class WiringMap {
     //Contains useful information about the simulation
@@ -19,10 +19,12 @@ export class WiringMap {
     //  the true entry represents input maps and the false
     //  entry represents output maps. 
     private wireMap : Map<SimulationComponent, Map<boolean, Map<number, Wire>>>
+    private wireHitAreas : Array<WireWiringArea>;
 
     constructor(refContainer : PIXI.Container) {
         this.refContainer = refContainer;
         this.wireMap = new Map<SimulationComponent, Map<boolean, Map<number, Wire>>>();
+        this.wireHitAreas = new Array<WireWiringArea>();
     }
 
     /**
@@ -57,16 +59,12 @@ export class WiringMap {
             lineUpdated: false
         }
         addWire.addInput(inputConnection);
-        addWire.graphic.on("mousedown", (e : MouseEvent) => {
-            //addWire.addDummySegment();
-            
-            //this.simulationState.draggingWire = addWire;
-        })
 
         //Add the wire to the map
         this.wireMap.get(ioComponent).get(isInput).set(lineNumber, addWire);
         this.refContainer.addChild(addWire.graphic);
         ioComponent.setGlow(true);
+        this.wireHitAreas.push(addWire.generateWiringArea());
         return addWire;
     }
 
@@ -91,15 +89,6 @@ export class WiringMap {
         this.wireMap.get(ioComponent).get(isInput).set(lineNumber, wire);
     }
 
-    /**
-     * Moves all wires on exitsing component
-     * @param component component to move wires wire
-     * @param dx change in x
-     * @param dy change in y
-     */
-    moveComponentWires(component : SimulationComponent, dx : number, dy : number) {
-
-    }
 
     getMappedComponentOutputs(component : SimulationComponent) {
         if (this.wireMap.get(component) != null) {
@@ -119,7 +108,10 @@ export class WiringMap {
         
     }
 
-    
+    getWireHitAreas() {
+        return this.wireHitAreas;
+    }
+
     /**
      * draw the component
      */

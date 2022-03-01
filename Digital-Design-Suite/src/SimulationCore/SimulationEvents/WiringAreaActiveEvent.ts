@@ -1,4 +1,4 @@
-import { WiringArea } from "../SimulationComponent/WiringArea";
+import { WiringArea } from "../Wiring/WiringArea";
 
 export class WiringAreaActiveEvent {
     wiringArea : WiringArea;

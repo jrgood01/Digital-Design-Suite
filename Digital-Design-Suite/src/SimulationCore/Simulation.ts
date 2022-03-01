@@ -23,9 +23,16 @@ import {HexDisplay} from "./SimulationComponent/Peripheral/HexDisplay";
 import {SimulationAddGraphicEvent} from "./SimulationEvents/SimulationAddGraphicEvent";
 import {SimulationGrid} from "./SimulationGrid";
 import {CustomHitDetector} from "./CustomHitDetector";
+import {ComponentWiringArea} from "./Wiring/ComponentWiringArea";
+import {WiringArea} from "./Wiring/WiringArea";
+import {WireWiringArea} from "./Wiring/WireWiringArea";
+import {ORGate} from "./SimulationComponent/Gates/ORGate";
+import {XORGate} from "./SimulationComponent/Gates/XORGate";
+import {XNORGate} from "./SimulationComponent/Gates/XNORGate";
+import {NORGate} from "./SimulationComponent/Gates/NORGate";
 
-const minStageScale = .14;
-const maxStageScale = 1.5;
+const minStageScale = .6;
+const maxStageScale = 1.6;
 export class DigitalDesignSimulation extends PIXI.Application{
 
     private simulationState : SimulationState;
@@ -100,9 +107,6 @@ export class DigitalDesignSimulation extends PIXI.Application{
        this.bg = new PIXI.Graphics();
        this.bg.zIndex = -1000;
        this.grid = new SimulationGrid(30, 30);
-       this.hitDetector = new CustomHitDetector();
-       this.hitDetector.setSimulationComponentArray(this.simulationState.components);
-
        this.cursorGraphic = new PIXI.Graphics();
 
     }
@@ -123,11 +127,15 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.stage.addChild(this.container);
         this.container.cacheAsBitmap = false;
         this.stage.cacheAsBitmap = false;
-        this.container.addChild(this.bg);
+        this.container.addChild(this.bg );
         this.container.addChild(this.grid.graphic);
+
         //We will use this to keep track of what component pins
         //  are connected to what wires
         this.wiringMap = new WiringMap(this.container);
+        this.hitDetector = new CustomHitDetector();
+        this.hitDetector.setSimulationComponentArray(this.simulationState.components);
+        this.hitDetector.setWiringMap(this.wiringMap);
         this.simulationUpdateFrequency = 1000;
         this.container.addChild(this.cursorGraphic)
         setInterval(this.runSimulation, 1000/this.simulationUpdateFrequency);
@@ -185,14 +193,14 @@ export class DigitalDesignSimulation extends PIXI.Application{
             notVisited = this.simulationState.components.filter(c => c.visited == false);
   
             while (i < notVisited.length)  {
-                let inputWires = this.wiringMap.getMappedComponentInputs(notVisited[i]);
+                const inputWires = this.wiringMap.getMappedComponentInputs(notVisited[i]);
                 if (inputWires == null || inputWires.size == 0) {
                     notVisited[i].simulate();
                     notVisited[i].visited = true;
                     i ++;
                     continue;
                 }
-                let notUpdatedWires = Object.values(inputWires).filter((w) => !(w as Wire).AllInputsVisited());
+                const notUpdatedWires = Object.values(inputWires).filter((w) => !(w as Wire).AllInputsVisited());
                         
                 if (notUpdatedWires.length == 0) {
                         inputWires.forEach((wire : Wire, line : number) => {
@@ -210,26 +218,39 @@ export class DigitalDesignSimulation extends PIXI.Application{
         } while (notVisited.length > 0)
     }
 
-    beginPlace(componentName : String) {
+    beginPlace(componentName : string) {
         if (componentName === "")
             return
 
         let addComponent : SimulationComponent;
         switch(componentName) {
             case "And":
-                addComponent = new ANDGate(1, 0, 0, 2);
+                addComponent = new ANDGate(1, 0, this.container,1, 2);
                 break;
             case "Constant":
-                addComponent = new ConstantComponent(0, 0, 1);
+                addComponent = new ConstantComponent(0, 0, this.container, 1);
                 break;
             case "Not":
-                addComponent = new NOTGate(1, 0, 0)
+                addComponent = new NOTGate(1, 0, this.container, 1)
                 break;
             case "Nand":
-                addComponent = new NANDGate(1, 0, 0, 2);
+                addComponent = new NANDGate(1, 0, this.container,1, 2);
+                break;
+            case "Or":
+                console.log("OR gate")
+                addComponent = new ORGate(1, 0, this.container, 1, 2);
+                break;
+            case "XOR":
+                addComponent = new XORGate(1, 0, this.container, 1, 2);
+                break;
+            case "Xnor":
+                addComponent = new XNORGate(1, 0, this.container, 1, 2);
+                break;
+            case "Nor":
+                addComponent = new NORGate(1, 0, this.container, 1, 2);
                 break;
             case "7 Segment Display":
-                addComponent = new HexDisplay(0, 0);
+                addComponent = new HexDisplay(0, 0, this.container);
                 break;
         }
         addComponent.setGrid(this.grid);
@@ -257,12 +278,12 @@ export class DigitalDesignSimulation extends PIXI.Application{
      */
 
     _onMouseDocumentDown(mouseEvent : InteractionEvent) {
-        let pos = mouseEvent.data.global;
-        let local = this.container.toLocal(pos);
+        const pos = mouseEvent.data.global;
+        const local = this.container.toLocal(pos);
         //this.simulationState.stage.addChild(new PIXI.Graphics().beginFill(0xff0000).drawRect(localPos.x, localPos.y, 10, 10))
         //let hit = this.interactionManager.hitTest(new PIXI.Point(localPos.x, localPos.y), this.container)
-        let wiringAreaHit = this.hitDetector.detectHitWiringArea(local.x, local.y);
-        let componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
+        const wiringAreaHit = this.hitDetector.detectHitWiringArea(local.x, local.y);
+        const componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
         if (this.simulationState.lockSelectedToCursor) {
             this.simulationState.SelectedComponent.setOpacity(1);
             this.simulationState.SelectedComponent = null;
@@ -270,12 +291,10 @@ export class DigitalDesignSimulation extends PIXI.Application{
             return;
         }   
         if (wiringAreaHit) {
-            let event = new HitAreaClickEvent(wiringAreaHit.component, wiringAreaHit)
-            this.onHitAreaClick(event);
+            this.onHitAreaClick(wiringAreaHit);
             return;
         }
         if (componentHit) {
-            console.log(componentHit)
             componentHit.selected = true;
             this.simulationState.isDraggingComponent = true;
             this.simulationState.stateChanged = true;
@@ -300,7 +319,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
      */
 
     _onMouseMove(mouseEvent : InteractionEvent) {
-        let pos = this.container.toLocal(mouseEvent.data.global);
+        const pos = this.container.toLocal(mouseEvent.data.global);
         let dX = 0;
         let dY = 0;
 
@@ -320,34 +339,30 @@ export class DigitalDesignSimulation extends PIXI.Application{
             this.grid.update();
             return;
         }
-        let componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
-        let wireAreaHit = this.hitDetector.detectHitWiringArea(pos.x, pos.y);
+        const componentHit = this.hitDetector.detectHitComponent(pos.x, pos.y);
+        const wireAreaHit = this.hitDetector.detectHitWiringArea(pos.x, pos.y);
         if (componentHit || wireAreaHit) {
             document.body.style.cursor = "grab";
         }
         if (wireAreaHit) {
             if (this.simulationState.activeWiringArea)
-                this.simulationState.activeWiringArea.graphic.alpha = 0;
-            wireAreaHit.graphic.alpha = 1;
+                this.simulationState.activeWiringArea.getGraphic().alpha = 0;
+            wireAreaHit.getGraphic().alpha = 1;
             this.simulationState.activeWiringArea = wireAreaHit;
         } else {
             if (this.simulationState.activeWiringArea)
-                this.simulationState.activeWiringArea.graphic.alpha = 0;
+                this.simulationState.activeWiringArea.getGraphic().alpha = 0;
             this.simulationState.activeWiringArea = null;
         }
 
         if (this.simulationState.isDraggingComponent) {
-            let event = new ComponentDragEvent(this.simulationState.SelectedComponent, pos.x, pos.y, dX, dY);
+            const event = new ComponentDragEvent(this.simulationState.SelectedComponent, pos.x, pos.y, dX, dY);
             this.onComponentDrag(event);
         }
 
         if (this.simulationState.lockSelectedToCursor) {
             this.simulationState.SelectedComponent.setX(pos.x);
             this.simulationState.SelectedComponent.setY(pos.y);
-        }
-
-        if (this.simulationState.getIsDraggingWire) {
-
         }
 
         this.lastMouseX = pos.x;
@@ -363,14 +378,10 @@ export class DigitalDesignSimulation extends PIXI.Application{
      */
 
     _onMouseUp(mouseEvent : InteractionEvent) {
-        let pos = this.stage.toLocal(mouseEvent.data.global);
-
         if (this.simulationState.isDragging) {
 
            if (this.simulationState.activeWiringArea != null) {
-               let e = new WireEndDragAtWiringAreaEvent(this.simulationState.getDraggingWire(), this.simulationState.activeWiringArea.component,
-               this.simulationState.activeWiringArea, pos.x, pos.y);
-               this.onWireEndDragAtWiringArea(e);              
+               this.onWireEndDragAtWiringArea(this.simulationState.getDraggingWire(), this.simulationState.activeWiringArea);
            }
 
             this.simulationState.stopDraggingWire();
@@ -391,6 +402,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
             let delta = scrollEvent.deltaY;
             if (delta > 0) {
                 if (this.container.scale.x > minStageScale) {
+                    this.grid.incrememtZoom();
                     this.container.scale.x -= Math.sqrt(delta) / 200;
                     this.container.scale.y -= Math.sqrt(delta) / 200;
                     this.bg.width *= 1 / this.container.scale.x;
@@ -398,6 +410,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 }
             } else {
                 if (this.container.scale.x < maxStageScale) {
+                    this.grid.decrementZoom();
                     delta = Math.abs(delta);
                     this.container.scale.x += Math.sqrt(delta) / 200;
                     this.container.scale.y += Math.sqrt(delta) / 200;
@@ -438,10 +451,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
     }
 
     onDrag(dragEvent : DragEvent) {
-        if (CustomHitDetector.isInside(dragEvent.clientX, dragEvent.clientY,
-            this.view.getBoundingClientRect())) {
 
-        }
     }
 
     /**
@@ -449,15 +459,25 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * @param e
      */
 
-    onHitAreaClick(e : HitAreaClickEvent) {
-        this.simulationState.draggingWireHitArea =this.simulationState.activeWiringArea;
-        let addWire = this.wiringMap.addWire(
-            e.component, e.hitArea.lineNumber, e.hitArea.x,
-            e.hitArea.y, e.hitArea.input);
+    onHitAreaClick(hitArea : WiringArea) {
+        this.simulationState.draggingWireHitArea = this.simulationState.activeWiringArea;
+        if (hitArea instanceof ComponentWiringArea) {
+            const componentWiringArea = hitArea as ComponentWiringArea;
 
-        if (addWire != null) {
-            addWire.setGrid(this.grid);
-            this.simulationState.setDraggingWire(addWire);
+            const addWire = this.wiringMap.addWire(
+                componentWiringArea.getComponent(), componentWiringArea.getLineNumber(),
+                componentWiringArea.getX(), componentWiringArea.getY(),
+                componentWiringArea.getIsInput());
+
+            if (addWire != null) {
+                addWire.setGrid(this.grid);
+                addWire.beginPlace(false);
+                this.simulationState.setDraggingWire(addWire);
+            }
+        } else {
+            const wireHitArea = hitArea as WireWiringArea;
+            wireHitArea.getWire().beginPlace(true);
+            this.simulationState.setDraggingWire(wireHitArea.getWire());
         }
     }
 
@@ -467,10 +487,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
      */
 
     onComponentDrag(e : ComponentDragEvent) {
-        let gridPoint = this.grid.snapToGrid(new PIXI.Point(e.x, e.y));
+        const gridPoint = this.grid.snapToGrid(new PIXI.Point(e.x, e.y));
         e.component.setX(gridPoint.x);
         e.component.setY(gridPoint.y);
-        this.wiringMap.moveComponentWires(e.component, gridPoint.x, gridPoint.y);
     }
 
     /**
@@ -478,14 +497,19 @@ export class DigitalDesignSimulation extends PIXI.Application{
      * @param e
      */
 
-    onWireEndDragAtWiringArea(e : WireEndDragAtWiringAreaEvent) {
-        e.wire.endPlace();
-        e.wire.connectComponentToTop(e.component);
+    onWireEndDragAtWiringArea(wire : Wire, wiringArea : WiringArea) {
+        if (wiringArea instanceof  ComponentWiringArea) {
+            const componentWiringArea = wiringArea as ComponentWiringArea;
+            wire.endPlace();
+            wire.removeWiringArea();
+            wire.connectComponentToTop(wiringArea.getComponent());
+            wire.removeWiringArea();
+            this.wiringMap.addWireMapping(wiringArea.getComponent(), wiringArea.getIsInput(),
+                wiringArea.getLineNumber(), wire);
+            wire.anchorToPoint(wiringArea.getX(), wiringArea.getY()
+                , true);
+        }
 
-        this.wiringMap.addWireMapping(e.component, e.wiringArea.input,
-            e.wiringArea.lineNumber, e.wire);
-        e.wire.anchorToPoint(e.wiringArea.x, e.wiringArea.y, true);
-        return
     }
 
     _onKeyDown(ev : KeyboardEvent) {

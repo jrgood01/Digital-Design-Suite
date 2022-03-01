@@ -8,15 +8,18 @@
 import {SimulationComponent} from "../SimulationComponent"
 import { wireState } from "../../WireStates";
 import { SimulationState } from "../../SimulationState";
+import * as PIXI from 'pixi.js'
+import {VariableInputComponent} from "../VariableInputComponent";
+import * as constants from "../../../constants";
+import {Heading} from "../../../Heading";
+import {Gate} from "./Gate";
 
-class XORGate extends SimulationComponent {
-    inputs : number;
-    bitWidth : number;
-
-    constructor(x : number, y : number, bitWidth : number, numInputs : number, simulationState : SimulationState) {
-        super(x, y, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
-        this.inputs = numInputs;
-        this.bitWidth = bitWidth;
+export class XORGate extends Gate {
+    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
+        super(x, y, container, 1, numInputs);
+        this.followQuadratic(50);
+        this.addRenderTarget(this.gateRenderObjectFactory.getGate("XOR"))
+        this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'], this.geometry['outputWireStartY'], 0, false, Heading.East);
     }
 
     simulate() {
@@ -34,9 +37,5 @@ class XORGate extends SimulationComponent {
             }
             this.output.setLineBit(0, bit, outputBit);
         }
-    }
-
-    draw() {
-        
     }
 }

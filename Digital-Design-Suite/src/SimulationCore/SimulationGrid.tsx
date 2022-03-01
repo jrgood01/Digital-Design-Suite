@@ -10,12 +10,15 @@ import * as PIXI from "pixi.js"
 export class SimulationGrid {
     spacingX : number;
     spacingY : number;
+
     xMax : number;
     yMax : number;
 
     graphic : PIXI.Graphics;
 
     updated : boolean;
+
+    zoom : number;
 
     constructor (spacingX : number, spacingY : number) {
         this.spacingX = spacingX;
@@ -26,6 +29,7 @@ export class SimulationGrid {
 
         this.graphic = new PIXI.Graphics();
         this.updated = true;
+        this.zoom = 1;
     }
 
     setXMax(xMax : number) {
@@ -56,19 +60,35 @@ export class SimulationGrid {
     }
 
     draw(zoom : number) {
+        let scale = 1;
+        if (this.zoom > 0) {
+            scale += Math.floor(this.zoom / (this.spacingX / 10))
+        }
         if (this.updated) {
             this.graphic.clear();
             this.graphic.lineStyle(3 * ((1 / zoom) ** .45), 0x333333);
-            for (let x = 0; x < this.xMax; x += this.spacingX) {
+            for (let x = 0; x < this.xMax; x += this.spacingX * scale) {
                 this.graphic.moveTo(x, 0)
                     .lineTo(x, this.yMax);
             }
 
-            for (let y = 0; y < this.xMax; y += this.spacingY) {
+            for (let y = 0; y < this.xMax; y += this.spacingY * scale) {
                 this.graphic.moveTo(0, y)
                     .lineTo(this.xMax, y);
             }
             this.updated = false;
         }
+    }
+
+    setZoom(newZoom : number) {
+        this.zoom = newZoom;
+    }
+
+    incrememtZoom() {
+        this.zoom += 1;
+    }
+
+    decrementZoom() {
+        this.zoom -= 1;
     }
 }

@@ -9,18 +9,24 @@ import {SimulationComponentIO} from "./SimulationComponentIO"
 import { SimulationState } from '../SimulationState';
 import { wireState } from "../WireStates";
 import * as PIXI from 'pixi.js'
-import {WiringArea} from "./WiringArea"
+import {WiringArea} from "../Wiring/WiringArea"
 import { GlowFilter } from '@pixi/filter-glow';
 import { WiringAreaActiveEvent } from "../SimulationEvents/WiringAreaActiveEvent";
 import { SimulationAddGraphicEvent } from "../SimulationEvents/SimulationAddGraphicEvent";
 import {SimulationGrid} from "../SimulationGrid";
 import {Point} from "pixi.js";
+import {ComponentWiringArea} from "../Wiring/ComponentWiringArea";
+import {DrawableClass} from "../DrawableClass";
+import { Heading } from "../../Heading";
+import {ComponentRenderObject} from "./ComponentRenderObject";
+import {ComponentColor} from "./ComponentColor";
+import {RenderObjectDecorator} from "./RenderObjectDecorator";
 
 /**
  * Represents a simulated digital component
  * Extend this class to create usable components
  */
-export abstract class SimulationComponent{
+export abstract class SimulationComponent extends DrawableClass{
     componentId : string;
     simulationState : SimulationState;
 
@@ -28,9 +34,6 @@ export abstract class SimulationComponent{
     output : SimulationComponentIO;
 
     deleted : boolean;
-
-    protected x : number;
-    protected y : number;
 
     selected : boolean;
 
@@ -54,8 +57,13 @@ export abstract class SimulationComponent{
     private onWiringAreaLeave : Array<() => void>;
 
     protected grid : SimulationGrid;
+    private heading : Heading;
 
-    constructor(x : number, y : number, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>) {
+    protected renderObject : RenderObjectDecorator;
+    constructor(x : number, y : number, container : PIXI.Container,
+                inputLines : number, outputLines : number, inputBitWidths : Array<number>,
+                outputBitWidths : Array<number>) {
+        super(x, y, container);
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
 
@@ -82,11 +90,14 @@ export abstract class SimulationComponent{
 
         this.onGraphicAdded = (e : SimulationAddGraphicEvent) => {};
         this.onGraphicRemove = (e : SimulationAddGraphicEvent) => {};
+
+        this.heading = Heading.East;
     }
 
 
-    abstract simulate(): void;
-    abstract draw() : void;
+    abstract simulate() : void;
+    protected updateGraphic?() : void;
+
     calculateGeometry(scaler : number) {return {"a" : 1} as Record<string, number>}
     
     /**
@@ -119,6 +130,10 @@ export abstract class SimulationComponent{
             this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : color})]
         } 
         this.glowColor = color;
+    }
+
+    getHeading() {
+        return this.heading;
     }
 
     /**
@@ -226,11 +241,7 @@ export abstract class SimulationComponent{
  
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
-                wiringArea.graphic.x += x;
-                wiringArea.graphic.y += y;
-                wiringArea.x += x;
-                wiringArea.y += y;
-                wiringArea.graphic.hitArea = new PIXI.Rectangle(wiringArea.x - 20, wiringArea.y - 20 , 100, 100);
+                wiringArea.translate(x, y);
             });
         });      
 
@@ -254,9 +265,7 @@ export abstract class SimulationComponent{
 
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
-                wiringArea.graphic.x += dx;
-                wiringArea.x += dx;
-                wiringArea.graphic.hitArea = new PIXI.Rectangle(wiringArea.x - 20, wiringArea.y - 20 , 100, 100);
+                wiringArea.translate(dx, 0);
             });
         });
 
@@ -280,9 +289,7 @@ export abstract class SimulationComponent{
 
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
-                wiringArea.graphic.y += dy;
-                wiringArea.y += dy;
-                wiringArea.graphic.hitArea = new PIXI.Rectangle(wiringArea.x - 20, wiringArea.y - 20 , 100, 100);
+                wiringArea.translate(0, dy);
             });
         });
 
@@ -309,55 +316,12 @@ export abstract class SimulationComponent{
      * @param lineNumber line number to map to
      * @param isInput is this mapped to an input line?
      */
-    addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean) {
-        let wiringAreaGraphic = new PIXI.Graphics();
-       
-        wiringAreaGraphic.interactive = true;
-        wiringAreaGraphic.alpha = 0;
-        wiringAreaGraphic.lineStyle(4, 0x0000FF);
-        wiringAreaGraphic.drawCircle(x + 3.5, y + 3.5, 14);
-        wiringAreaGraphic.isMask = false;
-   
-        this.onGraphicAdded(new SimulationAddGraphicEvent(wiringAreaGraphic));
-        wiringAreaGraphic.hitArea = new PIXI.Rectangle(x - 20, y - 20 , 100, 100);
-        
-        const addWiringArea = {
-            x : x,
-            y : y,
+    addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean, defaultHeading : Heading) {
 
-            component : this,
+        const newWiringArea = new ComponentWiringArea(x, y, this.container, defaultHeading, this, lineNumber, isInput);
+        this.onGraphicAdded(new SimulationAddGraphicEvent(newWiringArea.getGraphic()));
 
-            input : isInput,
-            lineNumber : lineNumber,
-
-            graphic : wiringAreaGraphic
-        }
-
-        //wiringAreaGraphic.cursor = "grab"
-
-       /* wiringAreaGraphic.on("mouseover", () =>
-        {
-            if (!this.selected) {
-                wiringAreaGraphic.alpha = 1;
-                this.onWiringAreaActive.forEach((handler : (e : WiringAreaActiveEvent) => void) => {
-                    handler(new WiringAreaActiveEvent(addWiringArea));
-                })
-            }
-        });
-
-        wiringAreaGraphic.on("mouseout", () => 
-        {
-            if (!this.selected) {
-                wiringAreaGraphic.alpha = 0;
-                this.onWiringAreaLeave.forEach((handler : () => void) => {
-                    handler()
-                });
-            }
-        });
-
-        */
-
-        this.wiringAreas.get(isInput).set(lineNumber, addWiringArea);
+        this.wiringAreas.get(isInput).set(lineNumber, newWiringArea);
     }
 
 
@@ -375,7 +339,7 @@ export abstract class SimulationComponent{
         handler(new SimulationAddGraphicEvent(this.componentTemplate));
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
-                handler(new SimulationAddGraphicEvent(wiringArea.graphic));
+                handler(new SimulationAddGraphicEvent(wiringArea.getGraphic()));
             });
         });
     }
@@ -383,4 +347,19 @@ export abstract class SimulationComponent{
     setOnGraphicRemove(handler : (e : SimulationAddGraphicEvent) => void) {
         this.onGraphicRemove = handler;
     }
+
+    addRenderTarget(renderTarget : RenderObjectDecorator) {
+        this.renderObject = renderTarget;
+        this.geometry = renderTarget.getGeometry(this.x, this.y);
+    }
+
+    draw() {
+        this.componentTemplate.clear();
+        if (this.updateGraphic)
+            this.updateGraphic();
+        this.geometry = this.renderObject.getGeometry(this.x, this.y);
+        this.renderObject.render(this.x, this.y, this.componentTemplate)
+        this.updateHitArea();
+    }
+
 }

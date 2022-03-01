@@ -103,7 +103,7 @@ export class WireSegment {
     }
 
     setHeading(pad? : boolean) {
-        let startHeading = this.heading;
+        const startHeading = this.heading;
 
         if (this.isVertical) {
             if (this.length > 0) {
@@ -232,7 +232,7 @@ export class WireSegment {
 
     private _onClick(ev : InteractionEvent) {
 
-        let pos = ev.data.global;
+        const pos = ev.data.global;
         if (Util.contains(this.bounds, pos.x, pos.y)) {
             this.selected = true;
         } else {
@@ -248,7 +248,6 @@ export class WireSegment {
     private _onMouseMove(ev : PointerEvent) {
         this.graphic.clear();
         let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
-        console.log(pos)
         let x = pos.x;
         let y = pos.y;
 

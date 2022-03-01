@@ -15,12 +15,11 @@ import {WireSegment} from "./WireSegment"
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { Heading } from "../../Heading";
 import {SimulationGrid} from "../SimulationGrid";
+import {WiringArea} from "./WiringArea";
+import {WireWiringArea} from "./WireWiringArea";
 
 export class Wire {
     graphic : PIXI.Graphics;
-
-    private visited : boolean;
-    private lastState : boolean;
 
     private segments : Array<WireSegment>
     private state : Array<wireState>
@@ -32,6 +31,9 @@ export class Wire {
     private isPlacing : boolean;
     private stage : PIXI.Container;
     private grid : SimulationGrid;
+    private wiringArea : WireWiringArea;
+    private isExtending : boolean;
+
     /**
      * Create new wire
      * @param startX wire startX
@@ -59,16 +61,33 @@ export class Wire {
         startY += 3.5; 
         startX += 3.5;
         
-        let addWire = new WireSegment(false, new PIXI.Point(startX, startY), 0, stage, this.onCreateSegment);
+        const addWire = new WireSegment(false, new PIXI.Point(startX, startY), 0, stage, this.onCreateSegment);
         addWire.addComponentDockBottom(dockComponent);
         this.segments.push(addWire);
 
         this.error = false;
         this.grid = null;
-
+        this.isExtending = false;
         document.addEventListener("mousemove", this.onMouseMove);
     }
 
+    /**
+     * Create the wiring area to extend wire
+     */
+    generateWiringArea() {
+        this.wiringArea = new WireWiringArea(0, 0, this.stage, this);
+        this.stage.addChild(this.wiringArea.getGraphic());
+        return this.wiringArea;
+    }
+
+    removeWiringArea() {
+        if (this.wiringArea)
+            this.wiringArea.unRegister();
+        this.wiringArea = null;
+    }
+    /**
+     * @param grid Grid to lock wire to
+     */
     setGrid(grid : SimulationGrid) {
         this.grid = grid;
         this.segments.forEach((s : WireSegment) => {
@@ -86,32 +105,58 @@ export class Wire {
         return true;
     }
 
-    beginPlace() {   
+    beginPlace(extending : boolean) {
         if (this.segments.length == 1) {
             this.addSegmentTop(0);
         } else {
-            this.addSegmentTop(0);
+            this.addSegmentTop(0, extending);
             this.addSegmentTop(0);
         }
+        this.isExtending = extending;
+        console.log("this.isExtending set ",this.isExtending, extending)
         this.isPlacing = true;
     }
 
     endPlace() {
-        let segmentOne = this.segments[this.segments.length - 2];
-        let segmentTwo = this.segments[this.segments.length - 1];
-
+        const segmentOne = this.segments[this.segments.length - 2];
+        const segmentTwo = this.segments[this.segments.length - 1];
+        this.isExtending = false;
+        this.isPlacing = false;
         segmentOne.unlockMouse();
         segmentTwo.unlockMouse();
-    
-
-        this.isPlacing = false;
+        this.setHitArea();
     }
 
-    addSegmentTop(length : number) {
-        let lastSegment = this.segments[this.segments.length - 1];
-        let lastSegmentEndPoint = lastSegment.getEndPoint();
-        let addSegment = new WireSegment(lastSegment.getIsVertical(), lastSegmentEndPoint, 0,
+    setHitArea() {
+        if (!this.wiringArea)
+            return;
+
+        const lastSegment = this.segments[this.segments.length - 1];
+        const endPoint = lastSegment.getEndPoint();
+        if (lastSegment.getIsVertical()) {
+            endPoint.x -= 10;
+        } else {
+            endPoint.y -= 10
+        }
+        this.wiringArea.setXY(endPoint.x, endPoint.y)
+        this.wiringArea.setOffset(lastSegment.getHeading())
+    }
+
+    addSegmentTop(length : number, isExtending? : boolean) {
+        const lastSegment = this.segments[this.segments.length - 1];
+        const lastSegmentEndPoint = lastSegment.getEndPoint();
+        if (isExtending) {
+            if (lastSegment.getIsVertical()) {
+                lastSegmentEndPoint.x -= 23.5;
+            } else {
+                lastSegmentEndPoint.y -= 23.5;
+            }
+        }
+
+        const addSegment = new WireSegment(lastSegment.getIsVertical(),
+            lastSegmentEndPoint, 0,
             this.stage, this.onCreateSegment);
+
         lastSegment.top = addSegment;
         addSegment.bottom = lastSegment
         addSegment.setGrid(this.grid);
@@ -143,12 +188,11 @@ export class Wire {
     onMouseMove(ev : PointerEvent) {
         let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
         if (this.isPlacing) {
-            console.log(pos.x, pos.y)
             this.anchorToPoint(pos.x, pos.y, true);
         }
     }
 
-    anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false, smartAnchor : boolean = false) {
+    anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false) {
         let segmentOne = this.segments[this.segments.length - 2]
         let segmentTwo = this.segments[this.segments.length - 1]
         let anchor = segmentOne.getStartPoint();
@@ -199,7 +243,19 @@ export class Wire {
             }
             segmentTwo.padSegment();
         }
+
+        if (this.isExtending) {
+            let anchor = this.segments[this.segments.length - 3];
+            if (anchor.getIsVertical() == segmentOne.getIsVertical()) {
+                if (segmentOne.getIsVertical()) {
+                    segmentOne.setStartX(anchor.getEndPoint().x + 4)
+                } else {
+                    segmentOne.setStartY(anchor.getEndPoint().y + 4)
+                }
+            }
+        }
         segmentTwo.padSegment();
+        this.setHitArea();
     }
 
 
@@ -254,8 +310,11 @@ export class Wire {
 
         let state = line[0];
         this.setColor(state);
-        
+    }
 
+    getHeadingLastSegment() {
+        let lastWire = this.segments[this.segments.length - 1];
+        return lastWire.getHeading();
     }
 
     draw() {
@@ -263,6 +322,10 @@ export class Wire {
         this.segments.forEach((segment : WireSegment) => {
             segment.Draw();
         })
+    }
+
+    getWiringArea() {
+        return this.wiringArea;
     }
 
 

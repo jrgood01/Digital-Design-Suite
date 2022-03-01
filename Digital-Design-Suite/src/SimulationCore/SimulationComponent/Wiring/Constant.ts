@@ -3,11 +3,12 @@ import { SimulationState } from "../../SimulationState";
 import * as constants from "../../../constants"
 import * as PIXI from 'pixi.js'
 import { wireState } from "../../../SimulationCore/WireStates";
+import { Heading } from "../../../Heading";
 export class ConstantComponent extends SimulationComponent {
     value : number;
     private text : PIXI.Text;
-    constructor(x : number, y : number, bitSize : number) {
-        super(x, y, 0, 1, Array<number>(0).fill(1), Array<number>(1).fill(bitSize));
+    constructor(x : number, y : number, container : PIXI.Container, bitSize : number) {
+        super(x, y, container, 0, 1, Array<number>(0).fill(1), Array<number>(1).fill(bitSize));
         this.value = Math.pow(2, bitSize) - 1; //set value to max
         this.x = x;
         this.y = y;
@@ -15,7 +16,7 @@ export class ConstantComponent extends SimulationComponent {
         this.componentTemplate.addChild(this.text);
         this.geometry = this.calculateGeometry(1);
         this.addWiringArea(this.geometry['outLineEndX'] - 3.5, this.geometry['outLineEndY'] - 3.5, 
-        0, false);
+        0, false, Heading.East);
     } 
 
     simulate() {
