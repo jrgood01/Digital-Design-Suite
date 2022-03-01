@@ -30,6 +30,7 @@ import {ORGate} from "./SimulationComponent/Gates/ORGate";
 import {XORGate} from "./SimulationComponent/Gates/XORGate";
 import {XNORGate} from "./SimulationComponent/Gates/XNORGate";
 import {NORGate} from "./SimulationComponent/Gates/NORGate";
+import {ComponentFactory} from "./SimulationComponent/ComponentFactory";
 
 const minStageScale = .6;
 const maxStageScale = 1.6;
@@ -222,37 +223,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         if (componentName === "")
             return
 
-        let addComponent : SimulationComponent;
-        switch(componentName) {
-            case "And":
-                addComponent = new ANDGate(1, 0, this.container,1, 2);
-                break;
-            case "Constant":
-                addComponent = new ConstantComponent(0, 0, this.container, 1);
-                break;
-            case "Not":
-                addComponent = new NOTGate(1, 0, this.container, 1)
-                break;
-            case "Nand":
-                addComponent = new NANDGate(1, 0, this.container,1, 2);
-                break;
-            case "Or":
-                console.log("OR gate")
-                addComponent = new ORGate(1, 0, this.container, 1, 2);
-                break;
-            case "XOR":
-                addComponent = new XORGate(1, 0, this.container, 1, 2);
-                break;
-            case "Xnor":
-                addComponent = new XNORGate(1, 0, this.container, 1, 2);
-                break;
-            case "Nor":
-                addComponent = new NORGate(1, 0, this.container, 1, 2);
-                break;
-            case "7 Segment Display":
-                addComponent = new HexDisplay(0, 0, this.container);
-                break;
-        }
+        const addComponent = ComponentFactory.getComponent(componentName, this.container);
         addComponent.setGrid(this.grid);
         this.beginPlaceHelper(addComponent)
     }
@@ -448,10 +419,6 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     onSimulationGraphicRemove(e : SimulationAddGraphicEvent) {
         this.container.removeChild(e.graphic);
-    }
-
-    onDrag(dragEvent : DragEvent) {
-
     }
 
     /**
