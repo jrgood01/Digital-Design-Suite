@@ -5,6 +5,6 @@ import {ComponentColor} from "./ComponentColor";
 export interface RenderObjectDecorator {
     render : (x : number, y : number, graphic : PIXI.Graphics) => void,
     getGeometry : (x : number, y : number) => Record<string, number>,
-    getColors : () => GateComponentColor,
+    getColors : () => ComponentColor,
     setColors : (newColors : ComponentColor) => void
 }

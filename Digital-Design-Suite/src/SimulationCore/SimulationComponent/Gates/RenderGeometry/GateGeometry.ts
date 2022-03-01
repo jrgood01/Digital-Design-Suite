@@ -7,11 +7,11 @@ import {RenderObjectDecorator} from "../../RenderObjectDecorator";
 export class GateGeometry {
     static generateNotGateGeometry = (x: number, y: number) => {
         const retMap = {} as Record<string, number>
-        retMap['scaler'] = 1;
-        retMap['componentLineWidth'] = 10;
+
+        retMap['componentLineWidth'] = 8;
         retMap['wireLineWidth'] = 7;
         retMap['componentLength'] = 130;
-        retMap['componentHeight'] = 100;
+        retMap['componentHeight'] = 120;
 
         retMap['cornerX'] = x;
         retMap['cornerY'] = y;
@@ -173,7 +173,7 @@ export class GateGeometry {
     static drawAndGate = (x: number, y: number, graphic : PIXI.Graphics, colors : GateComponentColor) => {
         const geometry = this.generateAndNandGateGeometry(x, y);
 
-        graphic.lineStyle(10, colors.bodyColor)
+        graphic.lineStyle(10, colors.bodyColor())
             .moveTo(geometry['startX'], geometry['startY'])
             .lineTo(geometry['startX'] + geometry['width1'],
                 geometry['startY'])
@@ -195,7 +195,7 @@ export class GateGeometry {
     static drawNandGate = (x: number, y: number, graphic : PIXI.Graphics, colors : GateComponentColor) => {
         const geometry = this.generateAndNandGateGeometry(x, y);
         this.drawAndGate(x, y, graphic, colors);
-        graphic.lineStyle(5, colors.bodyColor);
+        graphic.lineStyle(5, colors.bodyColor());
         graphic.beginFill(constants.General.BgColor_1)
             .drawCircle(geometry['outputWireStartX'] + 13, geometry['outputWireStartY'], 13);
     }
@@ -203,8 +203,8 @@ export class GateGeometry {
     
     static drawOrGate = (x: number, y: number, graphic : PIXI.Graphics, colors : GateComponentColor) => {
         const geometry = this.generateOrNorGateGeometry(x, y);
-        graphic.lineStyle(5, colors.bodyColor);
-        graphic.lineStyle(10, colors.bodyColor);
+        graphic.lineStyle(5, colors.bodyColor());
+        graphic.lineStyle(10, colors.bodyColor());
         graphic.moveTo(geometry['baseCurveStartX'], geometry['baseCurveStartY'])
             .quadraticCurveTo(geometry['baseCurveControlX'], geometry['baseCurveControlY'],
                 geometry['baseCurveEndX'], geometry['baseCurveEndY'])
@@ -212,7 +212,7 @@ export class GateGeometry {
                 geometry['bottomCurveEndX'], geometry['bottomCurveEndY'])
             .quadraticCurveTo(geometry['topCurveControlPointX'], geometry['topCurveControlPointY'],
                 geometry['topCurveEndX'], geometry['topCurveEndY'])
-        graphic.lineStyle(7, colors.bodyColor);
+        graphic.lineStyle(7, colors.bodyColor());
         graphic.moveTo(geometry['outputWireStartX'], geometry['outputWireStartY'])
             .lineTo(geometry['outputWireEndX'], geometry['outputWireEndY'])
     }
@@ -233,7 +233,7 @@ export class GateGeometry {
                 geometry['bottomCurveEndX'], geometry['bottomCurveEndY'])
             .quadraticCurveTo(geometry['topCurveControlPointX'], geometry['topCurveControlPointY'],
                 geometry['topCurveEndX'], geometry['topCurveEndY'])
-        graphic.lineStyle(7, colors.bodyColor);
+        graphic.lineStyle(7, colors.bodyColor());
         graphic.moveTo(geometry['outputWireStartX'], geometry['outputWireStartY'])
             .lineTo(geometry['outputWireEndX'], geometry['outputWireEndY'])
         graphic.moveTo(geometry['baseCurve2StartX'], geometry['baseCurve2StartY'])
@@ -250,7 +250,7 @@ export class GateGeometry {
 
     static drawNotGate = (x: number, y: number, graphic : PIXI.Graphics, colors : GateComponentColor) => {
         const geometry = this.generateNotGateGeometry(x, y);
-        graphic.lineStyle(geometry['componentLineWidth'], colors.bodyColor)
+        graphic.lineStyle(geometry['componentLineWidth'], colors.bodyColor())
             .moveTo(geometry['cornerX'], geometry['cornerY'])
             .lineTo(geometry['cornerX'], geometry['cornerY'] + geometry['componentHeight']);
 
@@ -258,11 +258,11 @@ export class GateGeometry {
             .moveTo(geometry['outputWireStartX'], geometry['outputWireStartY'])
             .lineTo(geometry['outputWireEndX'], geometry['outputWireEndY']);
 
-        graphic.lineStyle(geometry['componentLineWidth'], colors.bodyColor)
+        graphic.lineStyle(geometry['componentLineWidth'], colors.bodyColor())
             .moveTo(geometry['topWireStartX'], geometry['topWireStartY'])
             .lineTo(geometry['topWireEndX'], geometry['topWireEndY']);
 
-        graphic.lineStyle(geometry['componentLineWidth'], colors.bodyColor)
+        graphic.lineStyle(geometry['componentLineWidth'], colors.bodyColor())
             .moveTo(geometry['bottomWireStartX'], geometry['bottomWireStartY'])
             .lineTo(geometry['bottomWireEndX'], geometry['bottomWireEndY']);
     }    

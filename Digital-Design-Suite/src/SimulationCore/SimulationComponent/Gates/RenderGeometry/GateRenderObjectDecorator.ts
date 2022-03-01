@@ -1,8 +1,9 @@
 import {ComponentRenderObject} from "../../ComponentRenderObject";
 import {GateComponentColor} from "../GateComponentColor";
 import * as PIXI from "pixi.js";
+import {RenderObjectDecorator} from "../../RenderObjectDecorator";
 
-export class GateRenderObjectDecorator {
+export class GateRenderObjectDecorator implements RenderObjectDecorator{
     private target : ComponentRenderObject;
     constructor(target : ComponentRenderObject) {
         this.target = target;

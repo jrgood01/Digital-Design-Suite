@@ -1,3 +1,3 @@
 export interface ComponentColor {
-    bodyColor : number;
+    bodyColor : () => number;
 }

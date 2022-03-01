@@ -485,7 +485,6 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 this.simulationState.mode = MouseMode.PAN;
             else
                 this.simulationState.mode = MouseMode.STANDARD
-
         }
 
     }

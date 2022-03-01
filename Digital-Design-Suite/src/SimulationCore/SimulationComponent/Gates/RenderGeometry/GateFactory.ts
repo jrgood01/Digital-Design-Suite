@@ -9,10 +9,11 @@ export class GateRenderObjectFactory {
     linkOutputWireColor(outputWireColor : () => number) {
         this.outputWireColor = outputWireColor;
     }
+
     getGate(gateType : string) : GateRenderObjectDecorator {
         const defaultGateColors = {
             outputWireColor : this.outputWireColor ? this.outputWireColor : constants.General.componentColorStandard,
-            bodyColor: constants.General.componentColorStandard
+            bodyColor: () => {return constants.General.componentColorStandard;}
         }
         switch(gateType) {
             case "AND":

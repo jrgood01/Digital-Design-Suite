@@ -8,8 +8,9 @@ export abstract class Gate extends VariableInputComponent{
     bitWidth : number;
     protected gateRenderObjectFactory : GateRenderObjectFactory;
 
-    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
-        super(x, y, container, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1), 200);
+    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number, componentHeight? : number) {
+        super(x, y, container, numInputs, 1, Array(numInputs).fill(bitWidth), Array(bitWidth).fill(1),
+            componentHeight ? componentHeight : 200);
         this.getOutput = this.getOutput.bind(this);
 
         this.inputs = numInputs;

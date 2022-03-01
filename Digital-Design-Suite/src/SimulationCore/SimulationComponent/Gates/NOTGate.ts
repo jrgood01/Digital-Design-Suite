@@ -11,7 +11,7 @@ import { Heading } from "../../../Heading";
 import {Gate} from "./Gate";
 export class NOTGate extends Gate {
     constructor(x : number, y : number, container : PIXI.Container, bitWidth : number) {
-        super(x, y, container, 1, 1);
+        super(x, y, container, 1, 1, 130);
         this.followQuadratic(50);
         this.addRenderTarget(this.gateRenderObjectFactory.getGate("NOT"))
         this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'], this.geometry['outputWireStartY'], 0, false, Heading.East);
@@ -28,7 +28,7 @@ export class NOTGate extends Gate {
             } else {
                 outputBit = wireState.High;
             }
-            //console.log(this.input.getLineBit(0, bit), this.output.getLineBit(0, bit))
+
             this.output.setLineBit(0, bit, outputBit);
         }
         
