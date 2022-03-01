@@ -5,19 +5,26 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { wireState } from "../../WireStates";
 import {SimulationComponent} from "../SimulationComponent"
+import { wireState } from "../../WireStates";
 import { SimulationState } from "../../SimulationState";
 import * as PIXI from 'pixi.js'
-class NORGate extends SimulationComponent {
+import * as constants from "../../../constants";
+import {VariableInputComponent} from "../VariableInputComponent";
+import {Heading} from "../../../Heading";
+import {Gate} from "./Gate";
+
+export class NORGate extends Gate {
     inputs : number;
     bitWidth : number;
 
-    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number, simulationState : SimulationState) {
-        super(x, y, container, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
-        this.inputs = numInputs;
-        this.bitWidth = bitWidth;
+    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
+        super(x, y, container, 1, numInputs);
+        this.followQuadratic(50);
+        this.addRenderTarget(this.gateRenderObjectFactory.getGate("NOR"))
+        this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'], this.geometry['outputWireStartY'], 0, false, Heading.East);
     }
+
 
     simulate() {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
@@ -31,7 +38,4 @@ class NORGate extends SimulationComponent {
         }
     }
 
-    draw() {
-        
-    }
 }

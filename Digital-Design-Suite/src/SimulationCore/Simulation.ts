@@ -26,6 +26,10 @@ import {CustomHitDetector} from "./CustomHitDetector";
 import {ComponentWiringArea} from "./Wiring/ComponentWiringArea";
 import {WiringArea} from "./Wiring/WiringArea";
 import {WireWiringArea} from "./Wiring/WireWiringArea";
+import {ORGate} from "./SimulationComponent/Gates/ORGate";
+import {XORGate} from "./SimulationComponent/Gates/XORGate";
+import {XNORGate} from "./SimulationComponent/Gates/XNORGate";
+import {NORGate} from "./SimulationComponent/Gates/NORGate";
 
 const minStageScale = .6;
 const maxStageScale = 1.6;
@@ -125,6 +129,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.stage.cacheAsBitmap = false;
         this.container.addChild(this.bg );
         this.container.addChild(this.grid.graphic);
+
         //We will use this to keep track of what component pins
         //  are connected to what wires
         this.wiringMap = new WiringMap(this.container);
@@ -230,6 +235,19 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 break;
             case "Nand":
                 addComponent = new NANDGate(1, 0, this.container,1, 2);
+                break;
+            case "Or":
+                console.log("OR gate")
+                addComponent = new ORGate(1, 0, this.container, 1, 2);
+                break;
+            case "XOR":
+                addComponent = new XORGate(1, 0, this.container, 1, 2);
+                break;
+            case "Xnor":
+                addComponent = new XNORGate(1, 0, this.container, 1, 2);
+                break;
+            case "Nor":
+                addComponent = new NORGate(1, 0, this.container, 1, 2);
                 break;
             case "7 Segment Display":
                 addComponent = new HexDisplay(0, 0, this.container);

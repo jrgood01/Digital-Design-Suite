@@ -9,30 +9,33 @@ import {SimulationComponent} from "../SimulationComponent"
 import { wireState } from "../../WireStates";
 import { SimulationState } from "../../SimulationState";
 import * as PIXI from 'pixi.js'
+import * as constants from "../../../constants";
+import {VariableInputComponent} from "../VariableInputComponent";
+import {Heading} from "../../../Heading";
+import {GateGeometry} from "./RenderGeometry/GateGeometry";
+import {Gate} from "./Gate";
 
-class ORGate extends SimulationComponent {
-    inputs : number;
-    bitWidth : number;
-
-    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number, simulationState : SimulationState) {
-        super(x, y, container, numInputs, 1, Array(bitWidth).fill(numInputs), Array(bitWidth).fill(1));
-        this.inputs = numInputs;
-        this.bitWidth = bitWidth;
+export class ORGate extends Gate {
+    constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
+        super(x, y, container, 1, numInputs);
+        this.followQuadratic(50);
+        this.addRenderTarget(this.gateRenderObjectFactory.getGate("OR"))
+        this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'], this.geometry['outputWireStartY'], 0, false, Heading.East);
     }
 
     simulate() {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
             let outputBit = wireState.Low;
             for (let line = 0; line < this.inputs; line ++) {
+                if (this.input.getLineBit(line, bit) != wireState.High && this.input.getLineBit(line, bit) != wireState.Low) {
+                    outputBit = wireState.Error;
+                    break;
+                }
                 if (this.input.getLineBit(line, bit) == wireState.High) {
                     outputBit = wireState.High;
                 }
             }
             this.output.setLineBit(0, bit, outputBit);
         }
-    }
-
-    draw() {
-        
     }
 }

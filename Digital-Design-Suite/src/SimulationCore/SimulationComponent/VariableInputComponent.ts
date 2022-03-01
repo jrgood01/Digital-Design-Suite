@@ -12,6 +12,8 @@ import * as constants from "../../constants"
 import { SimulationState } from "../SimulationState";
 import { SimulationAddGraphicEvent } from "../SimulationEvents/SimulationAddGraphicEvent";
 import { Heading } from "../../Heading";
+import {ComponentRenderObject} from "./ComponentRenderObject";
+import {ComponentColor} from "./ComponentColor";
 export abstract class VariableInputComponent extends SimulationComponent {
     numInputs : number;
     componentHeight : number;
@@ -20,8 +22,13 @@ export abstract class VariableInputComponent extends SimulationComponent {
     private inputAreaPadding : number;
     private inputAreaStartY : number;
 
-    constructor(x : number, y : number, container : PIXI.Container, inputLines : number, outputLines : number, inputBitWidths : number[],
-        outputBitWidths : number[],componentHeight : number) {
+    private quadraticIntensity : number;
+    private followsQuadratic : boolean;
+
+    constructor(x : number, y : number, container : PIXI.Container,
+                inputLines : number, outputLines : number,
+                inputBitWidths : number[], outputBitWidths : number[],
+                componentHeight : number) {
         super(x, y, container, inputLines, outputLines, inputBitWidths, outputBitWidths);
         
         this.drawInputAreas = this.drawInputAreas.bind(this);
@@ -35,6 +42,8 @@ export abstract class VariableInputComponent extends SimulationComponent {
 
         this.onMove.push((dx : number, dY : number) => {this.calculateInputAreaCoordinates()})
         this.calculateInputAreaCoordinates();
+
+        this.followsQuadratic = false;
     }
 
     setNumInputs(numInputs : number) {
@@ -60,14 +69,60 @@ export abstract class VariableInputComponent extends SimulationComponent {
         }
     }
 
+    calculateQuadraticPoint(x : number, y : number) {
+
+    }
+
+    followQuadratic(intensity : number) {
+        this.quadraticIntensity = intensity;
+        this.followsQuadratic = true;
+    }
+
+    /**
+     * Snaps a point to a 3 point bezier curve
+     * @param x x point
+     * @param y y poiny
+     */
+    getPointOnQuadratic(x : number, y : number) {
+        const calc = (p_0 : number, p_1 : number, p_2 : number, t : number) =>
+            {
+                const coeff_0 = (1 - t) ** 2;
+                const coeff_1 = 2 * t * (1 - t);
+                const coeff_2 = t ** 2;
+
+                return coeff_0 * p_0
+                    + coeff_1 * p_1
+                    + coeff_2 * p_2;
+            };
+
+        const t = (y - this.y) / this.componentHeight;
+
+        const p_0_x = this.x;
+        const p_0_y = this.y;
+
+        const p_1_x = this.x + this.quadraticIntensity;
+        const p_1_y = this.y + this.componentHeight / 2;
+
+        const p_2_x = this.x;
+        const p_2_y = this.y + this.componentHeight;
+
+        const retX = calc(p_0_x, p_1_x, p_2_x, t);
+        const retY = calc(p_0_y, p_1_y, p_2_y, t);
+
+        return new PIXI.Point(retX, retY);
+    }
+
     drawInputAreas(inputIsWire : boolean) {
         for (let i = 0; i < this.numInputs; i ++) {
             let yPoint = this.inputAreaStartY + i * 50 - 3.5;
+            let xPoint = this.x;
             if (this.grid)
                 yPoint = this.grid.snapToGrid(new PIXI.Point(0, this.inputAreaStartY + i * 50 - 3.5)).y;
+            if (this.followsQuadratic)
+                xPoint = this.getPointOnQuadratic(this.x, yPoint).x;
             this.componentTemplate.lineStyle(7, this.getInputLineBit(i, 0))
-            .moveTo(this.x, yPoint)
-            .lineTo(this.x - 61, yPoint);
+            .moveTo(this.x - 61, yPoint)
+            .lineTo(xPoint, yPoint);
         }
     }
 

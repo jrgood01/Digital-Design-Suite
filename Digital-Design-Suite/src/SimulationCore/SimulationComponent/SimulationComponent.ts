@@ -18,6 +18,9 @@ import {Point} from "pixi.js";
 import {ComponentWiringArea} from "../Wiring/ComponentWiringArea";
 import {DrawableClass} from "../DrawableClass";
 import { Heading } from "../../Heading";
+import {ComponentRenderObject} from "./ComponentRenderObject";
+import {ComponentColor} from "./ComponentColor";
+import {RenderObjectDecorator} from "./RenderObjectDecorator";
 
 /**
  * Represents a simulated digital component
@@ -55,7 +58,11 @@ export abstract class SimulationComponent extends DrawableClass{
 
     protected grid : SimulationGrid;
     private heading : Heading;
-    constructor(x : number, y : number, container : PIXI.Container, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>) {
+
+    protected renderObject : RenderObjectDecorator;
+    constructor(x : number, y : number, container : PIXI.Container,
+                inputLines : number, outputLines : number, inputBitWidths : Array<number>,
+                outputBitWidths : Array<number>) {
         super(x, y, container);
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
         this.output = new SimulationComponentIO(outputLines, outputBitWidths);
@@ -88,8 +95,9 @@ export abstract class SimulationComponent extends DrawableClass{
     }
 
 
-    abstract simulate(): void;
-    abstract draw() : void;
+    abstract simulate() : void;
+    protected updateGraphic?() : void;
+
     calculateGeometry(scaler : number) {return {"a" : 1} as Record<string, number>}
     
     /**
@@ -339,4 +347,19 @@ export abstract class SimulationComponent extends DrawableClass{
     setOnGraphicRemove(handler : (e : SimulationAddGraphicEvent) => void) {
         this.onGraphicRemove = handler;
     }
+
+    addRenderTarget(renderTarget : RenderObjectDecorator) {
+        this.renderObject = renderTarget;
+        this.geometry = renderTarget.getGeometry(this.x, this.y);
+    }
+
+    draw() {
+        this.componentTemplate.clear();
+        if (this.updateGraphic)
+            this.updateGraphic();
+        this.geometry = this.renderObject.getGeometry(this.x, this.y);
+        this.renderObject.render(this.x, this.y, this.componentTemplate)
+        this.updateHitArea();
+    }
+
 }
