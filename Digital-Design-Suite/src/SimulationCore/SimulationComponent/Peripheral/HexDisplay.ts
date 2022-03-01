@@ -12,6 +12,7 @@ import * as PIXI from 'pixi.js'
 import { SimulationComponent } from "../SimulationComponent";
 import { SimulationState } from "../../SimulationState";
 import { wireState } from "../../../SimulationCore/WireStates";
+import { Heading } from "../../../Heading";
 export class HexDisplay extends SimulationComponent {
     private segments = Array<boolean>();
     private width = 450;
@@ -27,14 +28,14 @@ export class HexDisplay extends SimulationComponent {
             this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
             .drawCircle(this.x + 120 + (i * 55), this.y + 20, 2); 
 
-            this.addWiringArea(this.x + 120 + (i * 55), this.y + 20, i, true)
+            this.addWiringArea(this.x + 120 + (i * 55), this.y + 20, i, true, Heading.North)
         }
         
         for (let i = 0 ; i < 4; i ++) {
             this.componentTemplate.lineStyle(20, constants.General.componentColorStandard)
             .drawCircle(this.x + 120 + (i * 55), this.y + 575, 2); 
 
-            this.addWiringArea(this.x + 120 + (i * 55), this.y + 575, i + 4, true)
+            this.addWiringArea(this.x + 120 + (i * 55), this.y + 575, i + 4, true, Heading.South)
         }
 
         this.geometry = this.calculateGeometry(1);

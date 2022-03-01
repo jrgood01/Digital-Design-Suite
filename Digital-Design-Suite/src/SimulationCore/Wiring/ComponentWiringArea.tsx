@@ -8,17 +8,20 @@
 import {WiringArea} from "./WiringArea";
 import {SimulationComponent} from "../SimulationComponent/SimulationComponent";
 import * as PIXI from 'pixi.js'
+import { Heading } from "../../../src/Heading";
 
 export class ComponentWiringArea extends WiringArea {
     private component : SimulationComponent;
     private input : boolean;
     private lineNumber : number;
+    private defaultHeading : Heading;
 
-    constructor(x : number, y : number, container : PIXI.Container, component : SimulationComponent, lineNumber : number, input : boolean) {
+    constructor(x : number, y : number, container : PIXI.Container, defaultHeading : Heading, component : SimulationComponent, lineNumber : number, input : boolean) {
         super(x, y, container);
         this.component = component;
         this.input = input;
         this.lineNumber = lineNumber;
+        this.defaultHeading = defaultHeading;
     }
 
     getLineNumber() {
@@ -31,5 +34,9 @@ export class ComponentWiringArea extends WiringArea {
 
     getComponent() {
         return this.component;
+    }
+
+    getHeading() {
+        return (this.defaultHeading + this.component.getHeading()) % 4;
     }
 }

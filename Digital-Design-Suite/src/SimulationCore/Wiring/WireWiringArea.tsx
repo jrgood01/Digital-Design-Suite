@@ -1,6 +1,7 @@
 import {WiringArea} from "./WiringArea";
 import {Wire} from "./Wire";
 import * as PIXI from 'pixi.js'
+import { Heading } from "../../Heading";
 export class WireWiringArea extends WiringArea {
     private wire : Wire;
     constructor(x : number, y : number, container : PIXI.Container, wire : Wire) {
@@ -10,5 +11,9 @@ export class WireWiringArea extends WiringArea {
 
     getWire() {
         return this.wire;
+    }
+
+    getHeading() {
+        return this.wire.getHeadingLastSegment();
     }
 }

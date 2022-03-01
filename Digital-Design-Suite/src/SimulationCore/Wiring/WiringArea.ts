@@ -7,10 +7,11 @@ import * as PIXI from 'pixi.js'
 import {Heading} from "../../Heading";
 import {DrawableClass} from "../DrawableClass";
 
-export class WiringArea extends DrawableClass{
+export abstract class WiringArea extends DrawableClass{
+    private enabled : boolean;
+
     constructor(x : number, y : number, container : PIXI.Container) {
         super(x, y, container);
-
 
         this.graphic.interactive = true;
         this.graphic.alpha = 0;
@@ -19,6 +20,8 @@ export class WiringArea extends DrawableClass{
         this.draw()
         this.updateHitArea();
     }
+
+    abstract getHeading() : void;
 
     draw() {
         this.graphic.clear();
@@ -48,5 +51,24 @@ export class WiringArea extends DrawableClass{
     updateHitArea() {
         this.graphic.hitArea = new PIXI.Rectangle(this.x - 20, this.y - 20 , 40, 40);
     }
+    getIsEnabled() {
+        return this.enabled;
+    }
 
+    setIsEnabled(enabled : boolean) {
+        if (!enabled) {
+            this.graphic.alpha = 0;
+        }
+        this.enabled = enabled;
+    }
+
+    setGraphicVisible() {
+        if (this.enabled) {
+            this.graphic.alpha = 1;
+        }
+    }
+
+    setGraphicHidden() {
+        this.graphic.alpha = 0;
+    }
 }

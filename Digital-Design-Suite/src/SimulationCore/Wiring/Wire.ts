@@ -32,6 +32,7 @@ export class Wire {
     private stage : PIXI.Container;
     private grid : SimulationGrid;
     private wiringArea : WireWiringArea;
+    private isExtending : boolean;
 
     /**
      * Create new wire
@@ -66,7 +67,7 @@ export class Wire {
 
         this.error = false;
         this.grid = null;
-
+        this.isExtending = false;
         document.addEventListener("mousemove", this.onMouseMove);
     }
 
@@ -75,7 +76,6 @@ export class Wire {
      */
     generateWiringArea() {
         this.wiringArea = new WireWiringArea(0, 0, this.stage, this);
-        console.log(this.wiringArea)
         this.stage.addChild(this.wiringArea.getGraphic());
         return this.wiringArea;
     }
@@ -105,24 +105,26 @@ export class Wire {
         return true;
     }
 
-    beginPlace(extending? : boolean) {
+    beginPlace(extending : boolean) {
         if (this.segments.length == 1) {
             this.addSegmentTop(0);
         } else {
             this.addSegmentTop(0, extending);
             this.addSegmentTop(0);
         }
+        this.isExtending = extending;
+        console.log("this.isExtending set ",this.isExtending, extending)
         this.isPlacing = true;
     }
 
     endPlace() {
         const segmentOne = this.segments[this.segments.length - 2];
         const segmentTwo = this.segments[this.segments.length - 1];
-
+        this.isExtending = false;
+        this.isPlacing = false;
         segmentOne.unlockMouse();
         segmentTwo.unlockMouse();
         this.setHitArea();
-        this.isPlacing = false;
     }
 
     setHitArea() {
@@ -144,13 +146,13 @@ export class Wire {
         const lastSegment = this.segments[this.segments.length - 1];
         const lastSegmentEndPoint = lastSegment.getEndPoint();
         if (isExtending) {
-            console.log("EXTENDING SEGMENT")
             if (lastSegment.getIsVertical()) {
                 lastSegmentEndPoint.x -= 23.5;
             } else {
                 lastSegmentEndPoint.y -= 23.5;
             }
         }
+
         const addSegment = new WireSegment(lastSegment.getIsVertical(),
             lastSegmentEndPoint, 0,
             this.stage, this.onCreateSegment);
@@ -190,7 +192,7 @@ export class Wire {
         }
     }
 
-    anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false, smartAnchor : boolean = false) {
+    anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false) {
         let segmentOne = this.segments[this.segments.length - 2]
         let segmentTwo = this.segments[this.segments.length - 1]
         let anchor = segmentOne.getStartPoint();
@@ -240,6 +242,17 @@ export class Wire {
                 segmentTwo.incrementStartX(-3);
             }
             segmentTwo.padSegment();
+        }
+
+        if (this.isExtending) {
+            let anchor = this.segments[this.segments.length - 3];
+            if (anchor.getIsVertical() == segmentOne.getIsVertical()) {
+                if (segmentOne.getIsVertical()) {
+                    segmentOne.setStartX(anchor.getEndPoint().x + 4)
+                } else {
+                    segmentOne.setStartY(anchor.getEndPoint().y + 4)
+                }
+            }
         }
         segmentTwo.padSegment();
         this.setHitArea();
@@ -299,6 +312,11 @@ export class Wire {
         this.setColor(state);
     }
 
+    getHeadingLastSegment() {
+        let lastWire = this.segments[this.segments.length - 1];
+        return lastWire.getHeading();
+    }
+
     draw() {
         this.graphic.clear();
         this.segments.forEach((segment : WireSegment) => {
@@ -309,5 +327,6 @@ export class Wire {
     getWiringArea() {
         return this.wiringArea;
     }
+
 
 }

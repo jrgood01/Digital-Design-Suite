@@ -27,8 +27,8 @@ import {ComponentWiringArea} from "./Wiring/ComponentWiringArea";
 import {WiringArea} from "./Wiring/WiringArea";
 import {WireWiringArea} from "./Wiring/WireWiringArea";
 
-const minStageScale = .14;
-const maxStageScale = 1.5;
+const minStageScale = .6;
+const maxStageScale = 1.6;
 export class DigitalDesignSimulation extends PIXI.Application{
 
     private simulationState : SimulationState;
@@ -384,6 +384,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
             let delta = scrollEvent.deltaY;
             if (delta > 0) {
                 if (this.container.scale.x > minStageScale) {
+                    this.grid.incrememtZoom();
                     this.container.scale.x -= Math.sqrt(delta) / 200;
                     this.container.scale.y -= Math.sqrt(delta) / 200;
                     this.bg.width *= 1 / this.container.scale.x;
@@ -391,6 +392,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 }
             } else {
                 if (this.container.scale.x < maxStageScale) {
+                    this.grid.decrementZoom();
                     delta = Math.abs(delta);
                     this.container.scale.x += Math.sqrt(delta) / 200;
                     this.container.scale.y += Math.sqrt(delta) / 200;
@@ -443,6 +445,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
         this.simulationState.draggingWireHitArea = this.simulationState.activeWiringArea;
         if (hitArea instanceof ComponentWiringArea) {
             const componentWiringArea = hitArea as ComponentWiringArea;
+
             const addWire = this.wiringMap.addWire(
                 componentWiringArea.getComponent(), componentWiringArea.getLineNumber(),
                 componentWiringArea.getX(), componentWiringArea.getY(),
@@ -450,11 +453,11 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
             if (addWire != null) {
                 addWire.setGrid(this.grid);
+                addWire.beginPlace(false);
                 this.simulationState.setDraggingWire(addWire);
             }
         } else {
             const wireHitArea = hitArea as WireWiringArea;
-            console.log(wireHitArea.getWire())
             wireHitArea.getWire().beginPlace(true);
             this.simulationState.setDraggingWire(wireHitArea.getWire());
         }

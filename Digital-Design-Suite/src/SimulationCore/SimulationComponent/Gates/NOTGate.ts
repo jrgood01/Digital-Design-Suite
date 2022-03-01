@@ -10,6 +10,7 @@ import { wireState } from "../../WireStates";
 import * as constants from "../../../constants"
 import * as PIXI from 'pixi.js'
 import {SimulationState} from "../../SimulationState"
+import { Heading } from "../../../Heading";
 export class NOTGate extends SimulationComponent {
     bitWidth : number;
     simulationState : SimulationState;
@@ -23,10 +24,10 @@ export class NOTGate extends SimulationComponent {
         this.geometry = this.calculateGeometry(1);
 
         this.addWiringArea(this.geometry['outputWireEndX'] - 6, this.geometry['outputWireEndY'] - 3.5, 
-        0, false);
+        0, false, Heading.East);
 
         this.addWiringArea(this.geometry['inputWireEndX'], this.geometry['inputWireEndY'] - 3.5, 
-        0, true);
+        0, true, Heading.West);
 
     }
 

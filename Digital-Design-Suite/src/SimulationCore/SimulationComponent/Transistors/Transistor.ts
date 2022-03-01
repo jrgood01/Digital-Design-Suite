@@ -11,6 +11,7 @@ import { SimulationState } from '../../SimulationState';
 import { wireState } from '../../WireStates';
 import {SimulationComponent} from "../SimulationComponent"
 import { GlowFilter } from '@pixi/filter-glow';
+import { Heading } from '../../../Heading';
 export enum TransistorType {
     NPN,
     PNP
@@ -27,10 +28,10 @@ export class Transistor extends SimulationComponent {
         
         this.geometry = this.calculateGeometry(1);
         this.addWiringArea(this.geometry['emitterConnectorWireFinalX'] - 4, this.geometry['emitterConnectorWireFinalY'] - 7, 
-            0, false);
+            0, false, Heading.North);
 
         this.addWiringArea(this.geometry['collectorConnectorWireFinalX'] - 4, this.geometry['collectorConnectorWireFinalY'], 
-            0, true);
+            0, true, Heading.South);
     }
 
     simulate() {

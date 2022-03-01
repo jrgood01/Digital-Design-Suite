@@ -3,6 +3,7 @@ import { SimulationState } from "../../SimulationState";
 import * as constants from "../../../constants"
 import * as PIXI from 'pixi.js'
 import { wireState } from "../../../SimulationCore/WireStates";
+import { Heading } from "../../../Heading";
 export class ConstantComponent extends SimulationComponent {
     value : number;
     private text : PIXI.Text;
@@ -15,7 +16,7 @@ export class ConstantComponent extends SimulationComponent {
         this.componentTemplate.addChild(this.text);
         this.geometry = this.calculateGeometry(1);
         this.addWiringArea(this.geometry['outLineEndX'] - 3.5, this.geometry['outLineEndY'] - 3.5, 
-        0, false);
+        0, false, Heading.East);
     } 
 
     simulate() {

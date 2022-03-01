@@ -8,6 +8,7 @@ import { wireState } from "../../WireStates";
 import * as PIXI from 'pixi.js'
 import * as constants from "../../../constants"
 import { VariableInputComponent } from "../VariableInputComponent";
+import { Heading } from "../../../Heading";
 
 export class ANDGate extends VariableInputComponent {
     inputs : number;
@@ -20,7 +21,7 @@ export class ANDGate extends VariableInputComponent {
 
         this.geometry = this.calculateGeometry(1);
 
-        this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'] - 3.5, this.geometry['outputWireStartY'] - 3.5, 0, false)
+        this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'] - 3.5, this.geometry['outputWireStartY'] - 3.5, 0, false, Heading.East)
     }
 
     calculateGeometry(scaler: number): Record<string, number> {

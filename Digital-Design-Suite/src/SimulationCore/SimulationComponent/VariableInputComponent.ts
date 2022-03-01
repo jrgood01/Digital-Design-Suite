@@ -11,6 +11,7 @@ import * as PIXI from "pixi.js"
 import * as constants from "../../constants"
 import { SimulationState } from "../SimulationState";
 import { SimulationAddGraphicEvent } from "../SimulationEvents/SimulationAddGraphicEvent";
+import { Heading } from "../../Heading";
 export abstract class VariableInputComponent extends SimulationComponent {
     numInputs : number;
     componentHeight : number;
@@ -55,7 +56,7 @@ export abstract class VariableInputComponent extends SimulationComponent {
             let yPoint = this.inputAreaStartY + i * 50 - 3.5;
             if (this.grid)
                 yPoint = this.grid.snapToGrid(new PIXI.Point(0, this.inputAreaStartY + i * 50 - 3.5)).y;
-            this.addWiringArea(this.x - 61, yPoint, i, true)
+            this.addWiringArea(this.x - 61, yPoint, i, true, Heading.West)
         }
     }
 

@@ -62,7 +62,6 @@ export class SimulationState {
 
     setDraggingWire(wire : Wire) {
         this.draggingWire = wire;
-        wire.beginPlace();
         this.isDragging = true;
     }
 

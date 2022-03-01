@@ -17,6 +17,7 @@ import {SimulationGrid} from "../SimulationGrid";
 import {Point} from "pixi.js";
 import {ComponentWiringArea} from "../Wiring/ComponentWiringArea";
 import {DrawableClass} from "../DrawableClass";
+import { Heading } from "../../Heading";
 
 /**
  * Represents a simulated digital component
@@ -53,7 +54,7 @@ export abstract class SimulationComponent extends DrawableClass{
     private onWiringAreaLeave : Array<() => void>;
 
     protected grid : SimulationGrid;
-
+    private heading : Heading;
     constructor(x : number, y : number, container : PIXI.Container, inputLines : number, outputLines : number, inputBitWidths : Array<number>, outputBitWidths : Array<number>) {
         super(x, y, container);
         this.input = new SimulationComponentIO(inputLines, inputBitWidths);
@@ -82,6 +83,8 @@ export abstract class SimulationComponent extends DrawableClass{
 
         this.onGraphicAdded = (e : SimulationAddGraphicEvent) => {};
         this.onGraphicRemove = (e : SimulationAddGraphicEvent) => {};
+
+        this.heading = Heading.East;
     }
 
 
@@ -119,6 +122,10 @@ export abstract class SimulationComponent extends DrawableClass{
             this.componentTemplate.filters = [new GlowFilter({distance : 20, outerStrength: 2, color : color})]
         } 
         this.glowColor = color;
+    }
+
+    getHeading() {
+        return this.heading;
     }
 
     /**
@@ -301,9 +308,9 @@ export abstract class SimulationComponent extends DrawableClass{
      * @param lineNumber line number to map to
      * @param isInput is this mapped to an input line?
      */
-    addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean) {
+    addWiringArea(x : number, y : number, lineNumber : number, isInput : boolean, defaultHeading : Heading) {
 
-        const newWiringArea = new ComponentWiringArea(x, y, this.container, this, lineNumber, isInput);
+        const newWiringArea = new ComponentWiringArea(x, y, this.container, defaultHeading, this, lineNumber, isInput);
         this.onGraphicAdded(new SimulationAddGraphicEvent(newWiringArea.getGraphic()));
 
         this.wiringAreas.get(isInput).set(lineNumber, newWiringArea);
