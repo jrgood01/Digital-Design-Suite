@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js'
-import * as constants from "../../../../constants";
-import {ComponentRenderObject} from "../../ComponentRenderObject";
+import * as constants from "../../../../../constants";
+import {ComponentRenderObject} from "../../../ComponentRenderObject";
 import {GateComponentColor} from "../GateComponentColor";
-import {RenderObjectDecorator} from "../../RenderObjectDecorator";
+import {RenderObjectDecorator} from "../../../RenderObjectDecorator";
 
 export class GateGeometry {
     static generateNotGateGeometry = (x: number, y: number) => {

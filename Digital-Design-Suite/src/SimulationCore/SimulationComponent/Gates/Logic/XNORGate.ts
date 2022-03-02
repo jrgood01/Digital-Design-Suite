@@ -5,13 +5,13 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationComponent} from "../SimulationComponent"
-import { wireState } from "../../WireStates";
-import { SimulationState } from "../../SimulationState";
+import {SimulationComponent} from "../../SimulationComponent"
+import { wireState } from "../../../WireStates";
+import { SimulationState } from "../../../SimulationState";
 import * as PIXI from 'pixi.js'
-import {VariableInputComponent} from "../VariableInputComponent";
-import * as constants from "../../../constants";
-import {Heading} from "../../../Heading";
+import {VariableInputComponent} from "../../VariableInputComponent";
+import * as constants from "../../../../constants";
+import {Heading} from "../../../../Heading";
 import {Gate} from "./Gate";
 
 export class XNORGate extends Gate {

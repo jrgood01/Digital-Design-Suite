@@ -4,19 +4,19 @@
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
-
+import { wireState } from "../../../WireStates";
 import * as PIXI from 'pixi.js'
-import { wireState } from "../../WireStates";
-import { VariableInputComponent } from "../VariableInputComponent";
-import * as constants from "../../../constants"
-import { Heading } from '../../../Heading';
-import {GateGeometry} from "./RenderGeometry/GateGeometry";
+import * as constants from "../../../../constants"
+import { VariableInputComponent } from "../../VariableInputComponent";
+import { Heading } from "../../../../Heading";
+import { GateGeometry } from "../Render/Geometry/GateGeometry";
 import {Gate} from "./Gate";
 
-export class NANDGate extends Gate {
+
+export class ANDGate extends Gate{
     constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
         super(x, y, container, 1, numInputs);
-        this.addRenderTarget(this.gateRenderObjectFactory.getGate("NAND"));
+        this.addRenderTarget(this.gateRenderObjectFactory.getGate("AND"));
         this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'],
             this.geometry['outputWireStartY'], 0, false, Heading.East)
     }
@@ -36,14 +36,7 @@ export class NANDGate extends Gate {
                     break;
                 }
             }
-            if (outputBit == wireState.High) {
-                this.output.setLineBit(0, bit, wireState.Low);
-            } else if (outputBit == wireState.Low) {
-                this.output.setLineBit(0, bit, wireState.High);
-            } else {
-                this.output.setLineBit(0, bit, outputBit);
-            }
+            this.output.setLineBit(0, bit, outputBit);
         }
     }
-
 }

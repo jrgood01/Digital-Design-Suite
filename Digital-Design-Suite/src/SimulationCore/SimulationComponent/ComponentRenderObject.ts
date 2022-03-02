@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import {ComponentColor} from "./ComponentColor";
-import {GateComponentColor} from "./Gates/GateComponentColor";
+import {GateComponentColor} from "./Gates/Render/GateComponentColor";
 
 export class ComponentRenderObject {
     private geometry : (x : number, y : number) => Record<string, number>;

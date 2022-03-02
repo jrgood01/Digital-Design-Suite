@@ -1,7 +1,7 @@
-import {GateRenderObjectDecorator} from "./GateRenderObjectDecorator";
-import * as constants from "../../../../constants";
-import {GateGeometry} from "./GateGeometry";
-import {ComponentRenderObject} from "../../ComponentRenderObject";
+import {GateRenderObjectDecorator} from "../RenderDecorator/GateRenderObjectDecorator";
+import * as constants from "../../../../../constants";
+import {GateGeometry} from "../Geometry/GateGeometry";
+import {ComponentRenderObject} from "../../../ComponentRenderObject";
 
 export class GateRenderObjectFactory {
     private outputWireColor : () => number;

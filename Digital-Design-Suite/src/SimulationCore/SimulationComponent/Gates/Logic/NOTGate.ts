@@ -5,9 +5,9 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { wireState } from "../../WireStates";
+import { wireState } from "../../../WireStates";
 import * as PIXI from 'pixi.js'
-import { Heading } from "../../../Heading";
+import { Heading } from "../../../../Heading";
 import {Gate} from "./Gate";
 export class NOTGate extends Gate {
     constructor(x : number, y : number, container : PIXI.Container, bitWidth : number) {

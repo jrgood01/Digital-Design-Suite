@@ -6,14 +6,14 @@
 //Copyright Jacob R. Haygood 2022
 
 import {SimulationComponent} from "./SimulationComponent";
-import {ANDGate} from "./Gates/ANDGate";
-import {ConstantComponent} from "./Wiring/Constant";
-import {NOTGate} from "./Gates/NOTGate";
-import {NANDGate} from "./Gates/NANDGate";
-import {ORGate} from "./Gates/ORGate";
-import {XORGate} from "./Gates/XORGate";
-import {XNORGate} from "./Gates/XNORGate";
-import {NORGate} from "./Gates/NORGate";
+import {ANDGate} from "./Gates/Logic/ANDGate";
+import {ConstantComponent} from "./Wiring/Logic/Constant";
+import {NOTGate} from "./Gates/Logic/NOTGate";
+import {NANDGate} from "./Gates/Logic/NANDGate";
+import {ORGate} from "./Gates/Logic/ORGate";
+import {XORGate} from "./Gates/Logic/XORGate";
+import {XNORGate} from "./Gates/Logic/XNORGate";
+import {NORGate} from "./Gates/Logic/NORGate";
 import {HexDisplay} from "./Peripheral/HexDisplay";
 import * as PIXI from 'pixi.js'
 

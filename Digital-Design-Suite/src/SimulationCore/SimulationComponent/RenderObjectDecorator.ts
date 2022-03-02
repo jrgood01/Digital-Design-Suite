@@ -1,4 +1,4 @@
-import {GateComponentColor} from "./Gates/GateComponentColor";
+import {GateComponentColor} from "./Gates/Render/GateComponentColor";
 import * as PIXI from 'pixi.js'
 import {ComponentColor} from "./ComponentColor";
 

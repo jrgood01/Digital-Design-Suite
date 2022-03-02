@@ -1,10 +1,10 @@
-import { SimulationComponent } from "../SimulationComponent";
-import { SimulationState } from "../../SimulationState";
-import * as constants from "../../../constants"
+import { SimulationComponent } from "../../SimulationComponent";
+import { SimulationState } from "../../../SimulationState";
+import * as constants from "../../../../constants"
 import * as PIXI from 'pixi.js'
-import { wireState } from "../../../SimulationCore/WireStates";
-import { Heading } from "../../../Heading";
-import {WireBoxTextFactory} from "./RenderGeometry/WireBoxTextFactory";
+import { wireState } from "../../../WireStates";
+import { Heading } from "../../../../Heading";
+import {WireBoxTextFactory} from "../Render/Factory/WireBoxTextFactory";
 export class ConstantComponent extends SimulationComponent {
     value : number;
     private text : PIXI.Text;
@@ -14,7 +14,6 @@ export class ConstantComponent extends SimulationComponent {
         this.value = Math.pow(2, bitSize) - 1; //set value to max
         this.text = new PIXI.Text("0x"+this.value.toString(16));
         this.componentTemplate.addChild(this.text);
-        this.geometry = this.calculateGeometry(1);
 
         const renderTarget = WireBoxTextFactory.generateWireBoxText({bodyColor : this.getColor})
         renderTarget.linkText(this.text);

@@ -1,7 +1,7 @@
-import {VariableInputComponent} from "../VariableInputComponent";
+import {VariableInputComponent} from "../../VariableInputComponent";
 import * as PIXI from "pixi.js";
-import {Heading} from "../../../Heading";
-import {GateRenderObjectFactory} from "./RenderGeometry/GateFactory";
+import {Heading} from "../../../../Heading";
+import {GateRenderObjectFactory} from "../Render/Factory/GateFactory";
 
 export abstract class Gate extends VariableInputComponent{
     inputs : number;

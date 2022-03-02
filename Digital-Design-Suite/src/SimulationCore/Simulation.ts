@@ -7,8 +7,8 @@
 
 import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
 import {MouseMode, SimulationState} from "./SimulationState";
-import {NOTGate} from "./SimulationComponent/Gates/NOTGate";
-import {ConstantComponent} from "./SimulationComponent/Wiring/Constant"
+import {NOTGate} from "./SimulationComponent/Gates/Logic/NOTGate";
+import {ConstantComponent} from "./SimulationComponent/Wiring/Logic/Constant"
 import * as PIXI from "pixi.js"
 import {InteractionEvent, InteractionManager} from "pixi.js"
 import * as constants from "../constants";
@@ -17,8 +17,8 @@ import {HitAreaClickEvent} from "./SimulationEvents/HitAreaClickEvent"
 import {ComponentDragEvent} from "./SimulationEvents/ComponentDragEvent";
 import {WireEndDragAtWiringAreaEvent} from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
 import {Wire} from "./Wiring/Wire";
-import {ANDGate} from "./SimulationComponent/Gates/ANDGate";
-import {NANDGate} from "./SimulationComponent/Gates/NANDGate";
+import {ANDGate} from "./SimulationComponent/Gates/Logic/ANDGate";
+import {NANDGate} from "./SimulationComponent/Gates/Logic/NANDGate";
 import {HexDisplay} from "./SimulationComponent/Peripheral/HexDisplay";
 import {SimulationAddGraphicEvent} from "./SimulationEvents/SimulationAddGraphicEvent";
 import {SimulationGrid} from "./SimulationGrid";
@@ -26,10 +26,10 @@ import {CustomHitDetector} from "./CustomHitDetector";
 import {ComponentWiringArea} from "./Wiring/ComponentWiringArea";
 import {WiringArea} from "./Wiring/WiringArea";
 import {WireWiringArea} from "./Wiring/WireWiringArea";
-import {ORGate} from "./SimulationComponent/Gates/ORGate";
-import {XORGate} from "./SimulationComponent/Gates/XORGate";
-import {XNORGate} from "./SimulationComponent/Gates/XNORGate";
-import {NORGate} from "./SimulationComponent/Gates/NORGate";
+import {ORGate} from "./SimulationComponent/Gates/Logic/ORGate";
+import {XORGate} from "./SimulationComponent/Gates/Logic/XORGate";
+import {XNORGate} from "./SimulationComponent/Gates/Logic/XNORGate";
+import {NORGate} from "./SimulationComponent/Gates/Logic/NORGate";
 import {ComponentFactory} from "./SimulationComponent/ComponentFactory";
 
 const minStageScale = .6;

@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import {ComponentColor} from "../../ComponentColor";
+import {ComponentColor} from "../../../ComponentColor";
 
 export class WireComponentGeometry {
     static generateWiringBoxGeometry = (x : number, y : number) => {
@@ -27,6 +27,18 @@ export class WireComponentGeometry {
     }
 
     static drawWiringBoxWithText = (x : number, y : number, graphic : PIXI.Graphics, text : PIXI.Text, colors : ComponentColor) => {
+        const geometry = this.generateWiringBoxGeometry(x, y);
+
+        graphic.clear();
+
+        this.drawWiringBox(x, y, graphic, colors);
+
+        text.style = {fontFamily : 'Ariel', fontSize : 25, fill : colors.bodyColor()}
+        text.position.x = x + (geometry['sideLength'] / 2 + 28) - text.width;
+        text.position.y = y + (geometry['sideLength'] / 2 + 14) - text.height;
+    }
+
+    static drawClock = (x : number, y : number, graphic : PIXI.Graphics, text : PIXI.Text, colors : ComponentColor) => {
         const geometry = this.generateWiringBoxGeometry(x, y);
 
         graphic.clear();

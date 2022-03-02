@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
-import {RenderObjectDecorator} from "../../RenderObjectDecorator";
-import {WireBoxTextComponentRenderObject} from "./WireBoxTextComponentRenderObject";
-import {ComponentColor} from "../../ComponentColor";
+import {RenderObjectDecorator} from "../../../RenderObjectDecorator";
+import {WireBoxTextComponentRenderObject} from "../RenderObject/WireBoxTextComponentRenderObject";
+import {ComponentColor} from "../../../ComponentColor";
 
 export class WireBoxTextComponentRenderDecorator implements RenderObjectDecorator {
     private target : WireBoxTextComponentRenderObject;

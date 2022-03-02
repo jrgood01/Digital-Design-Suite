@@ -5,21 +5,20 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationComponent} from "../SimulationComponent"
-import { wireState } from "../../WireStates";
-import { SimulationState } from "../../SimulationState";
+import {SimulationComponent} from "../../SimulationComponent"
+import { wireState } from "../../../WireStates";
+import { SimulationState } from "../../../SimulationState";
 import * as PIXI from 'pixi.js'
-import * as constants from "../../../constants";
-import {VariableInputComponent} from "../VariableInputComponent";
-import {Heading} from "../../../Heading";
-import {GateGeometry} from "./RenderGeometry/GateGeometry";
+import {VariableInputComponent} from "../../VariableInputComponent";
+import * as constants from "../../../../constants";
+import {Heading} from "../../../../Heading";
 import {Gate} from "./Gate";
 
-export class ORGate extends Gate {
+export class XORGate extends Gate {
     constructor(x : number, y : number, container : PIXI.Container, bitWidth : number, numInputs : number) {
         super(x, y, container, 1, numInputs);
         this.followQuadratic(50);
-        this.addRenderTarget(this.gateRenderObjectFactory.getGate("OR"))
+        this.addRenderTarget(this.gateRenderObjectFactory.getGate("XOR"))
         this.addWiringArea(this.geometry['outputWireStartX'] + this.geometry['outputWireLength'], this.geometry['outputWireStartY'], 0, false, Heading.East);
     }
 
@@ -27,12 +26,13 @@ export class ORGate extends Gate {
         for (let bit = 0; bit < this.bitWidth; bit ++) {
             let outputBit = wireState.Low;
             for (let line = 0; line < this.inputs; line ++) {
-                if (this.input.getLineBit(line, bit) != wireState.High && this.input.getLineBit(line, bit) != wireState.Low) {
-                    outputBit = wireState.Error;
-                    break;
-                }
                 if (this.input.getLineBit(line, bit) == wireState.High) {
-                    outputBit = wireState.High;
+                    if (outputBit == wireState.High) {
+                        this.output.setLineBit(0, bit, outputBit);
+                        return;
+                    } else {
+                        outputBit = wireState.High;
+                    }
                 }
             }
             this.output.setLineBit(0, bit, outputBit);
