@@ -1,7 +1,7 @@
-import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
-import {WiringArea} from "../Wiring/WiringArea"
+import { SimulationComponent } from "../../SimulationComponent/SimulationComponent";
+import {WiringArea} from "../../DynamicWiring/WiringArea"
 import { ComponentEvent } from "./ComponentEvent";
-import {ComponentWiringArea} from "../Wiring/ComponentWiringArea";
+import {ComponentWiringArea} from "../../DynamicWiring/ComponentWiringArea";
 
 export class HitAreaClickEvent extends ComponentEvent{
     hitArea : ComponentWiringArea;

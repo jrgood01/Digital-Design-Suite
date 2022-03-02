@@ -1,4 +1,4 @@
-import { Wire } from "../Wiring/Wire";
+import { Wire } from "../../DynamicWiring/Wire";
 import { WireEvent } from "./WireEvent";
 
 export class WireDragEvent extends WireEvent {

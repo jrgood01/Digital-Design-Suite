@@ -1,4 +1,4 @@
-import { Wire } from "../Wiring/Wire";
+import { Wire } from "../../DynamicWiring/Wire";
 
 export class WireEvent {
     wire : Wire;

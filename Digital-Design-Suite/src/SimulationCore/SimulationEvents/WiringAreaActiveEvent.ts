@@ -1,4 +1,4 @@
-import { WiringArea } from "../Wiring/WiringArea";
+import { WiringArea } from "../../DynamicWiring/WiringArea";
 
 export class WiringAreaActiveEvent {
     wiringArea : WiringArea;

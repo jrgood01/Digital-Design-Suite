@@ -5,10 +5,10 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
-import {WiringArea} from "./Wiring/WiringArea";
-import {WiringMap} from "./Wiring/WiringMap";
-import {WireWiringArea} from "./Wiring/WireWiringArea";
+import {SimulationComponent} from "../SimulationComponent/SimulationComponent";
+import {WiringArea} from "../DynamicWiring/WiringArea";
+import {WiringMap} from "../DynamicWiring/WiringMap";
+import {WireWiringArea} from "../DynamicWiring/WireWiringArea";
 
 export class CustomHitDetector {
     private simulationComponents : Array<SimulationComponent>;

@@ -1,8 +1,8 @@
-import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
-import { WiringArea } from "../Wiring/WiringArea";
-import { Wire } from "../Wiring/Wire";
+import { SimulationComponent } from "../../SimulationComponent/SimulationComponent";
+import { WiringArea } from "../../DynamicWiring/WiringArea";
+import { Wire } from "../../DynamicWiring/Wire";
 import { WireDragEvent } from "./WireDragEvent";
-import {ComponentWiringArea} from "../Wiring/ComponentWiringArea";
+import {ComponentWiringArea} from "../../DynamicWiring/ComponentWiringArea";
 
 export class WireEndDragAtWiringAreaEvent extends WireDragEvent {
     wire : Wire;

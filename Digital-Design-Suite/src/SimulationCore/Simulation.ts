@@ -5,32 +5,32 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationComponent} from "./SimulationComponent/SimulationComponent"
+import {SimulationComponent} from "../SimulationComponent/SimulationComponent"
 import {MouseMode, SimulationState} from "./SimulationState";
-import {NOTGate} from "./SimulationComponent/Gates/Logic/NOTGate";
-import {ConstantComponent} from "./SimulationComponent/Wiring/Logic/Constant"
+import {NOTGate} from "../SimulationComponent/Gates/Logic/NOTGate";
+import {ConstantComponent} from "../SimulationComponent/Wiring/Logic/Constant"
 import * as PIXI from "pixi.js"
 import {InteractionEvent, InteractionManager} from "pixi.js"
 import * as constants from "../constants";
-import {WiringMap} from "./Wiring/WiringMap"
+import {WiringMap} from "../DynamicWiring/WiringMap"
 import {HitAreaClickEvent} from "./SimulationEvents/HitAreaClickEvent"
 import {ComponentDragEvent} from "./SimulationEvents/ComponentDragEvent";
 import {WireEndDragAtWiringAreaEvent} from "./SimulationEvents/WireEndDragAtWiringAreaEvent";
-import {Wire} from "./Wiring/Wire";
-import {ANDGate} from "./SimulationComponent/Gates/Logic/ANDGate";
-import {NANDGate} from "./SimulationComponent/Gates/Logic/NANDGate";
-import {HexDisplay} from "./SimulationComponent/Peripheral/HexDisplay";
+import {Wire} from "../DynamicWiring/Wire";
+import {ANDGate} from "../SimulationComponent/Gates/Logic/ANDGate";
+import {NANDGate} from "../SimulationComponent/Gates/Logic/NANDGate";
+import {HexDisplay} from "../SimulationComponent/Peripheral/HexDisplay";
 import {SimulationAddGraphicEvent} from "./SimulationEvents/SimulationAddGraphicEvent";
 import {SimulationGrid} from "./SimulationGrid";
 import {CustomHitDetector} from "./CustomHitDetector";
-import {ComponentWiringArea} from "./Wiring/ComponentWiringArea";
-import {WiringArea} from "./Wiring/WiringArea";
-import {WireWiringArea} from "./Wiring/WireWiringArea";
-import {ORGate} from "./SimulationComponent/Gates/Logic/ORGate";
-import {XORGate} from "./SimulationComponent/Gates/Logic/XORGate";
-import {XNORGate} from "./SimulationComponent/Gates/Logic/XNORGate";
-import {NORGate} from "./SimulationComponent/Gates/Logic/NORGate";
-import {ComponentFactory} from "./SimulationComponent/ComponentFactory";
+import {ComponentWiringArea} from "../DynamicWiring/ComponentWiringArea";
+import {WiringArea} from "../DynamicWiring/WiringArea";
+import {WireWiringArea} from "../DynamicWiring/WireWiringArea";
+import {ORGate} from "../SimulationComponent/Gates/Logic/ORGate";
+import {XORGate} from "../SimulationComponent/Gates/Logic/XORGate";
+import {XNORGate} from "../SimulationComponent/Gates/Logic/XNORGate";
+import {NORGate} from "../SimulationComponent/Gates/Logic/NORGate";
+import {ComponentFactory} from "../SimulationComponent/ComponentFactory";
 
 const minStageScale = .6;
 const maxStageScale = 1.6;
