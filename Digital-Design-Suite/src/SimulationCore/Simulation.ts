@@ -31,6 +31,7 @@ import {XORGate} from "../SimulationComponent/Gates/Logic/XORGate";
 import {XNORGate} from "../SimulationComponent/Gates/Logic/XNORGate";
 import {NORGate} from "../SimulationComponent/Gates/Logic/NORGate";
 import {ComponentFactory} from "../SimulationComponent/ComponentFactory";
+import {ComponentEvent} from "./SimulationEvents/ComponentEvent";
 
 const minStageScale = .6;
 const maxStageScale = 1.6;
@@ -51,7 +52,8 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
     private hitDetector : CustomHitDetector;
     private cursorGraphic : PIXI.Graphics;
-
+    private onSelect : Array<(e : ComponentEvent) => void>;
+    private onDiselect : Array<(e : ComponentEvent) => void>;
     constructor() {
         super();
        //Bind methods to class
@@ -109,7 +111,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
        this.bg.zIndex = -1000;
        this.grid = new SimulationGrid(30, 30);
        this.cursorGraphic = new PIXI.Graphics();
-
+       this.onSelect = new Array<(e : ComponentEvent) => {}>();
     }
 
     beginRender() {  
@@ -271,7 +273,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
             this.simulationState.stateChanged = true;
             this.simulationState.SelectedComponent = componentHit;
             this.simulationState.stateChanged = true;
-
+            this.onSelect.forEach((handler : (e : ComponentEvent) => void) => {
+                handler(new ComponentEvent(componentHit));
+            });
         }else {
             this.simulationState.components.forEach((c : SimulationComponent) => {
                 c.selected = false;
@@ -486,6 +490,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
             else
                 this.simulationState.mode = MouseMode.STANDARD
         }
+    }
 
+    addOnSelect(handler : (e : ComponentEvent) => void) {
+        this.onSelect.push(handler);
     }
 }

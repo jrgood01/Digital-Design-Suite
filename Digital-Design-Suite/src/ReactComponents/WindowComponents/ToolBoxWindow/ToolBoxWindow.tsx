@@ -19,7 +19,7 @@ export const ToolBoxWindow = (props : ToolBoxWindowProps) => {
     const [curSelected, setCurSelected] = React.useState("");
     const onSelect = (val : string) => {setCurSelected(val);}
     return (
-        <DockableWindow title='ToolBox' assignedId='3' width={250} height={1000} 
+        <DockableWindow title='ToolBox' assignedId='3' width={250} height={1000} startY={35}
         onMouseLeave={() => {props.onBeginComponentPlace(curSelected);setCurSelected("");}} 
         onMouseEnter={() => {setCurSelected("")}}>
             <div>

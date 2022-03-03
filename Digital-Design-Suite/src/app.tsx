@@ -12,37 +12,18 @@ import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
 import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
 import { ToolBoxWindow } from "./ReactComponents/WindowComponents/ToolBoxWindow/ToolBoxWindow"
+import {PropertiesWindow} from "./ReactComponents/WindowComponents/PropertiesWindow/PropertiesWindow";
+import {ComponentEvent} from "./SimulationCore/SimulationEvents/ComponentEvent";
+import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
+import {DigitalDesignSimulationApp} from "../appComponent";
 function render() {
 
-  const subMenuArr: SubMenuProps[] = [
-    { title: "File", values: [
-        {title: "New", action:() => {}},
-        {title: "Save", action:() => {}},
-        {title: "Open", action:() => {}}
-      ]
-    },
-
-    { title: "View", values: [
-        {title: "Toolbox", action:() => {}}
-      ]
-    },
-
-    { title: "Window", values: [
-        {title: "Minimize", action:() => {}},
-        {title: "Maximize", action:() => {}},
-        {title: "Full Screen", action:() => {}}
-      ]
-    }
-  ];
 
 
-  let simulation = new DigitalDesignSimulation();
+  const simulation = new DigitalDesignSimulation();
 
   ReactDOM.render(
-      <React.Fragment>
-        <MenuBar props={{elements:subMenuArr}}/>
-        <ToolBoxWindow currentSelection={""} onBeginComponentPlace={(val : string) => {simulation.beginPlace(val)}}/>
-      </React.Fragment>
+      <DigitalDesignSimulationApp simulation={simulation} />
   , document.body);
 
   simulation.beginRender();

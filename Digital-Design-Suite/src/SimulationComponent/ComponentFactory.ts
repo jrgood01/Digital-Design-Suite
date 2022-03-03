@@ -37,9 +37,9 @@ export class ComponentFactory {
             case "Xnor":
                 return new XNORGate(1, 0, container, 1, 2);
             case "Nor":
-                return new NORGate(1, 0, container, 1, 2);
+                return new NORGate(1, 0, container, 1, 4);
             case "Clock":
-                return new Clock(1, 0, container, 10000);
+                return new Clock(1, 0, container, 1000000);
             case "7 Segment Display":
                 return new HexDisplay(0, 0, container);
             default:

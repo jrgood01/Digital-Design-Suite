@@ -18,8 +18,6 @@ import {Point} from "pixi.js";
 import {ComponentWiringArea} from "../DynamicWiring/ComponentWiringArea";
 import {DrawableClass} from "../SimulationCore/DrawableClass";
 import { Heading } from "../Heading";
-import {ComponentRenderObject} from "./ComponentRenderObject";
-import {ComponentColor} from "./ComponentColor";
 import {RenderObjectDecorator} from "./RenderObjectDecorator";
 
 /**
