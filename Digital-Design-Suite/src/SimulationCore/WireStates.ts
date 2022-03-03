@@ -4,6 +4,7 @@
 //  for commercial purposes without written permission from the owner
 //
 //Copyright Jacob R. Haygood 2022
+
 import * as constants from "../constants"
 
 export enum wireState {

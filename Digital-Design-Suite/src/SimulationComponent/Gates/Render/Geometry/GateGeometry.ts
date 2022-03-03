@@ -1,8 +1,13 @@
+//Software licensed under creative commons Attribution-NonCommercial-NoDerivatives 4.0
+//
+//  You may not re-distribute this software with modification or use this software
+//  for commercial purposes without written permission from the owner
+//
+//Copyright Jacob R. Haygood 2022
+
 import * as PIXI from 'pixi.js'
 import * as constants from "../../../../constants";
-import {ComponentRenderObject} from "../../../ComponentRenderObject";
 import {GateComponentColor} from "../GateComponentColor";
-import {RenderObjectDecorator} from "../../../RenderObjectDecorator";
 
 export class GateGeometry {
     static generateNotGateGeometry = (x: number, y: number) => {
