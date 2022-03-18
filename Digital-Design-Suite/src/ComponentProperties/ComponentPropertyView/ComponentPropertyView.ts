@@ -1,14 +1,15 @@
 import {SimulationComponent} from "../../SimulationComponent/SimulationComponent";
 import {ComponentPropertyNumberField} from "../FieldTypes/ComponentPropertyNumberField";
 import {ComponentEvent} from "../../SimulationCore/SimulationEvents/ComponentEvent";
+import {Translatable} from "../../SimulationComponent/interfaces/Translatable";
 
 export class ComponentPropertyView {
-    private linkedComponent : SimulationComponent;
+    private linkedComponent : Translatable;
 
     private xField : ComponentPropertyNumberField;
     private yField : ComponentPropertyNumberField;
 
-    constructor(linkedComponent : SimulationComponent) {
+    constructor(linkedComponent : Translatable) {
         this.xFieldUpdated = this.xFieldUpdated.bind(this);
         this.yFieldUpdated = this.yFieldUpdated.bind(this);
         this.linkedComponentMove = this.linkedComponentMove.bind(this);
@@ -28,7 +29,7 @@ export class ComponentPropertyView {
         this.yField.setOnValueChanged(this.yFieldUpdated);
 
         this.xField.setValue(this.linkedComponent.getX().toString());
-        this.linkedComponent.onMove.push(this.linkedComponentMove);
+        this.linkedComponent.addOnMove(this.linkedComponentMove);
     }
 
     xFieldUpdated(val : number) {

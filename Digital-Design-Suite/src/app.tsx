@@ -18,8 +18,6 @@ import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
 import {DigitalDesignSimulationApp} from "../appComponent";
 function render() {
 
-
-
   const simulation = new DigitalDesignSimulation();
 
   ReactDOM.render(

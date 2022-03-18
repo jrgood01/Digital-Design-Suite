@@ -8,12 +8,9 @@
 import { SimulationComponent } from "./SimulationComponent";
 import { WiringArea } from "../DynamicWiring/WiringArea"
 import * as PIXI from "pixi.js"
-import * as constants from "../constants"
-import { SimulationState } from "../SimulationCore/SimulationState";
 import { SimulationAddGraphicEvent } from "../SimulationCore/SimulationEvents/SimulationAddGraphicEvent";
 import { Heading } from "../Heading";
-import {ComponentRenderObject} from "./ComponentRenderObject";
-import {ComponentColor} from "./ComponentColor";
+
 export abstract class VariableInputComponent extends SimulationComponent {
     numInputs : number;
     componentHeight : number;

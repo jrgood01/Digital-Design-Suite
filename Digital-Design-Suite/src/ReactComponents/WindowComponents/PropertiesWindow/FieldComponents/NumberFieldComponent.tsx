@@ -16,7 +16,6 @@ export const NumberFieldComponent = (props : PropertyWindowNumberFieldComponentP
     const [linkedVal, setLinkedVal] = React.useState(props.target.getValue());
     props.target.setOnValueChanged((newVal : number) => {
         setLinkedVal(newVal.toString());
-        console.log(newVal)
     })
     return (
         <div style={{width : "100%"}}>

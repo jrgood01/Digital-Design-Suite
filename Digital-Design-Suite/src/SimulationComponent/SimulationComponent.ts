@@ -19,12 +19,13 @@ import {ComponentWiringArea} from "../DynamicWiring/ComponentWiringArea";
 import {DrawableClass} from "../SimulationCore/DrawableClass";
 import { Heading } from "../Heading";
 import {RenderObjectDecorator} from "./RenderObjectDecorator";
+import {Translatable} from "./interfaces/Translatable";
 
 /**
  * Represents a simulated digital component
  * Extend this class to create usable components
  */
-export abstract class SimulationComponent extends DrawableClass{
+export abstract class SimulationComponent extends DrawableClass implements Translatable{
     componentId : string;
     simulationState : SimulationState;
 
@@ -134,6 +135,9 @@ export abstract class SimulationComponent extends DrawableClass{
         return this.heading;
     }
 
+    setHeading(newHeading : Heading){
+        this.heading = newHeading;
+    }
     /**
      * Add an input line to the component
      * @param bitWidth bitwidth of input line
@@ -229,22 +233,22 @@ export abstract class SimulationComponent extends DrawableClass{
 
     /**
      * Translate the component
-     * @param x dX
-     * @param y dY
+     * @param dX dX
+     * @param dY dY
      */
-    translate (x : number, y : number) {
-        this.x += x;
-        this.y += y;
+    translate (dX : number, dY : number) {
+        this.x += dX;
+        this.y += dY;
         this.geometry = this.calculateGeometry(1);
  
         this.wiringAreas.forEach((value : Map<Number, WiringArea>) => {
             value.forEach((wiringArea : WiringArea) => {
-                wiringArea.translate(x, y);
+                wiringArea.translate(dX, dY);
             });
         });      
 
         this.onMove.forEach((f : (dX : number, dY : number) => void) => {
-            f(x, y);
+            f(dX, dY);
         })
     }
 
@@ -351,6 +355,9 @@ export abstract class SimulationComponent extends DrawableClass{
         this.geometry = renderTarget.getGeometry(this.x, this.y);
     }
 
+    addOnMove(handler : (dX : number, dY : number) => void) {
+        this.onMove.push(handler);
+    }
     draw() {
         this.componentTemplate.clear();
         if (this.updateGraphic)

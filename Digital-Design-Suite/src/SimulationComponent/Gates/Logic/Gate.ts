@@ -1,9 +1,9 @@
 import {VariableInputComponent} from "../../VariableInputComponent";
 import * as PIXI from "pixi.js";
-import {Heading} from "../../../Heading";
 import {GateRenderObjectFactory} from "../Render/Factory/GateFactory";
+import {SingleBitWidthInputComponent} from "../../interfaces/SingleBitwidthInputComponent";
 
-export abstract class Gate extends VariableInputComponent{
+export abstract class Gate extends VariableInputComponent implements SingleBitWidthInputComponent{
     inputs : number;
     bitWidth : number;
     protected gateRenderObjectFactory : GateRenderObjectFactory;
@@ -26,5 +26,13 @@ export abstract class Gate extends VariableInputComponent{
 
     updateGraphic() {
         this.drawInputAreas(false);
+    }
+
+    getInputBitWidth() : number {
+        return this.bitWidth;
+    }
+
+    setInputBitWidth(newBitWidth : number) {
+        this.bitWidth = newBitWidth;
     }
 }
