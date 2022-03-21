@@ -6,9 +6,9 @@
 //Copyright Jacob R. Haygood 2022
 
 import * as PIXI from "pixi.js"
-import { Wire } from "../DynamicWiring/Wire";
-import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
-import { WiringArea } from "../DynamicWiring/WiringArea";
+import { Wire } from "./DynamicWiring/Wire";
+import { SimulationComponent } from "./SimulationComponent/SimulationComponent";
+import { WiringArea } from "./DynamicWiring/WiringArea";
 import { WiringAreaActiveEvent } from "./SimulationEvents/WiringAreaActiveEvent";
 export enum MouseMode {
     STANDARD = "pointer",

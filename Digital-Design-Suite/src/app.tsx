@@ -8,14 +8,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './default.css';
-import {SubMenuProps} from "./ReactComponents/MenuBar/SubMenuComponent";
-import {MenuBar} from "./ReactComponents/MenuBar/MenuBarComponent";
+
 import {DigitalDesignSimulation} from "./SimulationCore/Simulation"
-import { ToolBoxWindow } from "./ReactComponents/WindowComponents/ToolBoxWindow/ToolBoxWindow"
-import {PropertiesWindow} from "./ReactComponents/WindowComponents/PropertiesWindow/PropertiesWindow";
-import {ComponentEvent} from "./SimulationCore/SimulationEvents/ComponentEvent";
-import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
-import {DigitalDesignSimulationApp} from "../appComponent";
+import {DigitalDesignSimulationApp} from "./SimulationCore/DigitalDesignSimulation";
 function render() {
 
   const simulation = new DigitalDesignSimulation();

@@ -7,8 +7,8 @@
 
 import React from "react";
 import {DockableWindow} from "../DockableWindow";
-import {SimulationComponent} from "../../../SimulationComponent/SimulationComponent";
-import {ComponentPropertyViewFactory} from "../../../ComponentProperties/Factory/ComponentPropertyViewFactory";
+import {SimulationComponent} from "../../../SimulationCore/SimulationComponent/SimulationComponent";
+import {ComponentPropertyViewFactory} from "./ComponentProperties/Factory/ComponentPropertyViewFactory";
 
 interface PropertiesWindowProps {
     selectedComponent : SimulationComponent;

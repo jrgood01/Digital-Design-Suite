@@ -5,10 +5,10 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import {SimulationComponent} from "../SimulationComponent/SimulationComponent";
-import {WiringArea} from "../DynamicWiring/WiringArea";
-import {WiringMap} from "../DynamicWiring/WiringMap";
-import {WireWiringArea} from "../DynamicWiring/WireWiringArea";
+import {SimulationComponent} from "./SimulationComponent/SimulationComponent";
+import {WiringArea} from "./DynamicWiring/WiringArea";
+import {WiringMap} from "./DynamicWiring/WiringMap";
+import {WireWiringArea} from "./DynamicWiring/WireWiringArea";
 
 export class CustomHitDetector {
     private simulationComponents : Array<SimulationComponent>;
@@ -36,7 +36,7 @@ export class CustomHitDetector {
         this.simulationComponents.forEach((component : SimulationComponent) => {
             component.wiringAreas.forEach((val: Map<Number, WiringArea>) => {
                 val.forEach((val: WiringArea) => {
-                    if (val.getGraphic().hitArea.contains(x, y)) {
+                    if (val.getGraphic().hitArea.contains(x, y) && val.getIsEnabled()) {
                         retVal = val;
                     }
                 })

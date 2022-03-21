@@ -5,7 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { WiringArea } from "../../DynamicWiring/WiringArea";
+import { WiringArea } from "../DynamicWiring/WiringArea";
 
 export class WiringAreaActiveEvent {
     wiringArea : WiringArea;

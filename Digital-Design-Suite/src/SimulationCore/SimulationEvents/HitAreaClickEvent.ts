@@ -5,9 +5,9 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { SimulationComponent } from "../../SimulationComponent/SimulationComponent";
+import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { ComponentEvent } from "./ComponentEvent";
-import {ComponentWiringArea} from "../../DynamicWiring/ComponentWiringArea";
+import {ComponentWiringArea} from "../DynamicWiring/ComponentWiringArea";
 
 export class HitAreaClickEvent extends ComponentEvent{
     hitArea : ComponentWiringArea;

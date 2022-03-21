@@ -5,7 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { SimulationComponent } from "../../SimulationComponent/SimulationComponent";
+import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 
 export class ComponentEvent {
     component : SimulationComponent;

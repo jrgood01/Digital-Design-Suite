@@ -5,7 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import { Wire } from "../../DynamicWiring/Wire";
+import { Wire } from "../DynamicWiring/Wire";
 
 export class WireEvent {
     wire : Wire;

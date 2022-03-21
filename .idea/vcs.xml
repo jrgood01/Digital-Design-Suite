@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Digital-Design-Suite/Digital-Design-Suite-WebDeploy" vcs="Git" />
   </component>
 </project>

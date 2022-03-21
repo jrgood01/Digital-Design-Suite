@@ -6,7 +6,7 @@
 //Copyright Jacob R. Haygood 2022
 
 import { ComponentEvent } from "./ComponentEvent";
-import { SimulationComponent } from "../../SimulationComponent/SimulationComponent";
+import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 
 export class ComponentDragEvent extends ComponentEvent {
     x : number;
