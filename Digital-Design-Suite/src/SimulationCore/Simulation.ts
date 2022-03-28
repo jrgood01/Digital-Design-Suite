@@ -33,7 +33,7 @@ import {NORGate} from "./SimulationComponent/Gates/Logic/NORGate";
 import {ComponentFactory} from "./SimulationComponent/ComponentFactory";
 import {ComponentEvent} from "./SimulationEvents/ComponentEvent";
 
-const minStageScale = .6;
+const minStageScale = .4;
 const maxStageScale = 1.6;
 export class DigitalDesignSimulation extends PIXI.Application{
 
@@ -111,7 +111,7 @@ export class DigitalDesignSimulation extends PIXI.Application{
        this.bg.zIndex = -1000;
        this.grid = new SimulationGrid(30, 30);
        this.cursorGraphic = new PIXI.Graphics();
-       this.onSelect = new Array<(e : ComponentEvent) => {}>();
+       this.onSelect = new Array<(e : ComponentEvent) => void>();
     }
 
     beginRender() {  
@@ -437,17 +437,16 @@ export class DigitalDesignSimulation extends PIXI.Application{
 
             const addWire = this.wiringMap.addWire(
                 componentWiringArea.getComponent(), componentWiringArea.getLineNumber(),
-                componentWiringArea.getX() - 3.5, componentWiringArea.getY() - 3.5,
+                componentWiringArea.getAnchorPoint().x, componentWiringArea.getAnchorPoint().y,
                 componentWiringArea.getIsInput());
 
             if (addWire != null) {
-                addWire.setGrid(this.grid);
-                addWire.beginPlace(false);
+                addWire.beginPlace(hitArea.getAnchorPoint());
                 this.simulationState.setDraggingWire(addWire);
             }
         } else {
             const wireHitArea = hitArea as WireWiringArea;
-            wireHitArea.getWire().beginPlace(true);
+            wireHitArea.getWire().beginPlace(hitArea.getAnchorPoint());
             this.simulationState.setDraggingWire(wireHitArea.getWire());
         }
     }
@@ -471,14 +470,12 @@ export class DigitalDesignSimulation extends PIXI.Application{
     onWireEndDragAtWiringArea(wire : Wire, wiringArea : WiringArea) {
         if (wiringArea instanceof  ComponentWiringArea) {
             const componentWiringArea = wiringArea as ComponentWiringArea;
-            wire.endPlace();
+            wire.endPlace(componentWiringArea.getPoint());
             wire.removeWiringArea();
             wire.connectComponentToTop(wiringArea.getComponent());
             wire.removeWiringArea();
             this.wiringMap.addWireMapping(wiringArea.getComponent(), wiringArea.getIsInput(),
                 wiringArea.getLineNumber(), wire);
-            wire.anchorToPoint(wiringArea.getX(), wiringArea.getY()
-                , true);
         }
 
     }

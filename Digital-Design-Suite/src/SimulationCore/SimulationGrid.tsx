@@ -60,7 +60,7 @@ export class SimulationGrid {
     }
 
     draw(zoom : number) {
-        let scale = 1;
+       /* let scale = 1;
         if (this.zoom > 0) {
             scale += Math.floor(this.zoom / (this.spacingX / 10))
         }
@@ -77,7 +77,7 @@ export class SimulationGrid {
                     .lineTo(this.xMax, y);
             }
             this.updated = false;
-        }
+        }*/
     }
 
     setZoom(newZoom : number) {

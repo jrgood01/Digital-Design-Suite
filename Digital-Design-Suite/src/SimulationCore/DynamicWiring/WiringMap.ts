@@ -9,6 +9,7 @@ import * as PIXI from "pixi.js"
 import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
 import { Wire } from "./Wire";
 import {WireWiringArea} from "./WireWiringArea";
+import {ComponentConnection} from "./ComponentConnection";
 
 export class WiringMap {
     //Contains useful information about the simulation
@@ -51,13 +52,8 @@ export class WiringMap {
         }
 
         //Create a new wire with the passed start coordinates
-        let addWire = new Wire(startX, startY, ioComponent, this.refContainer);
-        const inputConnection = 
-        {
-            component: ioComponent, 
-            componentLineNumber: lineNumber, 
-            lineUpdated: false
-        }
+        const addWire = new Wire(ioComponent, this.refContainer);
+        const inputConnection = new ComponentConnection(ioComponent, lineNumber);
         addWire.addInput(inputConnection);
 
         //Add the wire to the map

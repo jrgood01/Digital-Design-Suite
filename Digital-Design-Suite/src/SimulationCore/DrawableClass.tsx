@@ -46,6 +46,9 @@ export abstract class DrawableClass {
         return this.y;
     }
 
+    getPoint() {
+        return new PIXI.Point(this.x, this.y);
+    }
     /**
      * Set the x and y values of the
      * @param x new x val

@@ -22,7 +22,7 @@ export abstract class WiringArea extends DrawableClass{
         this.updateHitArea();
     }
 
-    abstract getHeading() : void;
+    abstract getHeading() : Heading;
 
     draw() {
         this.graphic.clear();
@@ -50,11 +50,6 @@ export abstract class WiringArea extends DrawableClass{
         this.draw();
     }
 
-    getX(): number {
-
-        return super.getX();
-    }
-
     updateHitArea() {
         this.graphic.hitArea = new PIXI.Rectangle(this.x - 20, this.y - 20 , 40, 40);
     }
@@ -78,4 +73,28 @@ export abstract class WiringArea extends DrawableClass{
     setGraphicHidden() {
         this.graphic.alpha = 0;
     }
+
+    getAnchorPoint() {
+        console.log("Heading: ",this.getHeading())
+        switch (this.getHeading()) {
+            case Heading.North:
+                return new PIXI.Point(this.x - 3.5, this.y + 6);
+                break;
+
+            case Heading.East:
+                return new PIXI.Point(this.x - 7, this.y + 6);
+                break;
+
+            case Heading.South:
+                return new PIXI.Point(this.x - 10, this.y - 10);
+                break;
+
+            case Heading.West:
+                return new PIXI.Point(this.x - 7, this.y - 6);
+                break;
+
+        }
+    }
+
+
 }

@@ -10,8 +10,39 @@ import { SimulationComponent } from "../SimulationComponent/SimulationComponent"
 /**
  * Represents an output line on a specific component
  */
-export interface ComponentConnection {
-    component : SimulationComponent;
-    componentLineNumber : number;
-    lineUpdated : boolean;
+export class ComponentConnection {
+    private component : SimulationComponent;
+    private componentLineNumber : number;
+    private lineUpdated : boolean;
+
+    constructor(component : SimulationComponent, componentLineNumber : number) {
+        this.component = component;
+        this.componentLineNumber = componentLineNumber;
+        this.lineUpdated = false;
+    }
+
+    getLine() {
+        return this.component.getOutputLine(this.componentLineNumber);
+    }
+
+    getLineBit(bit : number) {
+        const line = this.component.getOutputLine(this.componentLineNumber);
+        return line[bit];
+    }
+
+    getLineBitWidth() {
+        return this.getLine().length;
+    }
+
+    hasUpdated() {
+        return this.lineUpdated;
+    }
+
+    setHadUpdated(updated : boolean) {
+        this.lineUpdated = updated;
+    }
+
+    getComponentVisited() {
+        return this.component.visited;
+    }
 }

@@ -5,18 +5,15 @@
 //
 //Copyright Jacob R. Haygood 2022
 import * as PIXI from "pixi.js";
-import { wireState } from "../WireStates";
-import { ComponentConnection } from "./ComponentConnection";
-import { Point, Rectangle } from "pixi.js";
-import * as Constants from "../../constants"
-import e from "express";
-import { GlowFilter } from '@pixi/filter-glow';
+import {wireState} from "../WireStates";
+import {ComponentConnection} from "./ComponentConnection";
 import {WireSegment} from "./WireSegment"
-import { SimulationComponent } from "../SimulationComponent/SimulationComponent";
-import { Heading } from "../../Heading";
+import {SimulationComponent} from "../SimulationComponent/SimulationComponent";
 import {SimulationGrid} from "../SimulationGrid";
-import {WiringArea} from "./WiringArea";
 import {WireWiringArea} from "./WireWiringArea";
+import {WireSegmentJointController} from "./WireSegmentJointController";
+import {WireSegmentJointMode} from "./WireSegmentJointMode";
+import {Heading} from "../../Heading";
 
 export class Wire {
     graphic : PIXI.Graphics;
@@ -33,17 +30,15 @@ export class Wire {
     private grid : SimulationGrid;
     private wiringArea : WireWiringArea;
     private isExtending : boolean;
+    private segmentController : WireSegmentJointController;
 
     /**
      * Create new wire
-     * @param startX wire startX
-     * @param startY wire endX
      */
-    constructor(startX : number, startY : number, dockComponent : SimulationComponent, stage : PIXI.Container) {
- 
-
+    constructor(dockComponent : SimulationComponent, stage : PIXI.Container) {
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onCreateSegment = this.onCreateSegment.bind(this);
+        this.onDeleteSegment = this.onDeleteSegment.bind(this);
 
         this.graphic = new PIXI.Graphics();
         this.graphic.interactive = true;
@@ -57,18 +52,15 @@ export class Wire {
         this.stage = stage;
 
         this.isPlacing = false;
-        
-        startY += 3.5; 
-        startX += 3.5;
-        
-        const addWire = new WireSegment(false, new PIXI.Point(startX, startY), 0, stage, this.onCreateSegment);
-        addWire.addComponentDockBottom(dockComponent);
-        this.segments.push(addWire);
 
         this.error = false;
         this.grid = null;
         this.isExtending = false;
+
+        this.segmentController = new WireSegmentJointController(this.stage, this.onCreateSegment,
+            this.onDeleteSegment);
         document.addEventListener("mousemove", this.onMouseMove);
+
     }
 
     /**
@@ -85,19 +77,15 @@ export class Wire {
             this.wiringArea.unRegister();
         this.wiringArea = null;
     }
-    /**
-     * @param grid Grid to lock wire to
-     */
-    setGrid(grid : SimulationGrid) {
-        this.grid = grid;
-        this.segments.forEach((s : WireSegment) => {
-            s.setGrid(grid);
-        })
-    }
 
+    /**
+     * Determines if all the inputs to the wire have been updated by the simulation
+     * Algorithm
+     * @constructor
+     */
     AllInputsVisited () {
         this.inputs.forEach((c : ComponentConnection) => {
-            if (!c.component.visited) {
+            if (!c.getComponentVisited()) {
                 return false;
             }
         });
@@ -105,27 +93,18 @@ export class Wire {
         return true;
     }
 
-    beginPlace(extending : boolean) {
-        if (this.segments.length == 1) {
-            this.addSegmentTop(0);
-        } else {
-            this.addSegmentTop(0, extending);
-            this.addSegmentTop(0);
-        }
+    beginPlace(startPoint : PIXI.Point) {
+        this.segmentController.addSegments(startPoint, WireSegmentJointMode.HVADD);
         this.wiringArea.setIsEnabled(false);
-        this.isExtending = extending;
-        console.log("this.isExtending set ",this.isExtending, extending)
         this.isPlacing = true;
     }
 
-    endPlace() {
-        this.wiringArea.setIsEnabled(true)
-        const segmentOne = this.segments[this.segments.length - 2];
-        const segmentTwo = this.segments[this.segments.length - 1];
-        this.isExtending = false;
+    endPlace(endPoint : PIXI.Point = null) {
+        if (endPoint) {
+            this.segmentController.anchorTo(endPoint);
+        }
+        this.segmentController.endControl();
         this.isPlacing = false;
-        segmentOne.unlockMouse();
-        segmentTwo.unlockMouse();
         this.setHitArea();
     }
 
@@ -133,145 +112,81 @@ export class Wire {
         if (!this.wiringArea)
             return;
 
-        const lastSegment = this.segments[this.segments.length - 1];
-        const endPoint = lastSegment.getEndPoint();
-        if (lastSegment.getIsVertical()) {
-            endPoint.x -= 10;
-        } else {
-            endPoint.y -= 10
+        const endPoint = this.getLastSegment().getEnd();
+
+        switch(this.getLastSegment().getHeading()) {
+            case Heading.North:
+                endPoint.y += 7;
+                break;
+            case Heading.South:
+                endPoint.y -= 7;
+                break;
+            case Heading.East:
+                endPoint.x -= 7;
+                break;
+            case Heading.West:
+                endPoint.x += 7;
+                break;
+
         }
         this.wiringArea.setXY(endPoint.x, endPoint.y)
-        this.wiringArea.setOffset(lastSegment.getHeading())
+        this.wiringArea.setOffset(this.getLastSegment().getHeading())
     }
 
-    addSegmentTop(length : number, isExtending? : boolean) {
-        const lastSegment = this.segments[this.segments.length - 1];
-        const lastSegmentEndPoint = lastSegment.getEndPoint();
-        if (isExtending) {
-            if (lastSegment.getIsVertical()) {
-                lastSegmentEndPoint.x -= 23.5;
-            } else {
-                lastSegmentEndPoint.y -= 23.5;
-            }
-        }
-
-        const addSegment = new WireSegment(lastSegment.getIsVertical(),
-            lastSegmentEndPoint, 0,
-            this.stage, this.onCreateSegment);
-
-        lastSegment.top = addSegment;
-        addSegment.bottom = lastSegment
-        addSegment.setGrid(this.grid);
-        this.segments.push(addSegment);
-    }
 
 
     addInput(input : ComponentConnection) {
-        this.bitWidth = input.component.output.getLineBitWidth(input.componentLineNumber);
+        this.bitWidth = input.getLineBitWidth();
         this.inputs.push(input);
     }
 
-    getComponentColor() {
-        if (this.error) {
-            return wireState.Error;
-        }
-
-        if (this.bitWidth > 1) {
-            return Constants.General.componentMultiBit;
-        }
-
-        if (this.inputs.length > 0) {
-            return this.inputs[0].component.output.getLineBit(this.inputs[0].componentLineNumber,0)
-        } else {
-            return wireState.Float;
-        }
-    } 
-
     onMouseMove(ev : PointerEvent) {
-        let pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
         if (this.isPlacing) {
-            this.anchorToPoint(pos.x, pos.y, true);
-        }
-    }
+            const pos = this.stage.toLocal(new PIXI.Point(ev.x, ev.y));
 
-    anchorToPoint(x : number, y : number, lockMouseOnAnchor : boolean = false) {
-        let segmentOne = this.segments[this.segments.length - 2]
-        let segmentTwo = this.segments[this.segments.length - 1]
-        let anchor = segmentOne.getStartPoint();
-        if (this.grid) {
-            //let gridPoint = this.grid.snapToGrid(new Point(x, y));
-            //x = gridPoint.x;
-            //y = gridPoint.y;
-        }
-        let dX = x - anchor.x;
-        let dY = y - anchor.y;
-        let anchorType = Math.abs(dX) > Math.abs(dY);
-        if (anchorType) {
-            
-            segmentTwo.setLength(dY);
-            segmentTwo.setIsVertical(true);
-
-            segmentOne.setLength(dX);
-            segmentOne.setIsVertical(false);
-            segmentTwo.setStartPoint(segmentOne.getEndPoint());
-           
-            if (segmentTwo.getLength() > 0) {
-                segmentTwo.incrementStartY(-10);
-            } else {
-                segmentTwo.incrementStartY(-3.5);
-            }
-            if (lockMouseOnAnchor) {
-                segmentTwo.lockToMouseY();
-                segmentOne.lockToMouseX();
-            }
-
-        } else {
-           
-            segmentTwo.setLength(dX);
-            segmentTwo.setIsVertical(false);
-
-            segmentOne.setLength(dY);
-            segmentOne.setIsVertical(true);
-            segmentTwo.setStartPoint(segmentOne.getEndPoint());
-            if (lockMouseOnAnchor) {
-                segmentTwo.lockToMouseX();
-                segmentOne.lockToMouseY();
-            }
-
-            if (segmentTwo.getLength() > 0) {
-                segmentTwo.incrementStartX(-10);
-            } else {
-                segmentTwo.incrementStartX(-3);
-            }
-            segmentTwo.padSegment();
-        }
-
-        if (this.isExtending) {
-            let anchor = this.segments[this.segments.length - 3];
-            if (anchor.getIsVertical() == segmentOne.getIsVertical()) {
-                if (segmentOne.getIsVertical()) {
-                    segmentOne.setStartX(anchor.getEndPoint().x + 4)
+            const distVector = this.segmentController.getDistToOriginVector(pos);
+            console.log(this.segmentController.getDistToOrigin(pos))
+            if (this.segmentController.getDistToOrigin(pos) < 300) {
+                if (distVector.x > distVector.y) {
+                    this.segmentController.setMode(WireSegmentJointMode.HVADD);
                 } else {
-                    segmentOne.setStartY(anchor.getEndPoint().y + 4)
+                    this.segmentController.setMode(WireSegmentJointMode.VHADD);
                 }
             }
+
+            if (distVector.y < 20 && this.segmentController.getMode() == WireSegmentJointMode.HVADD)
+                this.segmentController.setMode(WireSegmentJointMode.HADD);
+
+            if (distVector.x < 20 && this.segmentController.getMode() == WireSegmentJointMode.VHADD)
+                this.segmentController.setMode(WireSegmentJointMode.VADD);
+
+            if (distVector.y > 20 && this.segmentController.getMode() == WireSegmentJointMode.HADD)
+                this.segmentController.setMode(WireSegmentJointMode.HVADD);
+
+            if (distVector.x > 20 && this.segmentController.getMode() == WireSegmentJointMode.VADD)
+                this.segmentController.setMode(WireSegmentJointMode.VHADD);
+
+            console.log("Control set to: ",this.segmentController.getMode())
+            this.segmentController.anchorTo(pos);
         }
-        segmentTwo.padSegment();
-        this.setHitArea();
     }
 
 
     onCreateSegment(created : WireSegment) {
         this.segments.push(created);
+        console.log("segment created")
+        this.stage.addChild(created.getGraphic())
     }
 
-    connectComponentToTop(component : SimulationComponent) {
-        this.segments[this.segments.length - 1].addComponentDockTop(component);
+    onDeleteSegment(deleteSegment : WireSegment) {
+        this.stage.removeChild(deleteSegment.getGraphic())
+        const delIdx = this.segments.indexOf(deleteSegment);
+        this.segments.splice(delIdx, 1);
     }
 
-    setColor(color : number) {
+    setColors(colors : Array<number>) {
         this.segments.forEach((segment : WireSegment) => {
-            segment.color = color;
+            segment.setColorArr(colors);
         });
     }
 
@@ -279,50 +194,47 @@ export class Wire {
         return this.state;
     }
 
+    /**
+     * Checks to ensure that there are no short circuits on an input bit
+     * If there is a short circuit, wireState.Error is returned
+     * @param bit
+     */
+    validateBit(checkBit : number) {
+        let retBit = -1;
+        this.inputs.forEach((connection : ComponentConnection) => {
+            const bit = connection.getLineBit(checkBit);
+            if (retBit != -1) {
+                //Checks for short circuit.
+                if (bit != retBit) {
+                    retBit = wireState.Error;
+                }
+            } else {
+                //If no input checked, set add bit to input bit
+                retBit = bit;
+            }
+        })
+
+        return retBit;
+    }
+
     simulate() {
-        let s1 = this.inputs[0];
-        let line = s1.component.getOutputLine(s1.componentLineNumber);
-        let hasError = false;
-        this.state = line;
-        this.inputs.forEach((componentConnection : ComponentConnection) => {
-            let line_cmp = componentConnection.component.getOutputLine(componentConnection.componentLineNumber);
-                line.forEach((state : wireState, index : number) => {
-                    if (state != line_cmp[index]) {
-                        this.state[index] = wireState.Error;
-                        hasError = true;
-                    }
-                });
-        });
-  
-        if (hasError) {
-            this.setColor(wireState.Error);
-            return;
+        const finalWireState = new Array<number>();
+        for (let i = 0; i < this.bitWidth; i ++) {
+            finalWireState.push(this.validateBit(i));
         }
-
-        if (this.bitWidth > 1) {
-            this.setColor(Constants.General.componentMultiBit)
-            return;
-        }
-
-        if (this.inputs.length == 0) {
-            this.setColor(wireState.Float);
-            return;
-        }
-
-
-        let state = line[0];
-        this.setColor(state);
+        this.setColors(finalWireState)
+        this.state = finalWireState;
     }
 
     getHeadingLastSegment() {
-        let lastWire = this.segments[this.segments.length - 1];
+        const lastWire = this.segments[this.segments.length - 1];
         return lastWire.getHeading();
     }
 
     draw() {
         this.graphic.clear();
         this.segments.forEach((segment : WireSegment) => {
-            segment.Draw();
+            segment.draw();
         })
     }
 
@@ -330,5 +242,15 @@ export class Wire {
         return this.wiringArea;
     }
 
+    getLastSegment() {
+        return this.segments[this.segments.length - 1];
+    }
 
+    connectComponentToTop(component : SimulationComponent) {
+        this.segments[this.segments.length - 1].addComponentDockTop(component);
+    }
+
+    anchorTo(point : PIXI.Point) {
+        this.segmentController.anchorTo(point);
+    }
 }

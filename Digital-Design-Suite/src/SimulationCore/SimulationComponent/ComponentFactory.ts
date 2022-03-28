@@ -17,6 +17,7 @@ import {NORGate} from "./Gates/Logic/NORGate";
 import {HexDisplay} from "./Peripheral/HexDisplay";
 import * as PIXI from 'pixi.js'
 import {Clock} from "./Wiring/Logic/Clock";
+import {Transistor} from "./Transistors/Transistor";
 
 export class ComponentFactory {
     static getComponent(componentName : string, container : PIXI.Container) : SimulationComponent {
@@ -42,6 +43,10 @@ export class ComponentFactory {
                 return new Clock(1, 0, container, 1000000);
             case "7 Segment Display":
                 return new HexDisplay(0, 0, container);
+            case "NPN Transistor":
+                return new Transistor(0, 0, container);
+            case "PNP Transistor":
+                return new Transistor(0, 0, container);
             default:
                 return null;
         }
