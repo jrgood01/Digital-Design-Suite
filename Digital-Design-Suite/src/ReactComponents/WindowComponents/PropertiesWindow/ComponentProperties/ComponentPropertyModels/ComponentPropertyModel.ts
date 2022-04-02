@@ -16,8 +16,8 @@ export class ComponentPropertyModel {
 
         this.linkedComponent = linkedComponent;
 
-        this.xField = new ComponentPropertyNumberFieldModel(-10000, 10000);
-        this.yField = new ComponentPropertyNumberFieldModel(-10000, 10000);
+        this.xField = new ComponentPropertyNumberFieldModel(this.xFieldUpdated, -10000, 10000);
+        this.yField = new ComponentPropertyNumberFieldModel(this.yFieldUpdated,-10000, 10000);
 
         this.xField.setTitle("X");
         this.yField.setTitle("Y");
@@ -25,7 +25,7 @@ export class ComponentPropertyModel {
         this.xField.setWidth(50);
         this.yField.setWidth(50)
 
-        this.xField.setValue(this.linkedComponent.getX().toString());
+        this.xField.setValue(this.linkedComponent.getX());
         this.linkedComponent.addOnMove(this.linkedComponentMove);
         this.xField.setOnInputValueChange((event : ChangeEvent<HTMLInputElement>) =>
             {this.xFieldUpdated(Number.parseInt(event.target.value))});
@@ -50,7 +50,7 @@ export class ComponentPropertyModel {
     }
 
     linkedComponentMove(dX : number, dY : number) {
-        this.xField.setValue(this.linkedComponent.getX().toString());
-        this.yField.setValue(this.linkedComponent.getY().toString());
+        this.xField.setValue(this.linkedComponent.getX());
+        this.yField.setValue(this.linkedComponent.getY());
     }
 }

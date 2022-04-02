@@ -7,13 +7,18 @@ export class SingleBitWidthPropertiesModel extends ComponentPropertyModel {
 
     constructor(linkedComponent : Translatable) {
         super(linkedComponent);
-        this.bitWidthField = new ComponentPropertyNumberFieldModel(1, 16);
+        this.bitWidthFieldUpdated = this.bitWidthFieldUpdated.bind(this)
+        this.bitWidthField = new ComponentPropertyNumberFieldModel(this.bitWidthFieldUpdated, 1, 16);
         this.bitWidthField.setTitle("Bitwidth");
-        this.bitWidthField.setValue("1");
+        this.bitWidthField.setValue(1);
     }
 
-    public getBitWidthField() {
+    bitWidthFieldUpdated(val : number) {
+
+    }
+    getBitWidthField() {
         return this.bitWidthField;
     }
+
 }
 

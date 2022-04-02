@@ -1,34 +1,30 @@
 import {ComponentPropertyFieldType} from "./ComponentPropertyFieldType";
 import {ComponentPropertyFieldModel} from "./ComponentPropertyFieldModel";
-import React, {ChangeEvent, ChangeEventHandler, FocusEventHandler, SyntheticEvent} from "react";
+import {SyntheticEvent} from "react";
 
-export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldModel {
-    private value : number;
-
+export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldModel<number> {
     private max : number;
     private min : number;
     private width : number;
 
     private onValueChanged : (newVal : number) => void;
     private onInputChange : (event: SyntheticEvent) => void;
-    constructor(min : number, max : number) {
-        super(ComponentPropertyFieldType.NUMBER);
+    constructor(onSetLinkedVal : (newVal : number) => void, min : number, max : number) {
+        super(ComponentPropertyFieldType.NUMBER, onSetLinkedVal);
         this.setOnComponentValueChanged = this.setOnComponentValueChanged.bind(this);
         this.getValue = this.getValue.bind(this);
         this.setValue = this.setValue.bind(this);
         this.setWidth = this.setWidth.bind(this);
         this.getWidth = this.getWidth.bind(this);
-        this.setOnComponentValueChanged = this.setOnComponentValueChanged.bind(this);
         this.validate = this.validate.bind(this);
         this.setRange = this.setRange.bind(this);
-
         this.value = 0;
         this.min = min;
         this.max = max;
     }
 
     getValue() {
-        return this.value.toString();
+        return this.value;
     }
 
     setWidth(newWidth : number) {
@@ -43,10 +39,12 @@ export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldMod
         return this.onInputChange;
     }
 
-    setValue(newVal : string) {
-        this.value = Number.parseInt(newVal);
-        if (this.onValueChanged)
-            this.onValueChanged((Number.parseInt(newVal)));
+    setValue(newVal : number) {
+        this.value = newVal
+        if (this.onValueChanged) {
+            this.onValueChanged(newVal);
+        }
+
     }
 
     setValueAtomic(newVal : string) {
@@ -57,16 +55,22 @@ export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldMod
         this.onValueChanged = handler;
     }
 
-    validate() {
-        if (this.value > this.max) {
-            this.value = this.max;
+    validate(inputVal : string) {
+        const parsed = Number.parseInt(inputVal);
+        if (!parsed) {
+            return;
+        }
+        if (parsed > this.max) {
+            this.setValue(this.max);
+            return;
         }
 
-        if (this.value < this.min) {
-            this.value = this.min;
+        if (parsed < this.min) {
+            this.setValue(this.min);
+            return;
         }
 
-        return this.value.toString();
+        this.setValue(parsed);
     }
 
     setRange(min : number, max : number) {
@@ -92,5 +96,9 @@ export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldMod
 
     setOnInputValueChange(handler : (event : SyntheticEvent) => void) {
         this.onInputChange = handler;
+    }
+
+    valueToString() {
+        return this.value.toString();
     }
 }

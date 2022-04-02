@@ -1,12 +1,11 @@
 import {ComponentPropertyFieldModel} from "./ComponentPropertyFieldModel";
 import {ComponentPropertyFieldType} from "./ComponentPropertyFieldType";
 
-export class ComponentPropertyTextFieldModel extends ComponentPropertyFieldModel {
-    private value : string;
+export class ComponentPropertyTextFieldModel extends ComponentPropertyFieldModel<string> {
     private onValueChanged : (newVal : string) => void;
 
-    constructor() {
-        super(ComponentPropertyFieldType.TEXT);
+    constructor(onSetLinkedVal : (newVal : string) => void) {
+        super(ComponentPropertyFieldType.TEXT, onSetLinkedVal);
     }
 
     getValue() {

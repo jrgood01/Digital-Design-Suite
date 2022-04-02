@@ -33,7 +33,7 @@ import {NORGate} from "./SimulationComponent/Gates/Logic/NORGate";
 import {ComponentFactory} from "./SimulationComponent/ComponentFactory";
 import {ComponentEvent} from "./SimulationEvents/ComponentEvent";
 
-const minStageScale = .4;
+const minStageScale = .2;
 const maxStageScale = 1.6;
 export class DigitalDesignSimulation extends PIXI.Application{
 
