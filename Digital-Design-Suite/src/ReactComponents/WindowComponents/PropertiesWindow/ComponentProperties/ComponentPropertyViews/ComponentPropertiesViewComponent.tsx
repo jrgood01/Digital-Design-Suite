@@ -17,8 +17,12 @@ export const ComponentPropertiesViewComponent = (props : ComponentPropertiesView
 
     return (
         <React.Fragment>
-            <NumberFieldComponent target={props.target.getXField()}/>
-            <NumberFieldComponent target={props.target.getYField()}/>
+            <div style={{
+                width : "100%"
+            }}>
+                <NumberFieldComponent target={props.target.getXField()}/>
+                <NumberFieldComponent target={props.target.getYField()}/>
+            </div>
         </React.Fragment>
     );
 }

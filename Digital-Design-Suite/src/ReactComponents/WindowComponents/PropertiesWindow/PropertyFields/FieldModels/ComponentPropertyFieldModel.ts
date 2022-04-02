@@ -1,17 +1,20 @@
 import {ComponentPropertyFieldType} from "./ComponentPropertyFieldType";
 import {Heading} from "../../../../../Heading";
 
-export abstract class ComponentPropertyFieldModel {
+export abstract class ComponentPropertyFieldModel<T> {
     private fieldType : ComponentPropertyFieldType
     private canEdit : boolean;
     private title : string;
     private titleDirection : Heading;
+    private onSetLinkedValue : (newVal : T) => void;
+    protected value : T;
 
-    constructor(fieldType : ComponentPropertyFieldType) {
+    constructor(fieldType : ComponentPropertyFieldType, onSetLinkedValue : (newVal : T) => void) {
         this.fieldType = fieldType;
         this.canEdit = true;
         this.title = "";
         this.titleDirection = Heading.West;
+        this.onSetLinkedValue = onSetLinkedValue;
     }
 
     getCanEdit() {
@@ -39,7 +42,12 @@ export abstract class ComponentPropertyFieldModel {
         return this.titleDirection
     }
 
-    abstract setValue(newVal : string) : void;
-    abstract validate() : string;
-    abstract getValue() : string;
+    setLinkedVal(inputVal : string) {
+        this.validate(inputVal);
+        this.onSetLinkedValue(this.value);
+    }
+
+    abstract setValue(newVal : T) : void;
+    abstract validate(inputVal : string) : void;
+    abstract getValue() : T;
 }
