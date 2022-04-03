@@ -31,7 +31,6 @@ export class ComponentFactory {
             case "Nand":
                 return new NANDGate(1, 0, container,1, 2);
             case "Or":
-                console.log("OR gate")
                 return new ORGate(1, 0, container, 1, 2);
             case "XOR":
                 return new XORGate(1, 0, container, 1, 2);

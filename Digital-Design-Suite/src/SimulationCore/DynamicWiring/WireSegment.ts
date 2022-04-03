@@ -291,9 +291,9 @@ export class WireSegment {
             for (let i = 0; i < this.colorArr.length; i++) {
                 this.graphic.beginFill(this.colorArr[i]);
                 if (this.isVertical) {
-                    this.graphic.drawRect(this.start.x + this.padStartX, this.start.y + this.padStartY + step, step, this.length - this.padStartY);
+                    this.graphic.drawRect(this.start.x + this.padStartX + step * i, this.start.y + this.padStartY, step, this.length - this.padStartY);
                 } else {
-                    this.graphic.drawRect(this.start.x + this.padStartX + step, this.start.y + this.padStartY, this.length - this.padStartX, step);
+                    this.graphic.drawRect(this.start.x + this.padStartX, this.start.y + this.padStartY  + step * i, this.length - this.padStartX, step);
                 }
             }
         } else {

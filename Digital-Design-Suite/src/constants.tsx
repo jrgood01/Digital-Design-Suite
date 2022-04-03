@@ -12,7 +12,7 @@ export const General = {
     componentColorError : 0xCC6666,
     componentColorStandard : 0x22baff,
     componentColorHigh : 0x11ff11,
-    componentColorLow : 0xbaffba,
+    componentColorLow : 0x113311,//0xbaffba,
     componentMultiBit : 0x2222ff,
     selectedColor : 0x99EEFF
 }

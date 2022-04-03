@@ -37,7 +37,6 @@ export class WireSegmentJointController {
     anchorTo(anchorPoint : PIXI.Point) {
 
         if (this._isInAddMode()) {
-            console.log("Anchor")
             const activeStart = this.activeSegment.getStart();
             const top = this.activeSegment.getTop();
             const dX = anchorPoint.x - activeStart.x;
@@ -101,7 +100,6 @@ export class WireSegmentJointController {
     }
 
     setPadding() {
-        console.log("Padding")
         if (this.mode == WireSegmentJointMode.VHADD || this.mode == WireSegmentJointMode.VADD) {
             if (this.activeSegment.getHeading() == Heading.North) {
                 this.activeSegment.padY(-10)

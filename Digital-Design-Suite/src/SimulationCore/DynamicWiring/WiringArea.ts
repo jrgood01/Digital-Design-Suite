@@ -75,7 +75,6 @@ export abstract class WiringArea extends DrawableClass{
     }
 
     getAnchorPoint() {
-        console.log("Heading: ",this.getHeading())
         switch (this.getHeading()) {
             case Heading.North:
                 return new PIXI.Point(this.x - 3.5, this.y + 6);

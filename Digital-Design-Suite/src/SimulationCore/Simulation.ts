@@ -34,7 +34,7 @@ import {ComponentFactory} from "./SimulationComponent/ComponentFactory";
 import {ComponentEvent} from "./SimulationEvents/ComponentEvent";
 
 const minStageScale = .2;
-const maxStageScale = 1.6;
+const maxStageScale = 2;
 export class DigitalDesignSimulation extends PIXI.Application{
 
     private simulationState : SimulationState;
@@ -277,6 +277,9 @@ export class DigitalDesignSimulation extends PIXI.Application{
                 handler(new ComponentEvent(componentHit));
             });
         }else {
+            this.onSelect.forEach((handler : (e : ComponentEvent) => void) => {
+                handler(new ComponentEvent(null));
+            });
             this.simulationState.components.forEach((c : SimulationComponent) => {
                 c.selected = false;
             })
