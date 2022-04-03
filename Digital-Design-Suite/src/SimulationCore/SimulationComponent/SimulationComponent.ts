@@ -25,7 +25,7 @@ import {Translatable} from "./interfaces/Translatable";
  * Represents a simulated digital component
  * Extend this class to create usable components
  */
-export abstract class SimulationComponent extends DrawableClass implements Translatable{
+export abstract class SimulationComponent extends DrawableClass implements Translatable {
     componentId : string;
     simulationState : SimulationState;
 

@@ -10,7 +10,6 @@ interface SingleBitWidthPropertiesViewComponentProps {
 export const SingleBitWidthPropertiesViewComponent = (props : SingleBitWidthPropertiesViewComponentProps) => {
     return (
         <React.Fragment>
-            <ComponentPropertiesViewComponent target={props.target}/>
             <NumberFieldComponent target={props.target.getBitWidthField()}/>
         </React.Fragment>
 

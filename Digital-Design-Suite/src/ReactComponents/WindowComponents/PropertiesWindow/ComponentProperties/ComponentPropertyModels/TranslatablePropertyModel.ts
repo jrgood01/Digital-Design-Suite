@@ -3,7 +3,7 @@ import {ComponentPropertyNumberFieldModel} from "../../PropertyFields/FieldModel
 import {Translatable} from "../../../../../SimulationCore/SimulationComponent/interfaces/Translatable";
 import {ChangeEvent} from "react";
 
-export class ComponentPropertyModel {
+export class TranslatablePropertyModel {
     private linkedComponent : Translatable;
 
     private xField : ComponentPropertyNumberFieldModel;
@@ -26,11 +26,13 @@ export class ComponentPropertyModel {
         this.yField.setWidth(50)
 
         this.xField.setValue(this.linkedComponent.getX());
+        this.yField.setValue(this.linkedComponent.getY());
         this.linkedComponent.addOnMove(this.linkedComponentMove);
         this.xField.setOnInputValueChange((event : ChangeEvent<HTMLInputElement>) =>
             {this.xFieldUpdated(Number.parseInt(event.target.value))});
         this.yField.setOnInputValueChange((event : ChangeEvent<HTMLInputElement>) =>
             {this.yFieldUpdated(Number.parseInt(event.target.value))});
+        console.log(`Translatable Model Constructor Invoked On `,this.linkedComponent)
     }
 
     xFieldUpdated(val : number) {

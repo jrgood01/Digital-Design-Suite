@@ -6,11 +6,11 @@
 //Copyright Jacob R. Haygood 2022
 
 import React from "react";
-import {ComponentPropertyModel} from "../ComponentPropertyModels/ComponentPropertyModel";
+import {TranslatablePropertyModel} from "../ComponentPropertyModels/TranslatablePropertyModel";
 import {NumberFieldComponent} from "../../PropertyFields/FieldViews/NumberFieldComponent";
 
 interface ComponentPropertiesViewComponentProps {
-    target : ComponentPropertyModel;
+    target : TranslatablePropertyModel;
 }
 
 export const ComponentPropertiesViewComponent = (props : ComponentPropertiesViewComponentProps) => {

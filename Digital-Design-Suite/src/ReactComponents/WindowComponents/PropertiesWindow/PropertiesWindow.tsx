@@ -16,7 +16,7 @@ interface PropertiesWindowProps {
 
 export const PropertiesWindow = (props : PropertiesWindowProps) => {
     return (
-        <DockableWindow title={"Properties"} assignedId={"4"} width={400} height={1000} startX={440} startY={35}>
+        <DockableWindow title={"Properties"} assignedId={"4"} width={400} height={1000} startX={1300} startY={35}>
             <ComponentPropertyViewFactory selectedComponent={props.selectedComponent}/>
         </DockableWindow>
     )

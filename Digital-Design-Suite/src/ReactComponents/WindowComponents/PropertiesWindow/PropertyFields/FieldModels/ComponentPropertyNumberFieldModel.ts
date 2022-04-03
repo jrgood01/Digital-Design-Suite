@@ -57,7 +57,8 @@ export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldMod
 
     validate(inputVal : string) {
         const parsed = Number.parseInt(inputVal);
-        if (!parsed) {
+        if (Number.isNaN(parsed)) {
+            this.setValue(this.value);
             return;
         }
         if (parsed > this.max) {
