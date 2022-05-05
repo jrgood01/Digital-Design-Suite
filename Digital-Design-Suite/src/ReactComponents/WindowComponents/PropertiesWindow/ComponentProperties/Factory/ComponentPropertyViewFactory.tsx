@@ -26,35 +26,28 @@ const isSingleBitWidthComponent = (component : SimulationComponent) => {
 
 export const ComponentPropertyViewFactory = (props : ComponentPropertyViewFactoryProps) => {
     const [dispComponent, setDispComponent] = React.useState(new Array<JSX.Element>());
-    React.useEffect(() => {
-        const newComponent = new Array<JSX.Element>();
-        if (props.selectedComponent) {
-            const addTarget = new TranslatablePropertyModel(props.selectedComponent);
-            newComponent.push(
-                <ComponentPropertiesViewComponent target={addTarget}/>
-            )
-
-            if (isSingleBitWidthComponent(props.selectedComponent)) {
-                const addTarget = new SingleBitWidthPropertiesModel(props.selectedComponent as unknown as SingleBitWidthInputComponent);
-                newComponent.push(
-                    <SingleBitWidthPropertiesViewComponent target={addTarget}/>
-                )
-
-            }
-
-            if(props.selectedComponent instanceof ConstantComponent) {
-                const addTarget = new ConstantComponentPropertyModel(props.selectedComponent as ConstantComponent);
-                newComponent.push(
-                    <ConstantComponentPropertyView target={addTarget}/>
-                )
-            }
-            setDispComponent(newComponent)
-        }
-    }, [props.selectedComponent])
+    console.log("Render")
 
     return (
         <div>
-            {dispComponent.map((element : JSX.Element) => <div>{element}</div>)}
+            {
+                props.selectedComponent &&
+                <ComponentPropertiesViewComponent target={new TranslatablePropertyModel(props.selectedComponent)}/>
+            }
+
+
+            {props.selectedComponent && isSingleBitWidthComponent(props.selectedComponent) &&
+                    <SingleBitWidthPropertiesViewComponent target={
+                    new SingleBitWidthPropertiesModel(props.selectedComponent as unknown as SingleBitWidthInputComponent
+                    )}/>
+            }
+            {
+                props.selectedComponent && props.selectedComponent instanceof ConstantComponent &&
+                <ConstantComponentPropertyView target=
+                                                   {new ConstantComponentPropertyModel(
+                                                       props.selectedComponent as ConstantComponent)}/>
+            }
+
         </div>
     )
 }

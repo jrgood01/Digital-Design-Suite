@@ -5,7 +5,7 @@
 //
 //Copyright Jacob R. Haygood 2022
 
-import React, {ChangeEvent} from "react";
+import React, {ChangeEvent, useEffect} from "react";
 import {ComponentPropertyNumberFieldModel} from "../FieldModels/ComponentPropertyNumberFieldModel";
 
 interface PropertyWindowNumberFieldComponentProps {
@@ -23,6 +23,7 @@ export const NumberFieldComponent = (props : PropertyWindowNumberFieldComponentP
     props.target.setOnComponentValueChanged((newVal : number) => {
         setLinkedVal(newVal.toString());
     })
+    useEffect(() => {setLinkedVal(props.target.valueToString())}, [props])
     return (
         <div style={{width : "100%"}}>
             <h1 style={h1Style}>

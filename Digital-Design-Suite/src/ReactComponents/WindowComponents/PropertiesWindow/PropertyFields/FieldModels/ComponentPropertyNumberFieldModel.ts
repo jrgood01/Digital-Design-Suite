@@ -9,7 +9,7 @@ export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldMod
 
     private onValueChanged : (newVal : number) => void;
     private onInputChange : (event: SyntheticEvent) => void;
-    constructor(onSetLinkedVal : (newVal : number) => void, min : number, max : number) {
+    constructor(onSetLinkedVal : (newVal : number) => void, min : number, max : number, initVal? : number) {
         super(ComponentPropertyFieldType.NUMBER, onSetLinkedVal);
         this.setOnComponentValueChanged = this.setOnComponentValueChanged.bind(this);
         this.getValue = this.getValue.bind(this);
@@ -18,7 +18,7 @@ export class ComponentPropertyNumberFieldModel extends ComponentPropertyFieldMod
         this.getWidth = this.getWidth.bind(this);
         this.validate = this.validate.bind(this);
         this.setRange = this.setRange.bind(this);
-        this.value = 0;
+        this.value = initVal ? initVal : 0;
         this.min = min;
         this.max = max;
     }

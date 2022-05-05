@@ -16,7 +16,7 @@ export class TranslatablePropertyModel {
 
         this.linkedComponent = linkedComponent;
 
-        this.xField = new ComponentPropertyNumberFieldModel(this.xFieldUpdated, -10000, 10000);
+        this.xField = new ComponentPropertyNumberFieldModel(this.xFieldUpdated, -10000, 10000, this.linkedComponent.getX());
         this.yField = new ComponentPropertyNumberFieldModel(this.yFieldUpdated,-10000, 10000);
 
         this.xField.setTitle("X");
@@ -25,13 +25,13 @@ export class TranslatablePropertyModel {
         this.xField.setWidth(50);
         this.yField.setWidth(50)
 
-        this.xField.setValue(this.linkedComponent.getX());
-        this.yField.setValue(this.linkedComponent.getY());
         this.linkedComponent.addOnMove(this.linkedComponentMove);
         this.xField.setOnInputValueChange((event : ChangeEvent<HTMLInputElement>) =>
             {this.xFieldUpdated(Number.parseInt(event.target.value))});
         this.yField.setOnInputValueChange((event : ChangeEvent<HTMLInputElement>) =>
             {this.yFieldUpdated(Number.parseInt(event.target.value))});
+        this.xField.setValue(this.linkedComponent.getX());
+        this.yField.setValue(this.linkedComponent.getY());
         console.log(`Translatable Model Constructor Invoked On `,this.linkedComponent)
     }
 
